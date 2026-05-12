@@ -20,11 +20,44 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+            "@id": "https://www.nexovasolutions.com/#organization",
       "name": "Nexova Solutions",
-    "description": "Consultora HR-Tech especializada en adquisición de talento, outsourcing y operaciones de selección impulsadas por IA interna.",
+            "description": "Consultora HR-Tech especializada en adquisición de talento, outsourcing y operaciones de selección impulsadas por IA interna.",
       "url": "https://www.nexovasolutions.com",
       "email": "contact@nexovasolutions.com",
       "telephone": "+34 960 450 210",
+            "address": [
+                {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Valencia",
+                    "addressRegion": "Valencia",
+                    "addressCountry": "ES"
+                },
+                {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Miami",
+                    "addressRegion": "Florida",
+                    "addressCountry": "US"
+                }
+            ],
+            "contactPoint": [
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "sales",
+                    "telephone": "+34 960 450 210",
+                    "email": "contact@nexovasolutions.com",
+                    "areaServed": "ES",
+                    "availableLanguage": ["es"]
+                },
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "sales",
+                    "telephone": "+1 305 555 0198",
+                    "email": "contact@nexovasolutions.com",
+                    "areaServed": "US",
+                    "availableLanguage": ["en", "es"]
+                }
+            ],
       "sameAs": [
         "https://www.linkedin.com/company/nexova-solutions",
         "https://x.com/nexovasolutions"
@@ -38,31 +71,34 @@
     <header class="sticky top-0 z-40 border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Navegación principal">
             <a href="index.html" class="text-xl font-bold tracking-tight text-white [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Nexova Solutions</a>
-            <button id="menu-button" type="button" class="inline-flex items-center justify-center rounded-md border border-slate-700 px-3 py-2 text-slate-200 transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 md:hidden" aria-label="Abrir menú principal" aria-expanded="false" aria-controls="mobile-menu">
-                <span class="sr-only">Abrir menú</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm1 4a1 1 0 100 2h12a1 1 0 100-2H4z" clip-rule="evenodd" />
-                </svg>
-            </button>
             <ul class="hidden items-center gap-6 text-sm font-semibold md:flex">
                 <li><a href="index.html#inicio" class="transition hover:text-cyan-300">Inicio</a></li>
                 <li><a href="index.html#servicios" class="transition hover:text-cyan-300">Servicios</a></li>
                 <li><a href="index.html#tecnología" class="transition hover:text-cyan-300">Tecnología</a></li>
                 <li><a href="index.html#proceso" class="transition hover:text-cyan-300">Proceso</a></li>
                 <li><a href="index.html#contacto" class="transition hover:text-cyan-300">Contacto</a></li>
-                <li><a href="application.html" aria-current="page" class="rounded-full border border-cyan-300 px-4 py-2 text-cyan-300 transition hover:bg-cyan-300 hover:text-slate-950">Aplicar</a></li>
+                <li><a href="application.html" aria-current="page" class="rounded-full border border-cyan-300 px-4 py-2 text-cyan-300 transition hover:bg-cyan-300 hover:text-slate-950">Formulario de solicitud</a></li>
             </ul>
+
+            <details class="relative md:hidden">
+                <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-md border border-slate-700 px-3 py-2 text-slate-200 transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-label="Abrir menú principal">
+                    <span class="sr-only">Abrir menú</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm1 4a1 1 0 100 2h12a1 1 0 100-2H4z" clip-rule="evenodd" />
+                    </svg>
+                </summary>
+                <div class="absolute right-0 top-14 z-50 w-72 rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-2xl shadow-slate-950/70">
+                    <ul class="space-y-2 text-sm font-semibold">
+                        <li><a href="index.html#inicio" class="block rounded px-2 py-2 transition hover:bg-slate-800">Inicio</a></li>
+                        <li><a href="index.html#servicios" class="block rounded px-2 py-2 transition hover:bg-slate-800">Servicios</a></li>
+                        <li><a href="index.html#tecnología" class="block rounded px-2 py-2 transition hover:bg-slate-800">Tecnología</a></li>
+                        <li><a href="index.html#proceso" class="block rounded px-2 py-2 transition hover:bg-slate-800">Proceso</a></li>
+                        <li><a href="index.html#contacto" class="block rounded px-2 py-2 transition hover:bg-slate-800">Contacto</a></li>
+                        <li><a href="application.html" class="block rounded bg-cyan-300 px-2 py-2 text-center text-slate-950">Formulario de solicitud</a></li>
+                    </ul>
+                </div>
+            </details>
         </nav>
-        <div id="mobile-menu" class="hidden border-t border-slate-800 bg-slate-900 px-4 py-4 md:hidden" aria-label="Menú móvil">
-            <ul class="space-y-3 text-sm font-semibold">
-                <li><a href="index.html#inicio" class="block rounded px-2 py-2 transition hover:bg-slate-800">Inicio</a></li>
-                <li><a href="index.html#servicios" class="block rounded px-2 py-2 transition hover:bg-slate-800">Servicios</a></li>
-                <li><a href="index.html#tecnología" class="block rounded px-2 py-2 transition hover:bg-slate-800">Tecnología</a></li>
-                <li><a href="index.html#proceso" class="block rounded px-2 py-2 transition hover:bg-slate-800">Proceso</a></li>
-                <li><a href="index.html#contacto" class="block rounded px-2 py-2 transition hover:bg-slate-800">Contacto</a></li>
-                <li><a href="application.html" class="block rounded bg-cyan-300 px-2 py-2 text-center text-slate-950">Aplicar</a></li>
-            </ul>
-        </div>
     </header>
 
     <main id="main-content">
@@ -73,6 +109,7 @@
                     <p class="inline-flex rounded-full border border-cyan-300/40 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Consultoría HR-Tech con IA interna</p>
                     <h1 class="mt-5 text-4xl font-bold text-white sm:text-5xl [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Activa un proceso de selección más rápido, preciso y escalable</h1>
                     <p class="mt-4 max-w-3xl text-slate-200">Este formulario inicia tu flujo de consulta con Nexova Solutions. Nuestro equipo combina experiencia humana en adquisición de talento con automatización y analítica para acelerar contrataciones sin perder calidad.</p>
+                    <p class="mt-3 max-w-3xl text-sm text-cyan-200">Este formulario está diseñado para empresas que desean enviar un brief de servicio y para candidatos que quieren postularse a vacantes de forma estructurada. Si prefieres una conversación inicial con nuestro equipo antes de completar todos los datos, visita la sección <a href="index.html#contacto" class="font-semibold underline decoration-cyan-300/60 underline-offset-2 hover:text-cyan-100">Contacto</a>.</p>
                     <div class="mt-6 grid gap-3 sm:grid-cols-3">
                         <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
                             <p class="text-xs text-slate-400">Respuesta consultiva</p>
@@ -162,7 +199,11 @@
                             </div>
                             <div>
                                 <label for="country" class="mb-2 block text-sm font-semibold text-slate-100">País *</label>
-                                <input id="country" name="country" type="text" required autocomplete="country-name" data-validate="country" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-country">
+                                <select id="country" name="country" required autocomplete="country-name" data-validate="country" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-country">
+                                    <option value="">Selecciona un país</option>
+                                    <option value="espana">España</option>
+                                    <option value="estados-unidos">Estados Unidos</option>
+                                </select>
                                 <p id="error-country" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
                             </div>
                             <div>
@@ -241,7 +282,16 @@
                                 <p id="error-experienceYears" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
                             </div>
                             <div>
-                                <label for="englishLevel" class="mb-2 block text-sm font-semibold text-slate-100">Nivel de inglés *</label>
+                                <label for="nativeLanguage" class="mb-2 block text-sm font-semibold text-slate-100">Idioma nativo *</label>
+                                <select id="nativeLanguage" name="nativeLanguage" data-validate="nativeLanguage" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-nativeLanguage">
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="ingles">Inglés</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                                <p id="error-nativeLanguage" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
+                            </div>
+                            <div>
+                                <label for="englishLevel" class="mb-2 block text-sm font-semibold text-slate-100">Nivel de inglés</label>
                                 <select id="englishLevel" name="englishLevel" data-validate="englishLevel" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-englishLevel">
                                     <option value="">Selecciona nivel</option>
                                     <option value="a2">A2 - Básico</option>
@@ -250,11 +300,26 @@
                                     <option value="c1">C1 - Avanzado</option>
                                     <option value="c2">C2 - Bilingüe/profesional</option>
                                 </select>
+                                <p class="mt-2 text-xs text-slate-400">Obligatorio cuando el idioma nativo es otro.</p>
                                 <p id="error-englishLevel" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
                             </div>
                             <div>
-                                <label for="salaryRange" class="mb-2 block text-sm font-semibold text-slate-100">Rango salarial esperado (EUR bruto anual) *</label>
-                                <input id="salaryRange" name="salaryRange" type="number" min="12000" max="500000" data-validate="salaryRange" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-salaryRange" placeholder="45000">
+                                <label for="salaryRange" class="mb-2 block text-sm font-semibold text-slate-100">Rango salarial esperado (bruto anual) *</label>
+                                <div class="grid gap-3 sm:grid-cols-3">
+                                    <div>
+                                        <label for="salaryCurrency" class="sr-only">Moneda salarial</label>
+                                        <select id="salaryCurrency" name="salaryCurrency" data-validate="salaryCurrency" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-salaryCurrency">
+                                            <option value="">Moneda</option>
+                                            <option value="eur">EUR (€)</option>
+                                            <option value="usd">USD ($)</option>
+                                        </select>
+                                        <p id="error-salaryCurrency" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label for="salaryRange" class="sr-only">Monto salarial</label>
+                                        <input id="salaryRange" name="salaryRange" type="number" min="12000" max="500000" data-validate="salaryRange" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-describedby="error-salaryRange" placeholder="45000">
+                                    </div>
+                                </div>
                                 <p id="error-salaryRange" class="mt-2 hidden text-sm text-rose-300" role="alert"></p>
                             </div>
                             <div>
@@ -348,14 +413,15 @@
                     <li><a href="index.html#tecnología" class="hover:text-cyan-300">Tecnología</a></li>
                     <li><a href="index.html#proceso" class="hover:text-cyan-300">Proceso</a></li>
                     <li><a href="index.html#contacto" class="hover:text-cyan-300">Contacto</a></li>
-                    <li><a href="application.html" class="hover:text-cyan-300">Formulario</a></li>
+                    <li><a href="application.html" class="hover:text-cyan-300">Formulario de solicitud</a></li>
                 </ul>
             </nav>
             <div>
                 <p class="text-sm font-semibold uppercase tracking-wide text-slate-300">Contacto</p>
                 <ul class="mt-3 space-y-2 text-sm text-slate-400">
                     <li>contact@nexovasolutions.com</li>
-                    <li>+34 960 450 210</li>
+                    <li>Valencia, España: +34 960 450 210</li>
+                    <li>Florida, Estados Unidos: +1 305 555 0198</li>
                     <li>Valencia y Miami</li>
                 </ul>
             </div>

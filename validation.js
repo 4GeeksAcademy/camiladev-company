@@ -1,25 +1,3 @@
-function setupMobileMenu() {
-    const menuButton = document.getElementById("menu-button");
-    const mobileMenu = document.getElementById("mobile-menu");
-
-    if (!menuButton || !mobileMenu) return;
-
-    const toggleMenu = () => {
-        const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
-        menuButton.setAttribute("aria-expanded", String(!isExpanded));
-        mobileMenu.classList.toggle("hidden");
-    };
-
-    menuButton.addEventListener("click", toggleMenu);
-
-    mobileMenu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-            menuButton.setAttribute("aria-expanded", "false");
-            mobileMenu.classList.add("hidden");
-        });
-    });
-}
-
 function setupApplicationForm() {
     const form = document.getElementById("application-form");
     const feedback = document.getElementById("form-feedback");
@@ -49,7 +27,9 @@ function setupApplicationForm() {
         professionalArea: document.getElementById("professionalArea"),
         linkedinUrl: document.getElementById("linkedinUrl"),
         experienceYears: document.getElementById("experienceYears"),
+        nativeLanguage: document.getElementById("nativeLanguage"),
         englishLevel: document.getElementById("englishLevel"),
+        salaryCurrency: document.getElementById("salaryCurrency"),
         workMode: form.querySelectorAll("input[name='workMode']"),
         salaryRange: document.getElementById("salaryRange"),
         availability: document.getElementById("availability"),
@@ -70,7 +50,7 @@ function setupApplicationForm() {
         professionalEmail: (value) => {
             if (!value.trim()) return "El email de contacto es obligatorio.";
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-            if (!emailRegex.test(value)) return "Introduce un email valido.";
+            if (!emailRegex.test(value)) return "Introduce un email válido.";
 
             const selectedType = fields.applicationType?.value || "";
             const domain = value.split("@")[1]?.toLowerCase();
@@ -80,19 +60,19 @@ function setupApplicationForm() {
             return "";
         },
         phone: (value) => {
-            if (!value.trim()) return "El telefono es obligatorio.";
+            if (!value.trim()) return "El teléfono es obligatorio.";
             const normalized = value.replace(/[^\d+]/g, "");
             const phoneRegex = /^\+?[0-9]{9,15}$/;
-            if (!phoneRegex.test(normalized)) return "Introduce un telefono valido con prefijo internacional opcional.";
+            if (!phoneRegex.test(normalized)) return "Introduce un teléfono válido con prefijo internacional opcional.";
             return "";
         },
-        country: (value) => (!value.trim() ? "El pais es obligatorio." : ""),
+        country: (value) => (!value.trim() ? "El país es obligatorio." : ""),
         city: (value) => (!value.trim() ? "La ciudad es obligatoria." : ""),
         applicationType: (value) => (!value ? "Selecciona el tipo de solicitud para continuar." : ""),
         currentCompany: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType === "empresa-talento" && !value.trim()) {
-                return "Si representas una empresa, indica el nombre de la compania.";
+                return "Si representas una empresa, indica el nombre de la compañía.";
             }
             return "";
         },
@@ -109,21 +89,31 @@ function setupApplicationForm() {
         experienceYears: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType !== "vacante") return "";
-            if (value === "") return "Indica tus anos de experiencia.";
+            if (value === "") return "Indica tus años de experiencia.";
             const number = Number(value);
-            if (Number.isNaN(number) || number < 0 || number > 45) return "Los anos de experiencia deben estar entre 0 y 45.";
+            if (Number.isNaN(number) || number < 0 || number > 45) return "Los años de experiencia deben estar entre 0 y 45.";
             return "";
+        },
+        nativeLanguage: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
+            return !value ? "Selecciona tu idioma nativo." : "";
         },
         englishLevel: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType !== "vacante") return "";
-            return !value ? "Selecciona tu nivel de ingles." : "";
+
+            const selectedNativeLanguage = fields.nativeLanguage?.value || "";
+            const requiresEnglishLevel = selectedNativeLanguage === "otro";
+
+            if (requiresEnglishLevel && !value) return "Selecciona tu nivel de inglés.";
+            return "";
         },
         workMode: () => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType !== "vacante") return "";
             const checked = Array.from(fields.workMode).some((radio) => radio.checked);
-            return checked ? "" : "Selecciona la modalidad preferida: remoto, hibrido o presencial.";
+            return checked ? "" : "Selecciona la modalidad preferida: remoto, híbrido o presencial.";
         },
         salaryRange: (value) => {
             const selectedType = fields.applicationType?.value || "";
@@ -135,10 +125,15 @@ function setupApplicationForm() {
             }
             return "";
         },
+        salaryCurrency: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
+            return !value ? "Selecciona la moneda del rango salarial (EUR o USD)." : "";
+        },
         availability: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType !== "vacante") return "";
-            return !value ? "Selecciona tu disponibilidad de incorporacion." : "";
+            return !value ? "Selecciona tu disponibilidad de incorporación." : "";
         },
         message: (value) => {
             if (!value.trim()) return "Describe tu perfil o necesidad del proyecto.";
@@ -162,19 +157,19 @@ function setupApplicationForm() {
             }
 
             const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) return "El CV supera el tamano maximo permitido de 5MB.";
+            if (file.size > maxSize) return "El CV supera el tamaño máximo permitido de 5MB.";
             return "";
         },
         companySize: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType === "empresa-talento" && !value) {
-                return "Si representas una empresa, selecciona el tamano.";
+                return "Si representas una empresa, selecciona el tamaño.";
             }
             return "";
         },
-        privacyConsent: (value, input) => (!input.checked ? "Debes aceptar la politica de privacidad." : ""),
+        privacyConsent: (value, input) => (!input.checked ? "Debes aceptar la política de privacidad." : ""),
         contactConsent: (value, input) => (!input.checked ? "Debes aceptar ser contactado por Nexova." : ""),
-        accuracyConsent: (value, input) => (!input.checked ? "Debes confirmar que la informacion es correcta." : "")
+        accuracyConsent: (value, input) => (!input.checked ? "Debes confirmar que la información es correcta." : "")
     };
 
     function getInputStateTarget(fieldName) {
@@ -352,15 +347,27 @@ function setupApplicationForm() {
     fields.applicationType?.addEventListener("change", () => {
         validateField("applicationType");
         validateField("professionalEmail");
+        validateField("country");
         validateField("currentCompany");
         validateField("companySize");
         validateField("linkedinUrl");
         validateField("experienceYears");
+        validateField("nativeLanguage");
         validateField("englishLevel");
         validateField("workMode");
+        validateField("salaryCurrency");
         validateField("salaryRange");
         validateField("availability");
         validateField("cvFile");
+    });
+
+    fields.country?.addEventListener("change", () => {
+        validateField("country");
+    });
+
+    fields.nativeLanguage?.addEventListener("change", () => {
+        validateField("nativeLanguage");
+        validateField("englishLevel");
     });
 
     form.addEventListener("submit", (event) => {
@@ -374,8 +381,8 @@ function setupApplicationForm() {
 
         const selectedType = fields.applicationType?.value || "";
         const successMessage = selectedType === "empresa-talento"
-            ? "Solicitud enviada con exito. Un consultor de Nexova contactara a tu empresa en menos de 24 horas laborables."
-            : "Solicitud enviada con exito. El equipo de Nexova revisara tu CV y te contactara sobre vacantes afines.";
+            ? "Solicitud enviada con éxito. Un consultor de Nexova contactará a tu empresa en menos de 24 horas laborables."
+            : "Solicitud enviada con éxito. El equipo de Nexova revisará tu CV y te contactará sobre vacantes afines.";
         showFeedback(successMessage, "success");
         form.reset();
 
@@ -454,7 +461,7 @@ function setupLandingDemoForm() {
         if (!value) return showFieldError(emailInput, emailError, "El email corporativo es obligatorio.");
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-        if (!emailRegex.test(value)) return showFieldError(emailInput, emailError, "Introduce un email valido.");
+        if (!emailRegex.test(value)) return showFieldError(emailInput, emailError, "Introduce un email válido.");
 
         const domain = value.split("@")[1] || "";
         if (blockedDomains.includes(domain)) {
@@ -466,7 +473,7 @@ function setupLandingDemoForm() {
 
     function validateTeamSize() {
         const value = teamSizeSelect.value.trim();
-        if (!value) return showFieldError(teamSizeSelect, sizeError, "Selecciona el tamano de equipo.");
+        if (!value) return showFieldError(teamSizeSelect, sizeError, "Selecciona el tamaño de equipo.");
         return showFieldError(teamSizeSelect, sizeError, "");
     }
 
@@ -502,7 +509,7 @@ function setupLandingDemoForm() {
         submitButton.textContent = "Enviando solicitud...";
 
         window.setTimeout(() => {
-            showFeedback("Solicitud enviada con exito. El equipo de Nexova te contactara en menos de 24 horas laborables.", "success");
+            showFeedback("Solicitud enviada con éxito. El equipo de Nexova te contactará en menos de 24 horas laborables.", "success");
             form.reset();
             emailError.classList.add("hidden");
             sizeError.classList.add("hidden");
@@ -516,7 +523,6 @@ function setupLandingDemoForm() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    setupMobileMenu();
     setupApplicationForm();
     setupLandingDemoForm();
 });

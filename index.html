@@ -33,17 +33,44 @@
   {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://www.nexovasolutions.com/#organization",
     "name": "Nexova Solutions",
-    "url": "https://www.nexovasolutions.com/",
-    "logo": "https://www.nexovasolutions.com/logo.png",
+    "url": "https://www.nexovasolutions.com",
     "description": "Consultora HR-Tech especializada en adquisición de talento, headhunting, outsourcing y operaciones de selección impulsadas por IA.",
     "email": "contact@nexovasolutions.com",
     "telephone": "+34 960 450 210",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Valencia",
-      "addressCountry": "ES"
-    },
+    "address": [
+      {
+        "@type": "PostalAddress",
+        "addressLocality": "Valencia",
+        "addressRegion": "Valencia",
+        "addressCountry": "ES"
+      },
+      {
+        "@type": "PostalAddress",
+        "addressLocality": "Miami",
+        "addressRegion": "Florida",
+        "addressCountry": "US"
+      }
+    ],
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+34 960 450 210",
+        "email": "contact@nexovasolutions.com",
+        "areaServed": "ES",
+        "availableLanguage": ["es"]
+      },
+      {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+1 305 555 0198",
+        "email": "contact@nexovasolutions.com",
+        "areaServed": "US",
+        "availableLanguage": ["en", "es"]
+      }
+    ],
     "sameAs": [
       "https://www.linkedin.com/company/nexova-solutions",
       "https://x.com/nexovasolutions"
@@ -58,36 +85,37 @@
     <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Navegación principal">
       <a href="#inicio" class="text-xl font-bold tracking-tight text-white [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">NEXOVA SOLUTIONS</a>
 
-      <button id="menu-button" type="button" class="inline-flex items-center rounded-lg border border-slate-700 px-3 py-2 text-slate-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 md:hidden" aria-label="Abrir menú principal" aria-expanded="false" aria-controls="mobile-menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/>
-        </svg>
-      </button>
-
       <ul class="hidden items-center gap-7 text-sm font-semibold md:flex">
         <li><a href="#inicio" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Inicio</a></li>
         <li><a href="#evolucion" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Evolución</a></li>
         <li><a href="#servicios" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Servicios</a></li>
         <li><a href="#tecnologia" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Tecnología</a></li>
         <li><a href="#proceso" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Proceso</a></li>
-        <li><a href="application.html" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Formulario</a></li>
+        <li><a href="application.html" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Formulario de solicitud</a></li>
         <li><a href="#contacto" class="rounded px-2 py-1 text-slate-200 transition hover:text-cyan-300">Contacto</a></li>
-        <li><a href="#contacto" class="rounded-full bg-cyan-300 px-5 py-2.5 font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar Consulta</a></li>
+        <li><a href="#contacto" class="rounded-full bg-cyan-300 px-5 py-2.5 font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar consulta</a></li>
       </ul>
-    </nav>
 
-    <div id="mobile-menu" class="hidden border-t border-white/10 bg-slate-900/95 px-4 py-4 md:hidden">
-      <ul class="space-y-2 text-sm font-semibold">
-        <li><a href="#inicio" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Inicio</a></li>
-        <li><a href="#evolucion" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Evolución</a></li>
-        <li><a href="#servicios" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
-        <li><a href="#tecnologia" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
-        <li><a href="#proceso" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
-        <li><a href="application.html" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Formulario</a></li>
-        <li><a href="#contacto" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Contacto</a></li>
-        <li><a href="#contacto" class="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Hablar con un Especialista</a></li>
-      </ul>
-    </div>
+      <details class="relative md:hidden">
+        <summary class="inline-flex cursor-pointer list-none items-center rounded-lg border border-slate-700 px-3 py-2 text-slate-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-label="Abrir menú principal">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </summary>
+        <div class="absolute right-0 top-14 z-50 w-72 rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-2xl shadow-slate-950/70">
+          <ul class="space-y-2 text-sm font-semibold">
+            <li><a href="#inicio" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Inicio</a></li>
+            <li><a href="#evolucion" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Evolución</a></li>
+            <li><a href="#servicios" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
+            <li><a href="#tecnologia" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
+            <li><a href="#proceso" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
+            <li><a href="application.html" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Formulario de solicitud</a></li>
+            <li><a href="#contacto" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Contacto</a></li>
+            <li><a href="application.html" class="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Postularme ahora</a></li>
+          </ul>
+        </div>
+      </details>
+    </nav>
   </header>
 
   <main id="main-content">
@@ -99,9 +127,9 @@
           <h1 class="mt-6 max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Consultoría de talento con criterio humano, potenciada por IA operativa.</h1>
           <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">NEXOVA SOLUTIONS nació como consultora de reclutamiento y evolucionó a una operación HR-Tech enterprise: la IA acelera y ordena el proceso, mientras nuestros especialistas validan cada decisión crítica.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href="#contacto" class="rounded-full bg-cyan-300 px-7 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar Consulta</a>
+            <a href="#contacto" class="rounded-full bg-cyan-300 px-7 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar consulta</a>
             <a href="#servicios" class="rounded-full border border-slate-500 px-7 py-3 text-sm font-bold text-slate-100 transition hover:border-cyan-300 hover:text-cyan-200">Ver Servicios</a>
-            <a href="application.html" class="rounded-full border border-cyan-300/60 px-7 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-300/10">Ir al formulario completo</a>
+            <a href="application.html" class="rounded-full border border-cyan-300/60 px-7 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-300/10">Postularme ahora</a>
           </div>
 
           <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -285,6 +313,7 @@
             <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Contacto</p>
             <h2 id="contacto-title" class="mt-3 text-3xl font-bold text-white sm:text-4xl [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Ayudamos a empresas a profesionalizar y escalar su operación de RRHH.</h2>
             <p class="mt-4 max-w-2xl text-slate-300">Comparte los desafíos de tu organización y te proponemos un plan de consultoría de RRHH con tecnología interna, métricas claras y acompañamiento experto de principio a fin.</p>
+              <p class="mt-3 max-w-2xl text-sm text-cyan-200">Este canal está pensado para empresas que desean conversar su necesidad con nuestro equipo consultivo. Si ya cuentas con requerimientos definidos y quieres enviar una solicitud estructurada, utiliza el <a href="application.html" class="font-semibold underline decoration-cyan-300/60 underline-offset-2 hover:text-cyan-100">Formulario de solicitud</a>.</p>
           </article>
 
           <form id="contact-form" class="rounded-3xl border border-slate-700 bg-slate-950/70 p-6" novalidate aria-describedby="form-feedback">
@@ -346,7 +375,7 @@
                 <p id="error-message" class="mt-1.5 hidden text-xs text-rose-300" role="alert"></p>
               </div>
 
-              <button id="submit-btn" type="submit" class="w-full rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar asesoría para mi empresa</button>
+              <button id="submit-btn" type="submit" class="w-full rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar consulta empresarial</button>
             </div>
           </form>
         </div>
@@ -376,7 +405,8 @@
         <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Contacto</p>
         <ul class="mt-3 space-y-2 text-sm text-slate-400">
           <li>contact@nexovasolutions.com</li>
-          <li>+34 960 450 210</li>
+          <li>Valencia, España: +34 960 450 210</li>
+          <li>Florida, Estados Unidos: +1 305 555 0198</li>
           <li>Valencia, España | Miami, Florida</li>
         </ul>
       </div>
@@ -399,24 +429,6 @@
   </footer>
 
   <script>
-    const menuButton = document.getElementById("menu-button");
-    const mobileMenu = document.getElementById("mobile-menu");
-
-    if (menuButton && mobileMenu) {
-      menuButton.addEventListener("click", () => {
-        const expanded = menuButton.getAttribute("aria-expanded") === "true";
-        menuButton.setAttribute("aria-expanded", String(!expanded));
-        mobileMenu.classList.toggle("hidden");
-      });
-
-      mobileMenu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          mobileMenu.classList.add("hidden");
-          menuButton.setAttribute("aria-expanded", "false");
-        });
-      });
-    }
-
     const form = document.getElementById("contact-form");
     const feedback = document.getElementById("form-feedback");
     const submitBtn = document.getElementById("submit-btn");
