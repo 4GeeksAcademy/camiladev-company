@@ -363,7 +363,118 @@ function setupApplicationForm() {
     });
 }
 
+function setupLandingDemoForm() {
+    const form = document.getElementById("landing-demo-form");
+    const emailInput = document.getElementById("work-email");
+    const teamSizeSelect = document.getElementById("team-size");
+    const submitButton = document.getElementById("landing-submit");
+    const feedback = document.getElementById("landing-form-feedback");
+    const emailError = document.getElementById("landing-error-email");
+    const sizeError = document.getElementById("landing-error-size");
+
+    if (!form || !emailInput || !teamSizeSelect || !submitButton || !feedback || !emailError || !sizeError) {
+        return;
+    }
+
+    const blockedDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "live.com"];
+
+    function resetStatus() {
+        feedback.classList.add("hidden");
+        feedback.textContent = "";
+        feedback.classList.remove(
+            "border-rose-400",
+            "bg-rose-500/10",
+            "text-rose-200",
+            "border-emerald-400",
+            "bg-emerald-500/10",
+            "text-emerald-200"
+        );
+    }
+
+    function showFieldError(el, errorEl, message) {
+        if (message) {
+            errorEl.textContent = message;
+            errorEl.classList.remove("hidden");
+            el.classList.add("border-rose-400", "bg-rose-500/5");
+            el.setAttribute("aria-invalid", "true");
+            return false;
+        }
+
+        errorEl.textContent = "";
+        errorEl.classList.add("hidden");
+        el.classList.remove("border-rose-400", "bg-rose-500/5");
+        el.setAttribute("aria-invalid", "false");
+        return true;
+    }
+
+    function validateEmail() {
+        const value = emailInput.value.trim().toLowerCase();
+        if (!value) return showFieldError(emailInput, emailError, "El email corporativo es obligatorio.");
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        if (!emailRegex.test(value)) return showFieldError(emailInput, emailError, "Introduce un email valido.");
+
+        const domain = value.split("@")[1] || "";
+        if (blockedDomains.includes(domain)) {
+            return showFieldError(emailInput, emailError, "Usa un email corporativo, no personal.");
+        }
+
+        return showFieldError(emailInput, emailError, "");
+    }
+
+    function validateTeamSize() {
+        const value = teamSizeSelect.value.trim();
+        if (!value) return showFieldError(teamSizeSelect, sizeError, "Selecciona el tamano de equipo.");
+        return showFieldError(teamSizeSelect, sizeError, "");
+    }
+
+    function showFeedback(message, tone) {
+        resetStatus();
+        feedback.textContent = message;
+        feedback.classList.remove("hidden");
+        if (tone === "error") {
+            feedback.classList.add("border-rose-400", "bg-rose-500/10", "text-rose-200");
+        } else {
+            feedback.classList.add("border-emerald-400", "bg-emerald-500/10", "text-emerald-200");
+        }
+    }
+
+    emailInput.addEventListener("input", validateEmail);
+    teamSizeSelect.addEventListener("change", validateTeamSize);
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        resetStatus();
+
+        const emailOk = validateEmail();
+        const sizeOk = validateTeamSize();
+
+        if (!emailOk || !sizeOk) {
+            showFeedback("Corrige los campos marcados antes de enviar la solicitud.", "error");
+            return;
+        }
+
+        const defaultButtonText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.setAttribute("aria-busy", "true");
+        submitButton.textContent = "Enviando solicitud...";
+
+        window.setTimeout(() => {
+            showFeedback("Solicitud enviada con exito. El equipo de Nexova te contactara en menos de 24 horas laborables.", "success");
+            form.reset();
+            emailError.classList.add("hidden");
+            sizeError.classList.add("hidden");
+            emailInput.classList.remove("border-rose-400", "bg-rose-500/5");
+            teamSizeSelect.classList.remove("border-rose-400", "bg-rose-500/5");
+            submitButton.disabled = false;
+            submitButton.removeAttribute("aria-busy");
+            submitButton.textContent = defaultButtonText;
+        }, 900);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
     setupApplicationForm();
+    setupLandingDemoForm();
 });
