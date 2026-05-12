@@ -1,7 +1,5 @@
 Nexova Solutions 
 
- 
-
  Porque elegí esta empresa 
 
  La razón principal por la cual elegí esta empresa es porque toca casi todos los temas que aparecen en ofertas del mercado actual:  
