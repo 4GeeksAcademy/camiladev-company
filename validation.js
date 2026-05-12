@@ -43,18 +43,18 @@ function setupApplicationForm() {
         phone: document.getElementById("phone"),
         country: document.getElementById("country"),
         city: document.getElementById("city"),
-        linkedinUrl: document.getElementById("linkedinUrl"),
         applicationType: document.getElementById("applicationType"),
         currentCompany: document.getElementById("currentCompany"),
         currentRole: document.getElementById("currentRole"),
-        experienceYears: document.getElementById("experienceYears"),
         professionalArea: document.getElementById("professionalArea"),
+        linkedinUrl: document.getElementById("linkedinUrl"),
+        experienceYears: document.getElementById("experienceYears"),
         englishLevel: document.getElementById("englishLevel"),
         workMode: form.querySelectorAll("input[name='workMode']"),
-        message: document.getElementById("message"),
-        cvFile: document.getElementById("cvFile"),
         salaryRange: document.getElementById("salaryRange"),
         availability: document.getElementById("availability"),
+        message: document.getElementById("message"),
+        cvFile: document.getElementById("cvFile"),
         companySize: document.getElementById("companySize"),
         privacyConsent: document.getElementById("privacyConsent"),
         contactConsent: document.getElementById("contactConsent"),
@@ -68,12 +68,14 @@ function setupApplicationForm() {
             return "";
         },
         professionalEmail: (value) => {
-            if (!value.trim()) return "El email profesional es obligatorio.";
+            if (!value.trim()) return "El email de contacto es obligatorio.";
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-            if (!emailRegex.test(value)) return "Introduce un email corporativo valido.";
+            if (!emailRegex.test(value)) return "Introduce un email valido.";
+
+            const selectedType = fields.applicationType?.value || "";
             const domain = value.split("@")[1]?.toLowerCase();
-            if (corporateEmailProviders.includes(domain)) {
-                return "Introduce un email corporativo valido, no personal.";
+            if (selectedType === "empresa-talento" && corporateEmailProviders.includes(domain)) {
+                return "Para empresas, usa un email corporativo (no personal).";
             }
             return "";
         },
@@ -86,36 +88,66 @@ function setupApplicationForm() {
         },
         country: (value) => (!value.trim() ? "El pais es obligatorio." : ""),
         city: (value) => (!value.trim() ? "La ciudad es obligatoria." : ""),
+        applicationType: (value) => (!value ? "Selecciona el tipo de solicitud para continuar." : ""),
+        currentCompany: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType === "empresa-talento" && !value.trim()) {
+                return "Si representas una empresa, indica el nombre de la compania.";
+            }
+            return "";
+        },
+        currentRole: (value) => (!value.trim() ? "Indica el perfil o posicion." : ""),
+        professionalArea: (value) => (!value ? "Selecciona un area profesional." : ""),
         linkedinUrl: (value) => {
-            if (!value.trim()) return "La URL de LinkedIn es obligatoria.";
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante" || !value.trim()) return "";
             if (!value.startsWith("https://")) return "La URL de LinkedIn debe comenzar con https://.";
             const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/.+/i;
             if (!linkedinRegex.test(value)) return "Introduce una URL valida de LinkedIn (linkedin.com).";
             return "";
         },
-        applicationType: (value) => (!value ? "Selecciona el tipo de solicitud para continuar." : ""),
-        currentCompany: (value) => (!value.trim() ? "La empresa actual es obligatoria." : ""),
-        currentRole: (value) => (!value.trim() ? "El cargo actual es obligatorio." : ""),
         experienceYears: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
             if (value === "") return "Indica tus anos de experiencia.";
             const number = Number(value);
             if (Number.isNaN(number) || number < 0 || number > 45) return "Los anos de experiencia deben estar entre 0 y 45.";
             return "";
         },
-        professionalArea: (value) => (!value ? "Selecciona un area profesional." : ""),
-        englishLevel: (value) => (!value ? "Selecciona tu nivel de ingles." : ""),
+        englishLevel: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
+            return !value ? "Selecciona tu nivel de ingles." : "";
+        },
         workMode: () => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
             const checked = Array.from(fields.workMode).some((radio) => radio.checked);
             return checked ? "" : "Selecciona la modalidad preferida: remoto, hibrido o presencial.";
         },
+        salaryRange: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
+            if (value === "") return "Indica tu rango salarial esperado.";
+            const number = Number(value);
+            if (Number.isNaN(number) || number < 12000 || number > 500000) {
+                return "El rango salarial debe estar entre 12.000 y 500.000 EUR anuales.";
+            }
+            return "";
+        },
+        availability: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType !== "vacante") return "";
+            return !value ? "Selecciona tu disponibilidad de incorporacion." : "";
+        },
         message: (value) => {
             if (!value.trim()) return "Describe tu perfil o necesidad del proyecto.";
-            if (value.trim().length < 30) return "Amplia el mensaje con al menos 30 caracteres.";
+            if (value.trim().length < 20) return "Amplia el mensaje con al menos 20 caracteres.";
             return "";
         },
         cvFile: () => {
-            const selectedType = fields.applicationType.value;
-            const file = fields.cvFile.files[0];
+            const selectedType = fields.applicationType?.value || "";
+            const file = fields.cvFile?.files?.[0];
             const allowedExtensions = ["pdf", "doc", "docx"];
 
             if (selectedType === "vacante" && !file) {
@@ -133,16 +165,13 @@ function setupApplicationForm() {
             if (file.size > maxSize) return "El CV supera el tamano maximo permitido de 5MB.";
             return "";
         },
-        salaryRange: (value) => {
-            if (value === "") return "Indica tu rango salarial esperado.";
-            const number = Number(value);
-            if (Number.isNaN(number) || number < 12000 || number > 500000) {
-                return "El rango salarial debe estar entre 12.000 y 500.000 EUR anuales.";
+        companySize: (value) => {
+            const selectedType = fields.applicationType?.value || "";
+            if (selectedType === "empresa-talento" && !value) {
+                return "Si representas una empresa, selecciona el tamano.";
             }
             return "";
         },
-        availability: (value) => (!value ? "Selecciona tu disponibilidad de incorporacion." : ""),
-        companySize: (value) => (!value ? "Selecciona el tamano de empresa." : ""),
         privacyConsent: (value, input) => (!input.checked ? "Debes aceptar la politica de privacidad." : ""),
         contactConsent: (value, input) => (!input.checked ? "Debes aceptar ser contactado por Nexova." : ""),
         accuracyConsent: (value, input) => (!input.checked ? "Debes confirmar que la informacion es correcta." : "")
@@ -320,8 +349,17 @@ function setupApplicationForm() {
         field.addEventListener("blur", () => validateField(fieldName));
     });
 
-    fields.applicationType.addEventListener("change", () => {
+    fields.applicationType?.addEventListener("change", () => {
         validateField("applicationType");
+        validateField("professionalEmail");
+        validateField("currentCompany");
+        validateField("companySize");
+        validateField("linkedinUrl");
+        validateField("experienceYears");
+        validateField("englishLevel");
+        validateField("workMode");
+        validateField("salaryRange");
+        validateField("availability");
         validateField("cvFile");
     });
 
@@ -334,7 +372,11 @@ function setupApplicationForm() {
             return;
         }
 
-        showFeedback("Solicitud enviada con exito. El equipo de Nexova Solutions te contactara en un plazo maximo de 24 horas laborables.", "success");
+        const selectedType = fields.applicationType?.value || "";
+        const successMessage = selectedType === "empresa-talento"
+            ? "Solicitud enviada con exito. Un consultor de Nexova contactara a tu empresa en menos de 24 horas laborables."
+            : "Solicitud enviada con exito. El equipo de Nexova revisara tu CV y te contactara sobre vacantes afines.";
+        showFeedback(successMessage, "success");
         form.reset();
 
         Object.keys(validationRules).forEach((fieldName) => {
