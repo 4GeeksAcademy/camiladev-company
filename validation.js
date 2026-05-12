@@ -1,3 +1,4 @@
+// Valida el formulario principal de solicitud en application.html (id: application-form).
 function setupApplicationForm() {
     const form = document.getElementById("application-form");
     const feedback = document.getElementById("form-feedback");
@@ -412,6 +413,92 @@ function setupApplicationForm() {
     });
 }
 
+// Valida el formulario de contacto empresarial en index.html (id: contact-form).
+function setupContactForm() {
+    const form = document.getElementById("contact-form");
+    const feedback = document.getElementById("form-feedback");
+    const submitBtn = document.getElementById("submit-btn");
+
+    if (!form || !feedback || !submitBtn) return;
+
+    function setError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const error = document.getElementById(`error-${fieldId}`);
+        if (!field || !error) return;
+
+        field.classList.remove("border-rose-400", "bg-rose-500/5");
+        error.classList.add("hidden");
+        error.textContent = "";
+
+        if (message) {
+            field.classList.add("border-rose-400", "bg-rose-500/5");
+            error.textContent = message;
+            error.classList.remove("hidden");
+            field.setAttribute("aria-invalid", "true");
+        } else {
+            field.setAttribute("aria-invalid", "false");
+        }
+    }
+
+    function validateForm() {
+        let valid = true;
+        const requiredFields = ["name", "company", "email", "service", "company-size", "message"];
+
+        requiredFields.forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            const value = field ? field.value.trim() : "";
+
+            if (!value) {
+                setError(fieldId, "Este campo es obligatorio.");
+                valid = false;
+            } else {
+                setError(fieldId, "");
+            }
+        });
+
+        const email = document.getElementById("email");
+        if (email && email.value.trim()) {
+            const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim());
+            if (!ok) {
+                setError("email", "Introduce un email válido.");
+                valid = false;
+            }
+        }
+
+        const message = document.getElementById("message");
+        if (message && message.value.trim().length > 0 && message.value.trim().length < 20) {
+            setError("message", "Por favor, agrega un poco más de contexto (mínimo 20 caracteres).");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        feedback.classList.add("hidden");
+
+        if (!validateForm()) {
+            feedback.textContent = "Revisa los campos marcados antes de enviar tu solicitud.";
+            feedback.className = "mb-4 rounded-lg border border-rose-400 bg-rose-500/10 px-3 py-2 text-sm text-rose-200";
+            return;
+        }
+
+        const original = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Enviando...";
+
+        window.setTimeout(() => {
+            feedback.textContent = "Gracias. Recibimos la solicitud de tu empresa y un consultor de RRHH de Nexova te contactará en menos de 24 horas laborables.";
+            feedback.className = "mb-4 rounded-lg border border-emerald-400 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200";
+            form.reset();
+            submitBtn.disabled = false;
+            submitBtn.textContent = original;
+        }, 900);
+    });
+}
+
+// Valida un formulario demo opcional de captación (id: landing-demo-form), si existe en la página.
 function setupLandingDemoForm() {
     const form = document.getElementById("landing-demo-form");
     const emailInput = document.getElementById("work-email");
@@ -524,5 +611,6 @@ function setupLandingDemoForm() {
 
 document.addEventListener("DOMContentLoaded", () => {
     setupApplicationForm();
+    setupContactForm();
     setupLandingDemoForm();
 });
