@@ -1,107 +1,799 @@
-Bienvenido a Nexova Solutions
+Nexova Solutions 
 
-AI Engineering · 4Geeks Academy — Briefing de empresa
+ 
 
-Nexova Solutions es una consultora de recursos humanos y selección de talento fundada en 2011, con sede en Valencia, España, y una oficina de expansión en Miami, Florida. La empresa cuenta con 120 empleados y factura aproximadamente 8 millones de dólares anuales a través de tres líneas de negocio: headhunting para perfiles de mandos medios y directivos, outsourcing de equipos de soporte al cliente para empresas tecnológicas, y formación corporativa en habilidades blandas y liderazgo.
+Porque elegí esta empresa 
 
-Los clientes de Nexova son medianas empresas — principalmente del sector tecnológico, retail y servicios financieros — que han decidido externalizar una parte o la totalidad de su gestión de talento. Vienen a Nexova porque encontrar a las personas adecuadas, formarlas y mantenerlas comprometidas es difícil, y Nexova lleva doce años construyendo la experiencia para hacerlo bien.
+La razón principal por la cual elegí esta empresa es porque toca casi todos temas que aparecen en ofertas les en el mercado actual:  
 
-Cómo está organizada la empresa
-Nexova está liderada por Laura Mendoza, CEO desde la fundación de la empresa. Construyó el negocio desde una consultora de dos personas hasta una firma de 120 empleados que opera en dos países. Es directa, orientada a resultados y tiene una visión clara de lo que Nexova necesita llegar a ser — solo le hacen falta las herramientas adecuadas para lograrlo.
+AI Engineer, Full Stack Developer, Automation Developer, AI Product Developer, SaaS Developer, Internal Tools Engineer. 
 
-La empresa se organiza en las siguientes áreas:
+ 
 
-Operaciones de Selección es el núcleo de lo que Nexova hace y su principal fuente de ingresos. Javier Almeida gestiona un equipo de 40 consultores de selección que llevan procesos de reclutamiento en nombre de los clientes — desde el briefing inicial hasta la criba de CVs, las entrevistas y la contratación final. Cada paso de este proceso se realiza actualmente de forma manual.
+Todos los problemas por resolver en Nexova son muy interesantes, en particular el problema de que los consultores revisan entre 30 y 80 CVs manualmente, que escriban emails individuales a cada candidato y que los clientes no sepan en qué parte del proceso de selección se encuentran sus candidatos es grave. Resolver este problema es crucial para una empresa de selección de talentos ya que están perdiendo mucho tiempo, las vacantes demoran en cubrirse y están perdiendo clientes. 
 
-Formación Corporativa diseña e imparte programas de formación para empresas clientes. Elena Vargas lidera un equipo de 12 personas que gestiona cursos, talleres y webinars sobre liderazgo, comunicación y gestión de equipos. El catálogo existe, las inscripciones ocurren, pero apenas hay infraestructura detrás: un PDF, un formulario de Google y una hoja de cálculo.
+ 
 
-Soporte al Cliente Externalizado es donde Nexova proporciona a sus clientes equipos de atención dedicados. Roberto Díaz gestiona 30 agentes que atienden incidencias en nombre de empresas de tecnología, retail y finanzas, trabajando por teléfono, email y chat. El equipo es competente, pero opera sin base de conocimiento, sin visibilidad en tiempo real y con tiempos de resolución que incumplen regularmente el nivel de servicio comprometido.
+Los flujos de datos más interesantes dentro de Nexova Solutions están relacionados con el proceso de reclutamiento, automatización de soporte y centralización de información empresarial. Uno de los más relevantes es el flujo de candidatos, donde los CVs ingresan al sistema, son analizados por IA, clasificados según habilidades y experiencia, y luego enviados automáticamente al pipeline de selección para seguimiento y comunicación con recruiters y clientes. 
 
-Ventas y Desarrollo de Negocio impulsa el crecimiento del negocio. Megan Clarke lidera un equipo de 18 personas — account managers que cuidan a los clientes actuales y SDRs que persiguen a los nuevos. El equipo tiene un CRM pero lo usa de forma inconsistente, prospecta en su mayor parte manualmente y pierde deals que no debería perder simplemente porque el seguimiento cae en el olvido.
+Otro flujo importante es el de búsqueda semántica y matching inteligente, donde la información de candidatos, vacantes y habilidades se transforma en embeddings para permitir búsquedas avanzadas y recomendaciones automáticas de perfiles compatibles con cada puesto. 
 
-Marketing y Comunicación gestiona la presencia externa de Nexova: la web corporativa, LinkedIn, la newsletter mensual y el blog. Carmen Ruiz lidera un equipo pequeño que produce todo de forma manual y tiene visibilidad limitada sobre qué funciona realmente.
+También destaca el flujo de automatización de comunicaciones, en el que cambios de estado dentro del proceso de selección disparan automáticamente emails, notificaciones y actualizaciones para candidatos y recruiters, reduciendo tareas manuales y tiempos de respuesta. 
 
-Recursos Humanos gestiona todo lo relacionado con los propios 120 empleados de Nexova: contratos, onboarding, vacaciones, evaluaciones de desempeño y consultas del día a día. Patricia Solís lo gestiona con un equipo de cuatro personas, principalmente por email y hoja de cálculo.
+A nivel empresarial, resulta muy interesante el flujo de datos analíticos y dashboards, donde información proveniente de múltiples áreas (reclutamiento, ventas, soporte y RRHH) se centraliza para generar métricas en tiempo real, KPIs y reportes automáticos para la dirección de la empresa. 
 
-Tecnología e Infraestructura está liderada por el CTO Sergio Molina, que tiene un equipo de seis personas. El panorama tecnológico actual es una colección de herramientas que se introdujeron cada una para resolver un problema concreto y que nunca se han conectado de forma adecuada: un helpdesk legacy, un CRM, un sistema de seguimiento de candidatos construido internamente a principios de los años 2010, y Google Workspace como tejido conectivo entre todo lo demás. No hay telemetría, no hay registros centralizados y no hay una imagen clara de lo que está ocurriendo en el negocio en ningún momento dado.
+Finalmente, otro flujo clave es el relacionado con los sistemas de soporte y knowledge base, donde tickets, consultas y documentación interna se indexan mediante tecnologías RAG y semantic search para permitir asistentes inteligentes y chatbots capaces de responder preguntas automáticamente. 
 
-Dirección Ejecutiva se centra en Laura, que recibe un informe semanal en PDF preparado manualmente por cada responsable de área — un proceso que consume horas de su tiempo cada semana y que aun así entrega información que ya tiene varios días de antigüedad cuando le llega.
+ 
 
-Dónde está la empresa hoy
-Nexova tiene una sólida reputación en sus mercados, una red profunda de candidatos y clientes construida en doce años, y un equipo que realmente sabe encontrar, desarrollar y acompañar el talento. Lo que no tiene es la infraestructura para operar a escala.
+ 
 
-Las consecuencias son tangibles: los consultores dedican la mayor parte de su tiempo a tareas manuales que podrían automatizarse, los clientes no tienen visibilidad del estado de sus procesos de selección, el catálogo de formación es invisible para la mayoría de los compradores potenciales, el equipo de soporte incumple sus SLAs, y la dirección toma decisiones con datos que siempre llevan una semana de retraso.
+Considero que Nexova me dará un portafolio más alineado con el perfil junior que buscan las empresas actualmente ya que combina todo el stack moderno de muchísimas startups y SaaS. Muchas empresas necesitan onboarding workflows, email automations, ticketing systems, sales pipelines y Nexova me da la oportunidad de profundizar en estos proyectos. Además, Nexova parece un Saas moderno, muy alineado al mercado lo cual. Con Nexova construiré dashboards premium, candidate portals, recruiter panels, analytics interfaces, AI copilots, support centers, lo cual me ayudará a construir un portafolio fuerte que comunicará valor instantaneamente. 
 
-Nuevas plataformas — automatizadas, basadas en datos y construidas para escalar — empiezan a competir directamente con lo que ofrece Nexova. Laura sabe que la ventana para responder no es ilimitada.
+ 
 
-Ha reunido un equipo de AI Engineering para construir los sistemas, las automatizaciones y las herramientas inteligentes que permitan a Nexova hacer lo que ya hace bien — pero más rápido, a mayor escala y con mucho menos esfuerzo manual.
+ 
 
-Tú eres parte de ese equipo.
+Departamentos que me interesaron 
 
-Los departamentos y sus problemas
-🌐 Marketing y Comunicación
-Responsable: Carmen Ruiz
+ 
 
-La web corporativa se construyó en 2019 y no se ha actualizado de forma significativa — es lenta, no es accesible y no refleja el posicionamiento actual de la empresa. El contenido se produce manualmente y el equipo no mide el impacto real de su trabajo: saben cuántas visitas reciben, pero no qué convierte.
+Departamento de Atención al cliente:  
 
-Qué necesitan: Un rediseño completo de la web corporativa con optimización SEO/GEO y marcado schema.org, un pipeline de contenido asistido por IA, y un dashboard de métricas de marketing con visitas, fuentes de tráfico y tasas de conversión.
+Problema:  
 
-💼 Ventas y Desarrollo de Negocio
-Responsable: Marcos Ibáñez (equipo de 18 personas: 6 account managers, 12 SDRs)
+Las incidencias de los clientes se gestionan por email, por teléfono y por chat web. No hay base de conocimiento centralizada, el tiempo medio de resolución es de 48hs. 
 
-Los SDRs prospectan manualmente en LinkedIn, exportan listas a Excel y hacen seguimiento por email sin ninguna automatización. Tienen un CRM (HubSpot) pero solo el 40% del equipo lo actualiza con regularidad. Muchos deals se pierden por falta de seguimiento y no hay visibilidad sobre qué prospectos tienen más probabilidad de cerrar.
+Lo interesante: 
 
-Qué necesitan: Un dashboard del pipeline de ventas, una automatización de secuencias de prospección (primer contacto → seguimiento → cierre o descarte), alertas para conversaciones sin actividad, y un agente de IA que sugiera el ángulo de propuesta más adecuado para cada prospecto.
+La solución, crear un chatbot que resuelva el 40% de las incidencias sin intervención humana usando RAG, con una base de conocimiento centralizada. 
 
-🧑‍🤝‍🧑 Recursos Humanos (interno)
-Responsable: Patricia Solís
+ 
 
-Las solicitudes de vacaciones, ausencias y consultas de RRHH se gestionan por email y hojas de cálculo. El onboarding de nuevos empleados es manual. Las evaluaciones de desempeño se hacen dos veces al año mediante Google Forms que nadie revisa de forma sistemática. No existen métricas de seguimiento: sin tasa de rotación, sin datos de absentismo, sin tiempo medio de cobertura de vacantes internas.
+ 
 
-Qué necesitan: Un portal interno de RRHH, un flujo automatizado de onboarding con checklists progresivos, un dashboard de KPIs de RRHH, y un agente interno que responda las preguntas del equipo sobre políticas y beneficios.
+Departamento de Operaciones de Selección: 
 
-🔍 Operaciones de Selección (negocio principal)
-Responsable: Javier Almeida (40 consultores de selección)
+Problema: 
 
-El cribado de CVs es manual: cada consultor lee entre 30 y 80 CVs por proceso. La comunicación con candidatos se hace por email individual sin plantillas. No hay ningún sistema para conocer el estado en tiempo real de cada candidato — los clientes llaman a preguntar. El matching entre candidato y vacante depende completamente de la intuición del consultor.
+El cribado de CVs es manual, cada consultor lee entre 30 a 80 CVs por proceso. La comunicación con candidatos se hace por email individual sin plantillas. No hay ningún sistema para conocer el estado en tiempo real de cada candidato, los clientes llaman a preguntar. El matching entre candidato y vacante depende completamente de la intuición del consultor. 
 
-Qué necesitan: Un pipeline de selección asistido por IA con scoring y ranking automático de CVs, un sistema RAG sobre la base de datos de candidatos ("encuentra perfiles con experiencia en ventas B2B y nivel C1 de inglés"), un portal de candidatos con estado en tiempo real, y un agente de comunicación que envíe emails automáticos de seguimiento.
+Lo interesante: 
 
-🎓 Formación Corporativa
-Responsable: Elena Vargas (equipo de 12 personas)
+La solución, Un sistema RAG sobre la base de datos de candidatos, un portal de candidatos con estado en tiempo real para que tanto la empresa consultora como los clientes estén siempre al tanto del proceso de selcción y un agente de comunicación que envíe emails automáticos de seguimiento. 
 
-El catálogo de formación vive en un PDF que se actualiza trimestralmente. Las inscripciones se gestionan a través de un Google Form que alguien administra manualmente en una hoja de cálculo. No hay registro de quién completó qué formación más allá de listas de asistencia en Excel. La personalización es cero: todos los clientes reciben la misma propuesta de catálogo.
+ 
 
-Qué necesitan: Una plataforma de catálogo de formación con búsqueda e inscripción online, un sistema de recomendación que sugiera programas en función del perfil del cliente, un portal del alumno con seguimiento de progreso, y un chatbot de asesoramiento formativo que construya planes personalizados.
+ 
 
-📞 Atención al Cliente (servicio externalizado)
-Responsable: Roberto Díaz (30 agentes)
+Reto de automatización elegido 
 
-Los 30 agentes gestionan incidencias de los clientes de outsourcing de Nexova (tech, retail, finanzas) por teléfono, email y chat web. No hay base de conocimiento centralizada — los agentes resuelven por experiencia y un documento Word compartido en Drive. El tiempo medio de resolución es de 48 horas; el SLA comprometido es de 24. Los supervisores no tienen visibilidad en tiempo real sobre la carga de trabajo ni el estado del backlog.
+ 
 
-Qué necesitan: Un chatbot de soporte de primera línea que resuelva el 40% de las consultas sin intervención humana usando RAG, una base de conocimiento centralizada con búsqueda semántica, un dashboard de soporte en tiempo real, y un análisis de sentimiento de tickets para identificar clientes insatisfechos antes de que escalen.
+Nexova TalentFlow AI 
 
-💻 Tecnología e Infraestructura
-CTO: Sergio Molina (equipo de 6 personas)
+Plataforma Integral de AI Engineering para Transformar Toda la Operación de Nexova Solutions. 
 
-El stack tecnológico es un mosaico de herramientas desconectadas: HubSpot, Zendesk legacy, Google Workspace, un ATS hecho a medida de la década de 2010 y múltiples hojas de cálculo actuando como sistemas de gestión. No hay telemetría ni logging centralizado. Cuando algo falla, el equipo se entera a través de los usuarios. Los despliegues son manuales.
+Nexova TalentFlow AI es una plataforma SaaS empresarial impulsada por inteligencia artificial que centraliza: 
 
-Qué necesitan: Telemetría y logging centralizados, un pipeline de datos que alimente todos los dashboards de la empresa, monitorización en tiempo real con alertas automáticas, y un agente de ingeniería interna que responda preguntas de arquitectura consultando la documentación técnica.
+reclutamiento,  
 
-📊 Dirección Ejecutiva
-CEO: Laura Mendoza
+ventas,  
 
-Laura recibe un informe semanal en PDF preparado manualmente por cada responsable de área — su preparación lleva entre 4 y 8 horas por manager. No hay una visión unificada del negocio. Las decisiones estratégicas se toman con datos de hace una semana.
+soporte,  
 
-Qué necesita: Un dashboard ejecutivo unificado con KPIs de todas las áreas en tiempo real, un informe semanal generado automáticamente, alertas por umbrales estratégicos, y un asistente de IA al que pueda consultar en lenguaje natural.
+formación,  
 
-¿Por qué elegir Nexova?
-Elige Nexova si te atraen:
+RRHH interno,  
 
-Personas y datos — construir sistemas que rankean candidatos, hacen seguimiento de alumnos y miden el rendimiento del equipo de ventas.
-Servicios B2B — tus usuarios no son consumidores anónimos sino equipos profesionales con flujos de trabajo y expectativas concretas.
-La IA en el núcleo del negocio — en Nexova la IA no apoya el producto; es la ventaja competitiva. El scoring de CVs, el matching de candidatos, el RAG sobre base de conocimiento y los agentes de soporte de primera línea son entregables centrales, no mejoras opcionales.
-Complejidad multifuncional — construirás para cinco equipos muy distintos (operaciones, ventas, RRHH, formación, soporte), cada uno con datos diferentes, usuarios diferentes y definiciones de éxito diferentes.
-Los retos de IA en Nexova incluyen búsqueda semántica sobre una base de datos de candidatos, automatización de soporte de primera línea que debe respetar SLAs, un pipeline de scoring de CVs con rankings explicables, y un motor de recomendación para programas formativos. Si quieres que tu portfolio demuestre AI Engineering aplicada directamente a las operaciones principales de una empresa — no solo a sus herramientas internas — Nexova es tu empresa.
+marketing,  
 
+operaciones  
 
+y analítica ejecutiva,  
+
+en un único ecosistema inteligente conectado por pipelines de datos, automatizaciones y agentes de IA especializados. 
+
+Estrategia: 
+
+Convertir a Nexova en: 
+
+una consultora HR-Tech moderna,  
+
+basada en datos,  
+
+automatizada,  
+
+escalable,  
+
+orientada a IA,  
+
+y capaz de competir contra plataformas nativas digitales. 
+
+ 
+
+Ecosistema de Agentes IA: 
+
+ 
+
+Múltiples agentes especializados: 
+
+Recruiter IA: Analiza y ranquea candidatos. 
+
+Sales IA: Sugiere estrategias comerciales. 
+
+HR Assistante: Responde políticas internas. 
+
+Sopport IA: Atiende tickets automáticamente. 
+
+Learning IA: Recomienda formación. 
+
+Executive IA: Resume métricas y riesgos.  
+
+Marketing IA: Genera contenido SEO. 
+
+Engineering IA: Consulta documentación técnica. 
+
+ 
+
+Cómo Nexova TalentFlow AI Resuelve Cada Departamento 
+
+🔍 Operaciones de Selección (Core Business) 
+
+Problema actual 
+
+Screening manual  
+
+Seguimiento caótico  
+
+Sin visibilidad  
+
+Matching subjetivo  
+
+Mucho trabajo operativo  
+
+ 
+
+Solución TalentFlow AI 
+
+AI CV Scoring Engine 
+
+Qué hace 
+
+Analiza CVs automáticamente y genera rankings. 
+
+Input 
+
+CVs  
+
+Job descriptions  
+
+Skills  
+
+Seniority  
+
+Idiomas  
+
+Experiencia  
+
+Output 
+
+score automático  
+
+ranking  
+
+compatibilidad  
+
+explicación del score  
+
+ 
+
+Semantic Search + RAG 
+
+Ejemplo: 
+
+“Encuentra perfiles con experiencia SaaS B2B, inglés C1 y manejo de HubSpot” 
+
+La IA busca semánticamente en toda la base histórica. 
+
+Candidate Pipeline Visual 
+
+Pipeline estilo Kanban: 
+
+Applied  
+
+Screening  
+
+Interview  
+
+Technical  
+
+Offer  
+
+Hired  
+
+Rejected  
+
+con automatizaciones: 
+
+mover candidato automáticamente,  
+
+disparar emails,  
+
+agendar entrevistas,  
+
+actualizar métricas.  
+
+ 
+
+Candidate Portal 
+
+Los candidatos ven: 
+
+estado del proceso,  
+
+próximos pasos,  
+
+feedback,  
+
+documentación pendiente.  
+
+Reduce llamadas y emails manuales. 
+
+ 
+
+Recruiter Copilot 
+
+Asistente IA para recruiters: 
+
+redacta feedback,  
+
+resume entrevistas,  
+
+genera preguntas,  
+
+detecta riesgos,  
+
+recomienda candidatos similares.  
+
+ 
+
+💼 Ventas y Desarrollo de Negocio 
+
+Problema actual 
+
+Prospección manual  
+
+CRM incompleto  
+
+Seguimiento inconsistente  
+
+Deals perdidos  
+
+ 
+
+Solución TalentFlow AI 
+
+AI Prospect Intelligence 
+
+Analiza: 
+
+LinkedIn  
+
+empresa  
+
+industria  
+
+tamaño  
+
+historial comercial  
+
+y genera: 
+
+mejor ángulo de venta,  
+
+probabilidad de cierre,  
+
+discurso recomendado.  
+
+ 
+
+Automated Sales Sequences 
+
+Workflow automático: 
+
+Primer contacto  
+
+Follow-up 1  
+
+Follow-up 2  
+
+Reminder  
+
+Cierre  
+
+Descarte  
+
+Todo sincronizado con HubSpot. 
+
+ 
+
+Sales Pipeline Dashboard 
+
+KPIs en tiempo real: 
+
+conversiones  
+
+deals activos  
+
+forecast  
+
+tiempo promedio de cierre  
+
+SDR performance  
+
+actividad por cuenta  
+
+ 
+
+AI Alerts 
+
+Alertas automáticas: 
+
+prospecto sin seguimiento,  
+
+oportunidad estancada,  
+
+cliente con riesgo de churn.  
+
+ 
+
+🌐 Marketing y Comunicación 
+
+Problema actual 
+
+Web desactualizada  
+
+SEO pobre  
+
+Producción manual  
+
+Sin métricas reales  
+
+ 
+
+Solución TalentFlow AI 
+
+Nuevo Sitio Web Enterprise 
+
+Stack moderno: 
+
+Next.js  
+
+Tailwind  
+
+SSR  
+
+SEO técnico  
+
+schema.org  
+
+optimización GEO  
+
+ 
+
+AI Content Pipeline 
+
+La IA genera: 
+
+artículos SEO,  
+
+newsletters,  
+
+posts LinkedIn,  
+
+casos de estudio,  
+
+contenido de employer branding.  
+
+ 
+
+Marketing Analytics Dashboard 
+
+Métricas: 
+
+tráfico  
+
+conversiones  
+
+CAC  
+
+CTR  
+
+leads generados  
+
+canales más rentables  
+
+ 
+
+AI SEO Optimizer 
+
+Analiza: 
+
+keywords,  
+
+intención de búsqueda,  
+
+competencia,  
+
+rendimiento de contenido.  
+
+Y propone mejoras automáticamente. 
+
+ 
+
+🎓 Formación Corporativa 
+
+Problema actual 
+
+PDF manual  
+
+Inscripciones caóticas  
+
+Sin trazabilidad  
+
+Sin personalización  
+
+ 
+
+Solución TalentFlow AI 
+
+Learning Platform 
+
+Catálogo online con: 
+
+filtros,  
+
+búsqueda,  
+
+inscripción,  
+
+pagos,  
+
+certificaciones.  
+
+ 
+
+AI Recommendation System 
+
+Sugiere programas según: 
+
+industria,  
+
+tamaño empresa,  
+
+necesidades,  
+
+historial,  
+
+skills gap.  
+
+ 
+
+Student Portal 
+
+Cada alumno puede: 
+
+ver progreso,  
+
+descargar materiales,  
+
+completar actividades,  
+
+obtener certificados.  
+
+ 
+
+Learning Advisor AI 
+
+Chatbot IA que construye: 
+
+rutas de aprendizaje,  
+
+planes de liderazgo,  
+
+capacitaciones personalizadas.  
+
+ 
+
+📞 Atención al Cliente 
+
+Problema actual 
+
+SLA incumplido  
+
+Sin knowledge base  
+
+Sin monitoreo  
+
+Soporte lento  
+
+ 
+
+Solución TalentFlow AI 
+
+Support AI Agent 
+
+Resuelve automáticamente: 
+
+FAQs,  
+
+incidencias repetitivas,  
+
+consultas básicas.  
+
+Objetivo: 
+resolver 40%+ sin humanos. 
+
+ 
+
+Centralized Knowledge Base 
+
+Base RAG conectada a: 
+
+tickets,  
+
+documentos,  
+
+SOPs,  
+
+manuales,  
+
+FAQs.  
+
+ 
+
+Real-Time Support Dashboard 
+
+Visualización en vivo: 
+
+backlog  
+
+tickets abiertos  
+
+SLA risk  
+
+tiempo de resolución  
+
+agentes activos  
+
+ 
+
+Sentiment Analysis Engine 
+
+Detecta: 
+
+frustración,  
+
+riesgo de churn,  
+
+clientes críticos.  
+
+Y alerta supervisores. 
+
+ 
+
+🧑‍🤝‍🧑 RRHH Interno 
+
+Problema actual 
+
+Gestión manual  
+
+Onboarding lento  
+
+Sin KPIs  
+
+Consultas repetitivas  
+
+ 
+
+Solución TalentFlow AI 
+
+HR Employee Portal 
+
+Centraliza: 
+
+vacaciones,  
+
+documentos,  
+
+solicitudes,  
+
+evaluaciones,  
+
+beneficios.  
+
+ 
+
+Automated Onboarding 
+
+Workflow automático: 
+
+creación de cuentas,  
+
+checklists,  
+
+asignación de mentor,  
+
+documentación,  
+
+capacitaciones.  
+
+ 
+
+HR Analytics Dashboard 
+
+KPIs: 
+
+rotación  
+
+absentismo  
+
+performance  
+
+tiempo de contratación  
+
+satisfacción interna  
+
+ 
+
+HR Assistant AI 
+
+Responde preguntas sobre: 
+
+políticas,  
+
+vacaciones,  
+
+beneficios,  
+
+onboarding,  
+
+evaluaciones.  
+
+💻 Tecnología e Infraestructura 
+
+Problema actual 
+
+Herramientas desconectadas  
+
+Sin observabilidad  
+
+Deploys manuales  
+
+Sin monitoreo  
+
+ 
+
+Solución TalentFlow AI 
+
+Unified Data Pipeline 
+
+Centraliza datos usando: 
+
+PostgreSQL  
+
+BigQuery  
+
+Snowflake  
+
+Kafka  
+
+Airflow  
+
+ 
+
+Observability Stack 
+
+logs centralizados,  
+
+métricas,  
+
+tracing,  
+
+alertas,  
+
+health monitoring.  
+
+ 
+
+DevOps Automation 
+
+CI/CD con: 
+
+GitHub Actions  
+
+Docker  
+
+Kubernetes  
+
+Terraform  
+
+ 
+
+Internal Engineering AI 
+
+Consulta: 
+
+arquitectura,  
+
+documentación,  
+
+APIs,  
+
+runbooks.  
+
+usando RAG interno. 
+
+ 
+
+📊 Dirección Ejecutiva 
+
+Problema actual 
+
+PDFs manuales  
+
+Datos atrasados  
+
+Sin visión unificada  
+
+ 
+
+Solución TalentFlow AI 
+
+Executive Dashboard 
+
+KPIs globales en tiempo real: 
+
+revenue  
+
+hires  
+
+conversiones  
+
+SLA  
+
+churn  
+
+marketing ROI  
+
+performance operativa  
+
+ 
+
+AI Executive Assistant 
+
+Laura podrá preguntar: 
+
+“¿Qué clientes tienen riesgo de churn?” 
+“¿Qué recruiters tienen mejor performance?” 
+“¿Qué campañas generan más revenue?” 
+“¿Qué área está incumpliendo KPIs?” 
+
+y obtener respuestas instantáneas. 
+
+ 
+
+Automated Weekly Reports 
+
+La IA genera: 
+
+reportes ejecutivos,  
+
+insights,  
+
+anomalías,  
+
+recomendaciones.
+
+         
