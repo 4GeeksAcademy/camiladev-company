@@ -82,7 +82,7 @@ ventas,
 
 soporte,  
 
-formación,  
+formación interna,  
 
 RRHH interno,  
 
@@ -175,6 +175,8 @@ Seniority
 Idiomas  
 
 Experiencia  
+
+País: EEUU o España
 
 Output 
 
