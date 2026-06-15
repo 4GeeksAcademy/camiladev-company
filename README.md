@@ -16,7 +16,8 @@ Sitio corporativo para la empresa ficticia Nexova Solutions, consultora B2B de R
 .
 ├── index.html          # Landing page corporativa
 ├── application.html    # Formulario de aplicacion/registro
-├── validation.js       # Menu movil + validaciones y UX del formulario
+├── src/                # Pagina de inicio (index.html)
+│   ├── validation.js   # Menu movil + validaciones y UX del formulario
 └── README.md           # Documentacion tecnica
 ```
 
@@ -26,10 +27,27 @@ Sitio corporativo para la empresa ficticia Nexova Solutions, consultora B2B de R
 2. Desde la raiz del proyecto ejecuta:
 
 ```bash
-npx serve .
+npm install
+npm run dev
 ```
 
-3. Abre la URL local mostrada por el comando (normalmente `http://localhost:3000`).
+3. Abre `http://127.0.0.1:8080` en el navegador.
+
+En Codespaces, abre el puerto `8080` en la pestaña **Ports** y luego usa **Open in Browser**.
+
+## Chequeo rapido de rutas
+
+Con el servidor encendido, ejecuta:
+
+```bash
+npm run check:routes
+```
+
+Este script valida estas rutas:
+
+- `/`
+- `/pages/contact_form.html`
+- `/pages/vacant.html`
 
 ## Funcionalidades principales
 

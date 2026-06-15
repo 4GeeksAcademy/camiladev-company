@@ -1,0 +1,13 @@
+{
+  "name": "camiladev-company",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static web runtime scripts for the camiladev-company workspace",
+  "scripts": {
+    "dev": "http-server ./src -p 8080 -a 0.0.0.0 -c-1",
+    "check:routes": "node ./scripts/check-routes.mjs"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -62,6 +62,33 @@ ai-engineering-company-project-monorepo/
 4. **Revisa** los `README.md` de cada carpeta raíz para entender responsabilidades (`uis/`, `services/`, `data/`, `skills/`, etc.).
 5. **Empieza a implementar** entregables por hito en `uis/` y `services/`, reutilizando `packages/shared/` y `data/` según corresponda.
 
+## Ejecutar la web de src
+
+Comandos recomendados para este repositorio:
+
+```bash
+npm install
+npm run dev
+```
+
+Esto levanta el servidor estático en `http://127.0.0.1:8080` sirviendo la carpeta `src/`.
+
+En Codespaces, abre el puerto `8080` desde la pestaña **Ports** y selecciona **Open in Browser**.
+
+## Chequeo rápido de rutas
+
+Con el servidor arriba (`npm run dev`), ejecuta:
+
+```bash
+npm run check:routes
+```
+
+El script valida que carguen correctamente:
+
+- `/`
+- `/pages/contact_form.html`
+- `/pages/vacant.html`
+
 ---
 
 ## Hitos (referencia)
