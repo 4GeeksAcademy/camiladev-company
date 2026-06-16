@@ -639,18 +639,15 @@ function setupLandingDemoForm() {
     });
 }
 
-// Controla validación condicional del stack tecnológico en el modal de vacantes (vacant.html).
+// Controla validación del formulario del modal de vacantes (vacant.html).
 function setupVacantApplyModalForm() {
     const applyModal = document.getElementById("apply-modal");
     if (!applyModal) return;
 
     const form = applyModal.querySelector("form");
     const feedback = applyModal.querySelector("#apply-popup-feedback");
-    const techVacancyRadios = applyModal.querySelectorAll('input[name="tech-vacancy"]');
-    const techStackInput = applyModal.querySelector("#tech-stack");
-    const techStackNote = applyModal.querySelector("#tech-stack-note");
 
-    if (!form || !feedback || techVacancyRadios.length === 0 || !techStackInput || !techStackNote) return;
+    if (!form || !feedback) return;
 
     const fields = {
         candidateName: applyModal.querySelector("#candidate-name"),
@@ -658,11 +655,10 @@ function setupVacantApplyModalForm() {
         candidateCv: applyModal.querySelector("#candidate-cv"),
         englishLevel: applyModal.querySelector("#english-level"),
         experienceYears: applyModal.querySelector("#experience-years"),
+        seniorityLevel: applyModal.querySelector("#seniority-level"),
         disponibility: applyModal.querySelector("#disponibility") || applyModal.querySelector("#availability"),
-        salaryAgreement: applyModal.querySelector("#salary-agreement"),
-        techVacancy: techVacancyRadios,
-        techStack: techStackInput,
-        githubPortfolio: applyModal.querySelector("#github-portfolio")
+        salaryExpectation: applyModal.querySelector("#salary-expectation"),
+        candidateSkills: applyModal.querySelector("#candidate-skills")
     };
 
     const validationRules = {
@@ -689,36 +685,17 @@ function setupVacantApplyModalForm() {
         },
         englishLevel: (value) => (!value ? "Este campo es obligatorio." : ""),
         experienceYears: (value) => (!value ? "Este campo es obligatorio." : ""),
+        seniorityLevel: (value) => (!value ? "Este campo es obligatorio." : ""),
         disponibility: (value) => (!value ? "Este campo es obligatorio." : ""),
-        salaryAgreement: (value) => (!value ? "Este campo es obligatorio." : ""),
-        techVacancy: () => {
-            const checked = Array.from(fields.techVacancy).some((radio) => radio.checked);
-            return checked ? "" : "Este campo es obligatorio.";
-        },
-        techStack: (value) => {
-            const selected = Array.from(fields.techVacancy).find((radio) => radio.checked);
-            const isTechVacancy = Boolean(selected && selected.value === "si");
-            if (!isTechVacancy) return "";
-            return value.trim() ? "" : "Este campo es obligatorio.";
-        },
-        githubPortfolio: (value) => {
+        salaryExpectation: (value) => {
             if (!value.trim()) return "Este campo es obligatorio.";
-            try {
-                const parsed = new URL(value);
-                if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-                    return "La URL del portafolio debe iniciar con http:// o https://.";
-                }
-            } catch {
-                return "Ingresa una URL válida de portafolio o GitHub.";
-            }
+            if (!/^\d+$/.test(value.trim())) return "Ingresa solo numeros en USD (sin simbolos ni letras).";
             return "";
-        }
+        },
+        candidateSkills: (value) => (!value.trim() ? "Este campo es obligatorio." : "")
     };
 
     function getInputStateTarget(fieldName) {
-        if (fieldName === "techVacancy") {
-            return fields.techVacancy[0]?.closest("fieldset") || fields.techVacancy[0];
-        }
         return fields[fieldName];
     }
 
@@ -828,7 +805,7 @@ function setupVacantApplyModalForm() {
         const field = fields[fieldName];
         if (!rule || !field) return true;
 
-        const value = fieldName === "candidateCv" || fieldName === "techVacancy"
+        const value = fieldName === "candidateCv"
             ? ""
             : field.value || "";
 
@@ -876,39 +853,20 @@ function setupVacantApplyModalForm() {
         feedback.classList.add("border-emerald-400", "bg-emerald-500/10", "text-emerald-200", "shadow-lg", "shadow-emerald-500/10");
     }
 
-    function syncTechStackRequirement() {
-        const selected = Array.from(techVacancyRadios).find((radio) => radio.checked);
-        const isTechVacancy = Boolean(selected && selected.value === "si");
-
-        techStackInput.required = isTechVacancy;
-        techStackInput.disabled = !isTechVacancy;
-
-        if (isTechVacancy) {
-            techStackInput.setAttribute("aria-required", "true");
-            techStackNote.textContent = "Campo obligatorio para vacantes tecnológicas.";
-            return;
-        }
-
-        techStackInput.removeAttribute("aria-required");
-        techStackInput.value = "";
-        techStackNote.textContent = "Opcional para vacantes no tecnológicas.";
-    }
-
-    techVacancyRadios.forEach((radio) => {
-        radio.addEventListener("change", syncTechStackRequirement);
-        radio.addEventListener("change", () => validateField("techVacancy"));
-        radio.addEventListener("change", () => validateField("techStack"));
-    });
-
     fields.candidateName?.addEventListener("input", () => validateField("candidateName"));
     fields.candidateEmail?.addEventListener("input", () => validateField("candidateEmail"));
     fields.candidateCv?.addEventListener("change", () => validateField("candidateCv"));
     fields.englishLevel?.addEventListener("change", () => validateField("englishLevel"));
     fields.experienceYears?.addEventListener("change", () => validateField("experienceYears"));
+    fields.seniorityLevel?.addEventListener("change", () => validateField("seniorityLevel"));
     fields.disponibility?.addEventListener("change", () => validateField("disponibility"));
-    fields.salaryAgreement?.addEventListener("change", () => validateField("salaryAgreement"));
-    fields.techStack?.addEventListener("input", () => validateField("techStack"));
-    fields.githubPortfolio?.addEventListener("input", () => validateField("githubPortfolio"));
+    fields.salaryExpectation?.addEventListener("input", (event) => {
+        const input = event.target;
+        if (!input) return;
+        input.value = input.value.replace(/\D/g, "");
+        validateField("salaryExpectation");
+    });
+    fields.candidateSkills?.addEventListener("input", () => validateField("candidateSkills"));
 
     form.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -921,11 +879,8 @@ function setupVacantApplyModalForm() {
 
         showFeedback("Información completada correctamente. Tu postulación está lista para continuar en el proceso.", "success");
         form.reset();
-        syncTechStackRequirement();
         Object.keys(validationRules).forEach((fieldName) => showError(fieldName, ""));
     });
-
-    syncTechStackRequirement();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
