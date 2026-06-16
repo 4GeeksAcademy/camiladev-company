@@ -62,7 +62,7 @@ ai-engineering-company-project-monorepo/
 4. **Revisa** los `README.md` de cada carpeta raíz para entender responsabilidades (`uis/`, `services/`, `data/`, `skills/`, etc.).
 5. **Empieza a implementar** entregables por hito en `uis/` y `services/`, reutilizando `packages/shared/` y `data/` según corresponda.
 
-## Ejecutar la web de src
+## Ejecutar la web
 
 Comandos recomendados para este repositorio:
 
@@ -71,7 +71,7 @@ npm install
 npm run dev
 ```
 
-Esto levanta el servidor estático en `http://127.0.0.1:8080` sirviendo la carpeta `src/`.
+Esto levanta el servidor estático en `http://127.0.0.1:8080` sirviendo la raíz del proyecto (`.`), donde ahora están `index.html`, `validation.js` y la carpeta `pages/`.
 
 En Codespaces, abre el puerto `8080` desde la pestaña **Ports** y selecciona **Open in Browser**.
 
@@ -86,6 +86,7 @@ npm run check:routes
 El script valida que carguen correctamente:
 
 - `/`
+- `/validation.js`
 - `/pages/contact_form.html`
 - `/pages/vacant.html`
 

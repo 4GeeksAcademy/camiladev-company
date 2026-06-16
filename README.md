@@ -15,9 +15,10 @@ Sitio corporativo para la empresa ficticia Nexova Solutions, consultora B2B de R
 ```text
 .
 ├── index.html          # Landing page corporativa
-├── application.html    # Formulario de aplicacion/registro
-├── src/                # Pagina de inicio (index.html)
-│   ├── validation.js   # Menu movil + validaciones y UX del formulario
+├── validation.js       # Menu movil + validaciones y UX de formularios
+├── pages/
+│   ├── contact_form.html  # Formulario de contacto y solicitud
+│   └── vacant.html        # Vacantes y modales de postulacion
 └── README.md           # Documentacion tecnica
 ```
 
@@ -46,6 +47,7 @@ npm run check:routes
 Este script valida estas rutas:
 
 - `/`
+- `/validation.js`
 - `/pages/contact_form.html`
 - `/pages/vacant.html`
 
