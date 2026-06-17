@@ -1,4 +1,4 @@
-interface Candidate {
+export interface Candidate {
    id: string;
    name: string;
    email: string;
@@ -14,14 +14,14 @@ interface Candidate {
    status: CandidateStatus; 
 
 }
-type EnglishLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | "Native";
-type SeniorityLevel = "Junior" | "Semi-Senior" | "Senior" | "Lead" | "Executive";
-type AvailabilityStatus = "Immediate" | "2 weeks" | "1 month" | "Not available";
-type CandidateStatus = "Active" | "In process" | "Hired" | "Inactive";
+export type EnglishLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | "Native";
+export type SeniorityLevel = "Junior" | "Semi-Senior" | "Senior" | "Lead" | "Executive";
+export type AvailabilityStatus = "Immediate" | "2 weeks" | "1 month" | "Not available";
+export type CandidateStatus = "Active" | "In process" | "Hired" | "Inactive";
 
 
 
-interface Vacancy {
+export interface Vacancy {
   id: string; // Identificador único (ej: "V-2024-0892")
   title: string; // Título del puesto (ej: "Senior Full-Stack Developer")
   companyName: string; // Nombre de la empresa cliente
@@ -38,11 +38,11 @@ interface Vacancy {
   status: VacancyStatus; // Estado actual de la vacante
 }
 
-type VacancyStatus = "Open" | "In progress" | "Closed" | "On hold";
+export type VacancyStatus = "Open" | "In progress" | "Closed" | "On hold";
 
 
 
-interface SelectionProcess {
+export interface SelectionProcess {
   id: string; // Identificador único (ej: "SP-2024-1523")
   candidateId: string; // Referencia al candidato
   vacancyId: string; // Referencia a la vacante
@@ -53,7 +53,7 @@ interface SelectionProcess {
   updatedAt: Date; // Fecha de última actualización
 }
 
-type ProcessStage =
+export type ProcessStage =
   | "Screening"
   | "Interview"
   | "Technical test"

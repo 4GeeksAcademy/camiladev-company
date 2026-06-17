@@ -1,3 +1,28 @@
+import { AVAILABILITY_MAP } from "./src/utils/collections.js";
+
+function populateAvailabilityOptions(selectElement) {
+    if (!selectElement) return;
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Selecciona tu disponibilidad";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+
+    selectElement.replaceChildren(placeholder);
+
+    Object.entries(AVAILABILITY_MAP).forEach(([key, label]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = label;
+        selectElement.appendChild(option);
+    });
+}
+
+function isAvailabilityKey(value) {
+    return Object.prototype.hasOwnProperty.call(AVAILABILITY_MAP, value);
+}
+
 // Valida el formulario principal de solicitud en contact_form.html (id: application-form).
 function setupApplicationForm() {
     const form = document.getElementById("application-form");
@@ -41,6 +66,8 @@ function setupApplicationForm() {
         contactConsent: document.getElementById("contactConsent"),
         accuracyConsent: document.getElementById("accuracyConsent")
     };
+
+    populateAvailabilityOptions(fields.availability);
 
     const validationRules = {
         fullName: (value) => {
@@ -134,7 +161,8 @@ function setupApplicationForm() {
         availability: (value) => {
             const selectedType = fields.applicationType?.value || "";
             if (selectedType !== "vacante") return "";
-            return !value ? "Selecciona tu disponibilidad de incorporación." : "";
+            if (!value) return "Selecciona tu disponibilidad de incorporación.";
+            return isAvailabilityKey(value) ? "" : "Selecciona una disponibilidad válida.";
         },
         message: (value) => {
             if (!value.trim()) return "Describe tu perfil o necesidad del proyecto.";
@@ -410,6 +438,15 @@ function setupApplicationForm() {
         }
 
         const selectedType = fields.applicationType?.value || "";
+        if (selectedType === "vacante") {
+            const selectedAvailability = fields.availability?.value || "";
+            if (!isAvailabilityKey(selectedAvailability)) {
+                showError("availability", "Selecciona una disponibilidad válida.");
+                showFeedback("Selecciona una disponibilidad válida antes de enviar la solicitud.", "error");
+                return;
+            }
+        }
+
         const successMessage = selectedType === "empresa-talento"
             ? "Solicitud enviada con éxito. Un consultor de Nexova contactará a tu empresa en menos de 24 horas laborables."
             : "Solicitud enviada con éxito. El equipo de Nexova revisará tu CV y te contactará sobre vacantes afines.";
