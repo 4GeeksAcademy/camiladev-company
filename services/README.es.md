@@ -33,7 +33,7 @@ Exponer una API REST para gestionar proveedores (`suppliers`) con validación de
 - `services/api/routes/__init__.py`:
 	Inicializador del paquete de rutas.
 - `services/api/routes/suppliers.py`:
-	Endpoints HTTP de proveedores (`POST /suppliers`, `GET /suppliers` y filtro por `country`).
+	Endpoints HTTP de proveedores (`POST /suppliers`, `GET /suppliers` con filtros por `country` y `category`, alias `GET /suppliers/by-category`, `PATCH` de `status`, `PATCH` de `rate` y `DELETE /suppliers/{id}`).
 
 ### Cómo ejecutarlo
 
@@ -63,4 +63,13 @@ python seed.py
 curl "http://127.0.0.1:8000/suppliers"
 curl "http://127.0.0.1:8000/suppliers?country=Spain"
 curl "http://127.0.0.1:8000/suppliers?country=USA"
+curl "http://127.0.0.1:8000/suppliers?category=job_boards"
+curl "http://127.0.0.1:8000/suppliers?country=USA&category=job_boards"
+curl "http://127.0.0.1:8000/suppliers/by-category?category=job_boards"
+curl -X DELETE "http://127.0.0.1:8000/suppliers/3"
 ```
+
+### Nota de compatibilidad
+
+- `GET /suppliers?category=...` es la ruta recomendada para filtrar por categoría.
+- `GET /suppliers/by-category?category=...` se mantiene como alias compatible para integraciones existentes.
