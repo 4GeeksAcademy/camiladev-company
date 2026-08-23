@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query
-from tinydb import Query as TinyDBQuery
 from datetime import datetime, timezone
 
 from database import suppliers_table
-from models import Suppliers, VALID_COUNTRY, VALID_STATUS
+from models import Suppliers, VALID_CATEGORIES, VALID_COUNTRY, VALID_STATUS
 
 
 router = APIRouter(
@@ -18,12 +17,46 @@ def serialize_document(document):
         **document
     }
 
+
+def filter_suppliers(country: str | None = None, category: str | None = None):
+    # Evita lecturas desactualizadas cuando la tabla fue modificada por otro proceso.
+    suppliers_table.clear_cache()
+
+    # Punto de partida: obtener todos los proveedores y luego aplicar filtros opcionales.
+    documents = suppliers_table.all()
+
+    if country is not None:
+        # Si se envía país, primero validamos que esté en el catálogo permitido.
+        if country not in VALID_COUNTRY:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid country '{country}'. Valid options are: {VALID_COUNTRY}"
+            )
+        # Filtra solo proveedores del país solicitado.
+        documents = [doc for doc in documents if doc.get("country") == country]
+
+    if category is not None:
+        # Si se envía categoría, validamos contra las categorías definidas en el modelo.
+        if category not in VALID_CATEGORIES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid category '{category}'. Valid options are: {VALID_CATEGORIES}"
+            )
+        # Filtra proveedores que contengan esa categoría en su lista de categorías.
+        documents = [doc for doc in documents if category in doc.get("categories", [])]
+
+    # Serializa cada documento para devolver también el id de TinyDB en la respuesta.
+    return [
+        serialize_document(document)
+        for document in documents
+    ]
+
 # POST
 
 @router.post("")
 def create_suppliers(supplier: Suppliers):
-    suppliers_data = supplier.model_dump() 
-    doc_id = suppliers_table.insert(suppliers_data) 
+    suppliers_data = supplier.model_dump()
+    doc_id = suppliers_table.insert(suppliers_data)
 
     return {
         "id": doc_id,
@@ -31,31 +64,20 @@ def create_suppliers(supplier: Suppliers):
     }
 
 
-# GET /suppliers  —  opcionalmente filtrado por ?country=x
+# GET /suppliers  —  opcionalmente filtrado por ?country=x y/o ?category=y
 @router.get("")
-def get_suppliers(country: str | None = Query(None)):
-    # TinyDB can cache search results; clear cache to avoid stale reads
-    # when data is modified from another process (e.g. running seed.py).
-    suppliers_table.clear_cache()
+def get_suppliers(
+    country: str | None = Query(None),
+    category: str | None = Query(None)
+):
+    return filter_suppliers(country=country, category=category)
 
-    if country is None:
-        # Sin filtro: devolver todos los proveedores
-        documents = suppliers_table.all()
-    else:
-        # Con filtro: validar país y buscar solo los de ese país
-        if country not in VALID_COUNTRY:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid country '{country}'. Valid options are: {VALID_COUNTRY}"
-            )
 
-        db_query = TinyDBQuery()
-        documents = suppliers_table.search(db_query.country == country)
-
-    return [
-        serialize_document(document)
-        for document in documents
-    ]
+# GET /suppliers/by-category?category=Y
+@router.get("/by-category")
+def get_suppliers_by_category(category: str = Query(...)):
+    # Backward-compatible alias for clients already using this route.
+    return filter_suppliers(category=category)
 
 # PATCH /suppliers/{id}/status
 @router.patch("/{supplier_id}/status")
