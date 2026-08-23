@@ -149,3 +149,19 @@ def update_supplier_rate(supplier_id: int, payload: dict):
     updated_supplier = suppliers_table.get(doc_id=supplier_id)
 
     return serialize_document(updated_supplier)
+
+
+# DELETE /suppliers/{id}
+@router.delete("/{supplier_id}")
+def delete_supplier(supplier_id: int):
+    existing_supplier = suppliers_table.get(doc_id=supplier_id)
+
+    if existing_supplier is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Supplier with id {supplier_id} not found"
+        )
+
+    suppliers_table.remove(doc_ids=[supplier_id])
+
+    return {"message": f"Supplier with id {supplier_id} deleted"}
