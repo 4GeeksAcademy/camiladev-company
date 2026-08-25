@@ -86,12 +86,14 @@
             <a href="../index.html" class="text-xl font-bold tracking-tight text-white [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Nexova Solutions</a>
             <ul class="hidden items-center gap-7 text-sm font-semibold lg:flex">
                 <li><a href="../index.html#inicio" class="transition hover:text-cyan-300">Inicio</a></li>
+              <li><a href="../index.html#evolucion" class="transition hover:text-cyan-300">Evolución</a></li>
                 <li><a href="../index.html#servicios" class="transition hover:text-cyan-300">Servicios</a></li>
                 <li><a href="../index.html#tecnologia" class="transition hover:text-cyan-300">Tecnología</a></li>
                 <li><a href="../index.html#proceso" class="transition hover:text-cyan-300">Proceso</a></li>
-                <li><a href="vacant.html" class="transition hover:text-cyan-300">Vacantes</a></li>
-                <li><a href="../index.html#contacto" class="transition hover:text-cyan-300">Solicitar consulta</a></li>
+              <li><a href="/suppliers" data-suppliers-link class="transition hover:text-cyan-300">Proveedores</a></li>
                 <li><a href="contact_form.html" class="rounded-full border border-cyan-300 px-4 py-2 text-cyan-300 transition hover:bg-cyan-300 hover:text-slate-950">Formulario</a></li>
+              <li><a href="vacant.html" class="transition hover:text-cyan-300">Vacantes</a></li>
+              <li><a href="../index.html#contacto" class="transition hover:text-cyan-300">Solicitar consulta</a></li>
             </ul>
 
             <details class="relative lg:hidden">
@@ -108,9 +110,10 @@
                   <li><a href="../index.html#servicios" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
                   <li><a href="../index.html#tecnologia" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
                   <li><a href="../index.html#proceso" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
+                  <li><a href="/suppliers" data-suppliers-link class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proveedores</a></li>
+                  <li><a href="contact_form.html" class="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Formulario</a></li>
                   <li><a href="vacant.html" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Vacantes</a></li>
                   <li><a href="../index.html#contacto" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Solicitar consulta</a></li>
-                  <li><a href="contact_form.html" class="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Formulario</a></li>
                     </ul>
                 </div>
             </details>
@@ -1377,4 +1380,26 @@
 
     <script type="module" src="../validation.js"></script>
 </body>
+<script>
+  (function () {
+    var configured = window.NEXOVA_SUPPLIERS_URL;
+    var host = window.location.hostname;
+    var targetUrl = configured || "";
+
+    if (!targetUrl) {
+      if (host === "localhost" || host === "127.0.0.1") {
+        targetUrl = "http://localhost:3000/suppliers";
+      } else if (host.indexOf("app.github.dev") !== -1) {
+        var mappedHost = host.replace(/-\d+(?=\.app\.github\.dev$)/, "-3000");
+        targetUrl = window.location.protocol + "//" + mappedHost + "/suppliers";
+      } else {
+        targetUrl = window.location.origin + "/suppliers";
+      }
+    }
+
+    document.querySelectorAll("[data-suppliers-link]").forEach(function (link) {
+      link.setAttribute("href", targetUrl);
+    });
+  })();
+</script>
 </html>

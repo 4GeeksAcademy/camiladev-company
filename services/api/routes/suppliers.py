@@ -55,7 +55,7 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
 
 @router.post("")
 def create_suppliers(supplier: Suppliers):
-    suppliers_data = supplier.model_dump()
+    suppliers_data = supplier.model_dump(mode="json")
     doc_id = suppliers_table.insert(suppliers_data)
 
     return {
