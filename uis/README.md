@@ -24,6 +24,12 @@ npm run dev
 
 http://localhost:3000
 
+## Nota importante de rutas
+
+- La pantalla de Proveedores (`/suppliers`) pertenece a esta app Next.js dentro de `uis/`.
+- Debes ejecutar `npm run dev` desde `uis/` para que `/suppliers` exista.
+- Si ejecutas `npm run dev` desde la raiz del repositorio, se levanta un servidor estatico y la ruta `/suppliers` devolvera 404.
+
 ## Backend requerido
 
 Para que el frontend funcione, la API debe estar levantada en paralelo:
@@ -107,21 +113,9 @@ http://127.0.0.1:8000
 
 ## Configuracion de URL de Proveedores en HTML estatico
 
-Los menus de index.html, pages/contact_form.html y pages/vacant.html usan una variable global opcional:
+Los menus de index.html, pages/contact_form.html y pages/vacant.html deben apuntar a la instancia activa de la app Next.js de `uis`.
 
-window.NEXOVA_SUPPLIERS_URL
-
-Comportamiento:
-
-1. Si `window.NEXOVA_SUPPLIERS_URL` existe, se usa ese valor para el enlace de Proveedores.
-2. Si no existe y estas en localhost/127.0.0.1, usa `http://localhost:3000/suppliers`.
-3. Si no existe y estas en otro host, usa `${location.origin}/suppliers`.
-
-Ejemplo para sobreescribir en tiempo de ejecucion antes de los menus:
-
-<script>
-	window.NEXOVA_SUPPLIERS_URL = "https://tu-dominio.com/suppliers";
-</script>
+No se documentan ni se recomiendan constantes globales hardcodeadas para resolver la URL de Proveedores.
 
 ## Comandos útiles
 
