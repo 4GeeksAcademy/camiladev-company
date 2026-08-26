@@ -91,7 +91,7 @@
         <li><a href="#servicios" class="transition hover:text-cyan-300">Servicios</a></li>
         <li><a href="#tecnologia" class="transition hover:text-cyan-300">Tecnología</a></li>
         <li><a href="#proceso" class="transition hover:text-cyan-300">Proceso</a></li>
-        <li><a href="/suppliers" data-suppliers-link class="transition hover:text-cyan-300">Proveedores</a></li>
+        <li><a href="http://127.0.0.1:3000/suppliers" class="transition hover:text-cyan-300">Proveedores</a></li>
         <li><a href="pages/contact_form.html" class="transition hover:text-cyan-300">Formulario</a></li>
         <li><a href="pages/vacant.html" class="transition hover:text-cyan-300">Vacantes</a></li>
         <li><a href="#contacto" class="rounded-full bg-cyan-300 px-5 py-2.5 font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar consulta</a></li>
@@ -111,7 +111,7 @@
             <li><a href="#servicios" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
             <li><a href="#tecnologia" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
             <li><a href="#proceso" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
-            <li><a href="/suppliers" data-suppliers-link class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proveedores</a></li>
+            <li><a href="http://127.0.0.1:3000/suppliers" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proveedores</a></li>
             <li><a href="pages/contact_form.html" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Formulario</a></li>
             <li><a href="pages/vacant.html" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Vacantes</a></li>
             <li><a href="#contacto" class="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Solicitar consulta</a></li>
@@ -437,26 +437,4 @@
 
   <script type="module" src="validation.js"></script>
 </body>
-<script>
-  (function () {
-    var configured = window.NEXOVA_SUPPLIERS_URL;
-    var host = window.location.hostname;
-    var targetUrl = configured || "";
-
-    if (!targetUrl) {
-      if (host === "localhost" || host === "127.0.0.1") {
-        targetUrl = "http://localhost:3000/suppliers";
-      } else if (host.indexOf("app.github.dev") !== -1) {
-        var mappedHost = host.replace(/-\d+(?=\.app\.github\.dev$)/, "-3000");
-        targetUrl = window.location.protocol + "//" + mappedHost + "/suppliers";
-      } else {
-        targetUrl = window.location.origin + "/suppliers";
-      }
-    }
-
-    document.querySelectorAll("[data-suppliers-link]").forEach(function (link) {
-      link.setAttribute("href", targetUrl);
-    });
-  })();
-</script>
 </html>
