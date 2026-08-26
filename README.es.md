@@ -77,6 +77,22 @@ Esto levanta el servidor estático en `http://127.0.0.1:8080` sirviendo la raíz
 
 En Codespaces, abre el puerto `8080` desde la pestaña **Ports** y selecciona **Open in Browser**.
 
+## Nota sobre la ruta de Proveedores
+
+La pantalla `/suppliers` pertenece a la app Next.js dentro de `uis/`.
+
+- Ejecutar `npm run dev` desde la raíz solo levanta el servidor estático (puerto `8080`).
+- Ese servidor no expone `/suppliers` y devolverá `404` en esa ruta.
+- Para usar el directorio de Proveedores, levanta el frontend desde `uis/`:
+
+```bash
+cd uis
+npm install
+npm run dev
+```
+
+Luego abre `http://127.0.0.1:3000/suppliers`.
+
 ## Verificación durante desarrollo
 
 Además del servidor web, se recomienda validar tipado y tests de forma frecuente:

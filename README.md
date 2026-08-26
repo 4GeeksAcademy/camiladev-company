@@ -36,6 +36,22 @@ npm run dev
 
 En Codespaces, abre el puerto `8080` en la pestaña **Ports** y luego usa **Open in Browser**.
 
+## Suppliers route note
+
+The `/suppliers` page belongs to the Next.js app inside `uis/`.
+
+- Running `npm run dev` from the repository root starts a static server only (port `8080`).
+- The static server does not provide `/suppliers` and will return `404` for that route.
+- To use the suppliers UI, run the frontend from `uis/`:
+
+```bash
+cd uis
+npm install
+npm run dev
+```
+
+Then open `http://127.0.0.1:3000/suppliers`.
+
 ## Chequeo rapido de rutas
 
 Con el servidor encendido, ejecuta:
