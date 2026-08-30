@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime, timezone
 
 from database import suppliers_table
-from models import Suppliers, Category, Country, Status
+from models import Suppliers, SupplierStatusPatch, SupplierRatePatch, SupplierRead, Category, Country
 
 router = APIRouter(
     prefix="/suppliers", tags=["suppliers"]
@@ -11,10 +11,11 @@ router = APIRouter(
 
 
 def serialize_document(document):
-    return {
+    payload = {
         "id": document.doc_id,
         **document
     }
+    return SupplierRead(**payload).model_dump(mode="json")
 
 
 def filter_suppliers(country: str | None = None, category: str | None = None):
@@ -72,10 +73,10 @@ def create_suppliers(supplier: Suppliers):
 # GET /suppliers  —  opcionalmente filtrado por ?country=x y/o ?category=y
 @router.get("")
 def get_suppliers(
-    country: str | None = Query(None),
-    category: str | None = Query(None)
+    country: Country | None = Query(None),
+    category: Category | None = Query(None)
 ):
-    return filter_suppliers(country=country, category=category)
+    return filter_suppliers(country=country.value if country else None, category=category.value if category else None)
 
 
 # GET /suppliers/by-category?category=Y
@@ -86,20 +87,8 @@ def get_suppliers_by_category(category: str = Query(...)):
 
 # PATCH /suppliers/{id}/status
 @router.patch("/{supplier_id}/status")
-def update_supplier_status(supplier_id: int, payload: dict):
-    new_status = payload.get("status")
-
-    if new_status is None:
-        raise HTTPException(status_code=400, detail="Field 'status' is required")
-
-    try:
-        new_status_value = Status(new_status).value
-    except ValueError:
-        valid_status = [item.value for item in Status]
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid status '{new_status}'. Valid options are: {valid_status}"
-        )
+def update_supplier_status(supplier_id: int, payload: SupplierStatusPatch):
+    new_status_value = payload.status.value
 
     existing_supplier = suppliers_table.get(doc_id=supplier_id)
 
@@ -122,22 +111,11 @@ def update_supplier_status(supplier_id: int, payload: dict):
     return serialize_document(updated_supplier)
 
 
+
 # PATCH /suppliers/{id}/rate
 @router.patch("/{supplier_id}/rate")
-def update_supplier_rate(supplier_id: int, payload: dict):
-    new_rate = payload.get("monthly_rate")
-
-    if new_rate is None:
-        raise HTTPException(status_code=400, detail="Field 'monthly_rate' is required")
-
-    try:
-        parsed_rate = float(new_rate)
-    except (TypeError, ValueError) as error:
-        raise HTTPException(status_code=400, detail="'monthly_rate' must be a number") from error
-
-    if parsed_rate <= 0:
-        raise HTTPException(status_code=400, detail="'monthly_rate' must be greater than 0")
-
+def update_supplier_rate(supplier_id: int, payload: SupplierRatePatch):
+  
     existing_supplier = suppliers_table.get(doc_id=supplier_id)
 
     if existing_supplier is None:
@@ -148,7 +126,7 @@ def update_supplier_rate(supplier_id: int, payload: dict):
 
     suppliers_table.update(
         {
-            "monthly_rate": parsed_rate,
+            "monthly_rate": payload.monthly_rate,
             "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         },
         doc_ids=[supplier_id]
