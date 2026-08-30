@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime, timezone
 
 from database import suppliers_table
-from models import Suppliers, VALID_CATEGORIES, VALID_COUNTRY, VALID_STATUS
-
+from models import Suppliers, Category, Country, Status
 
 router = APIRouter(
     prefix="/suppliers", tags=["suppliers"]
@@ -27,23 +26,29 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
 
     if country is not None:
         # Si se envía país, primero validamos que esté en el catálogo permitido.
-        if country not in VALID_COUNTRY:
+        try:
+            country_value = Country(country).value
+        except ValueError:
+            valid_country = [item.value for item in Country]
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid country '{country}'. Valid options are: {VALID_COUNTRY}"
+                detail=f"Invalid country '{country}'. Valid options are: {valid_country}"
             )
         # Filtra solo proveedores del país solicitado.
-        documents = [doc for doc in documents if doc.get("country") == country]
+        documents = [doc for doc in documents if doc.get("country") == country_value]
 
     if category is not None:
         # Si se envía categoría, validamos contra las categorías definidas en el modelo.
-        if category not in VALID_CATEGORIES:
+        try:
+            category_value = Category(category).value
+        except ValueError:
+            valid_categories = [item.value for item in Category]
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid category '{category}'. Valid options are: {VALID_CATEGORIES}"
+                detail=f"Invalid category '{category}'. Valid options are: {valid_categories}"
             )
         # Filtra proveedores que contengan esa categoría en su lista de categorías.
-        documents = [doc for doc in documents if category in doc.get("categories", [])]
+        documents = [doc for doc in documents if category_value in doc.get("categories", [])]
 
     # Serializa cada documento para devolver también el id de TinyDB en la respuesta.
     return [
@@ -87,10 +92,13 @@ def update_supplier_status(supplier_id: int, payload: dict):
     if new_status is None:
         raise HTTPException(status_code=400, detail="Field 'status' is required")
 
-    if new_status not in VALID_STATUS:
+    try:
+        new_status_value = Status(new_status).value
+    except ValueError:
+        valid_status = [item.value for item in Status]
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid status '{new_status}'. Valid options are: {VALID_STATUS}"
+            detail=f"Invalid status '{new_status}'. Valid options are: {valid_status}"
         )
 
     existing_supplier = suppliers_table.get(doc_id=supplier_id)
@@ -103,7 +111,7 @@ def update_supplier_status(supplier_id: int, payload: dict):
 
     suppliers_table.update(
         {
-            "status": new_status,
+            "status": new_status_value,
             "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         },
         doc_ids=[supplier_id]
