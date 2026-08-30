@@ -12,7 +12,7 @@ class UserRole(str, Enum):
 class User(BaseModel):
      model_config = ConfigDict(extra="forbid")
 
-     id: int
+     id: str
      email: str
      hashed_password: str
      is_active: bool
