@@ -6,7 +6,7 @@ import type {
 } from "@/types/suppliers";
 
 interface ApiErrorShape {
-  detail?: string;
+  detail?: unknown;
   message?: string;
 }
 
@@ -40,9 +40,46 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
 
   if (!response.ok) {
+    const formatDetail = (detail: unknown): string => {
+      if (typeof detail === "string") {
+        return detail;
+      }
+
+      if (Array.isArray(detail)) {
+        const messages = detail
+          .map((issue) => {
+            if (!issue || typeof issue !== "object") {
+              return null;
+            }
+
+            const message = "msg" in issue ? issue.msg : null;
+            if (typeof message !== "string") {
+              return null;
+            }
+
+            const location = "loc" in issue && Array.isArray(issue.loc)
+              ? issue.loc.slice(1).join(".")
+              : "";
+
+            return location ? `${location}: ${message}` : message;
+          })
+          .filter((message): message is string => Boolean(message));
+
+        if (messages.length > 0) {
+          return messages.join(" | ");
+        }
+      }
+
+      if (detail && typeof detail === "object") {
+        return "Solicitud invalida. Revisa los campos e intenta de nuevo.";
+      }
+
+      return "Unexpected API error";
+    };
+
     const detail =
       parsed && typeof parsed === "object" && "detail" in parsed
-        ? parsed.detail
+        ? formatDetail(parsed.detail)
         : parsed && typeof parsed === "object" && "message" in parsed
           ? parsed.message
           : text || "Unexpected API error";

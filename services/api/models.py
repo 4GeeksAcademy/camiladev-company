@@ -45,7 +45,14 @@ class Suppliers(BaseModel):
     notes: str | None = None
 
     
+class SupplierStatusPatch(BaseModel):
+    status: Status
 
+class SupplierRatePatch(BaseModel):
+    monthly_rate: float = Field(gt=0)
+
+class SupplierRead(Suppliers):
+    id: int
     
 
     
