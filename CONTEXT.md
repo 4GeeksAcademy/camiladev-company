@@ -4,7 +4,7 @@ Nexova Solutions
 
 Porque elegí esta empresa 
 
-La razón principal por la cual elegí esta empresa es porque toca casi todos temas que aparecen en ofertas les en el mercado actual:  
+La razón principal por la cual elegí esta empresa es porque toca casi todos temas que aparecen en ofertas laborales en el mercado actual:  
 
 AI Engineer, Full Stack Developer, Automation Developer, AI Product Developer, SaaS Developer, Internal Tools Engineer. 
 
