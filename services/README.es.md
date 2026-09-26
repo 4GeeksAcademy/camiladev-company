@@ -50,23 +50,34 @@ cd services/api
 uvicorn main:app --reload
 ```
 
-3. Sembrar datos de ejemplo:
+3. Con myenv activo (myenv) instalar las dependencias si estamos en un nuevo Codespaces
 
 ```bash
-cd services/api
+pip install fastapi uvicorn tinydb pydantic
+```
+
+4. Ejecutar:
+
+```bash
+uvicorn main:app --reload
+```
+
+5. Sembrar datos de ejemplo desde services/api/
+
+```bash
 python seed.py
 ```
 
-4. Probar endpoints:
+6. Probar endpoints:
 
 ```bash
-curl "http://127.0.0.1:8000/suppliers"
-curl "http://127.0.0.1:8000/suppliers?country=Spain"
-curl "http://127.0.0.1:8000/suppliers?country=USA"
-curl "http://127.0.0.1:8000/suppliers?category=job_boards"
-curl "http://127.0.0.1:8000/suppliers?country=USA&category=job_boards"
-curl "http://127.0.0.1:8000/suppliers/by-category?category=job_boards"
-curl -X DELETE "http://127.0.0.1:8000/suppliers/3"
+/suppliers
+/suppliers?country=Spain
+/suppliers?country=USA
+/suppliers?category=job_boards
+/suppliers?country=USA&category=job_boards
+/suppliers/by-category?category=job_boards
+
 ```
 
 ### Nota de compatibilidad
