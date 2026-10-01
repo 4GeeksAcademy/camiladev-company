@@ -1,6 +1,7 @@
 import { clearToken, getToken, LOGIN_ROUTE, setToken } from "@/lib/auth-storage";
 import type {
   AuthUser,
+  ChangePasswordInput,
   LoginInput,
   LoginResponse,
   ProfileUpdateInput,
@@ -151,6 +152,38 @@ export async function register(payload: RegisterInput): Promise<void> {
 export async function getCurrentUser(): Promise<AuthUser> {
   const response = await authorizedFetch(`${API_PREFIX}/me`, { method: "GET" });
   return parseResponse<AuthUser>(response);
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const response = await fetch(`${API_PREFIX}/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+    cache: "no-store",
+  });
+
+  await parseResponse<unknown>(response);
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const response = await fetch(`${API_PREFIX}/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, new_password: newPassword }),
+    cache: "no-store",
+  });
+
+  await parseResponse<unknown>(response);
+}
+
+export async function changePassword(payload: ChangePasswordInput): Promise<void> {
+  const response = await authorizedFetch(`${API_PREFIX}/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  await parseResponse<unknown>(response);
 }
 
 export async function updateMyProfile(

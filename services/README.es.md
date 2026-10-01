@@ -45,9 +45,11 @@ source myenv/bin/activate
 
 2. Levantar la API:
 
+Si `services-1/api` ya está usando el puerto predeterminado `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo.
+
 ```bash
 cd services/api
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8001
 ```
 
 3. Con myenv activo (myenv) instalar las dependencias si estamos en un nuevo Codespaces

@@ -15,4 +15,5 @@ dependencies = [
     "python-multipart>=0.0.32",
     "tinydb>=4.9.0",
     "uvicorn[standard]>=0.52.4",
+    "resend>=2.49.0",
 ]

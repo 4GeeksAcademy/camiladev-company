@@ -2,6 +2,22 @@
 
 This API uses `uv` with a project-local virtual environment in `.venv/`.
 
+## Password reset email
+
+Password reset links are sent with Resend. Set these variables in a local
+`.env` file in `services-1/api/` before starting the API:
+
+```env
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=onboarding@resend.dev
+FRONTEND_URL=http://localhost:3000
+```
+
+Keep the Resend API key out of source control. `.env` is ignored by Git. The
+onboarding sender is suitable for development; Resend may restrict it to
+verified recipients until a sender/domain is configured in the Resend account.
+Reset links expire after 30 minutes and can only be used once.
+
 ## First setup in a new Codespace
 
 Install `uv` if it is not already available:

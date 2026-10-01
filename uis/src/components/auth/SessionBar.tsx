@@ -14,6 +14,9 @@ export function SessionBar({ email }: { email?: string }) {
         <Link href="/account/profile" className="text-slate-300 hover:text-cyan-300">
           Mi perfil
         </Link>
+        <Link href="/account/change-password" className="text-slate-300 hover:text-cyan-300">
+          Cambiar contraseña
+        </Link>
       </div>
 
       <div className="flex items-center gap-3 text-sm">

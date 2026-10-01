@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { login } from "@/lib/auth-api";
@@ -9,8 +10,10 @@ import { hasToken } from "@/lib/auth-storage";
 
 const HOME_ROUTE = "/suppliers";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const passwordReset = searchParams.get("passwordReset") === "success";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -76,6 +79,19 @@ export default function LoginPage() {
             />
           </label>
 
+          <Link
+            href="/forgot-password"
+            className="-mt-2 justify-self-end text-sm text-cyan-300 hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+
+          {passwordReset && (
+            <p role="status" className="rounded-md border border-emerald-900 bg-emerald-950/60 px-3 py-2 text-sm text-emerald-200">
+              Tu contraseña se actualizó. Ya puedes iniciar sesión.
+            </p>
+          )}
+
           {error && (
             <p
               role="alert"
@@ -102,5 +118,13 @@ export default function LoginPage() {
         </p>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-950" />}>
+      <LoginContent />
+    </Suspense>
   );
 }
