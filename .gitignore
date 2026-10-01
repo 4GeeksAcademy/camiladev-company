@@ -1,4 +1,11 @@
 .env
+.env.*
 data/db.json
+services-1/api/data/db.json
+services/api/db.json
 .venv/
 __pycache__/
+*.pem
+*.key
+*.p12
+*.pfx
