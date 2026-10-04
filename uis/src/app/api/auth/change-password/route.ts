@@ -1,13 +1,19 @@
 import {
   forwardAuthorizationHeader,
+  fetchUpstream,
   getAuthApiBaseUrl,
+  invalidRequestBodyResponse,
   passthroughResponse,
+  readRequestBody,
 } from "@/lib/backend-api";
 
 export async function POST(request: Request) {
-  const payload = await request.text();
+  const payload = await readRequestBody(request);
+  if (payload === null) {
+    return invalidRequestBodyResponse();
+  }
 
-  const response = await fetch(`${getAuthApiBaseUrl()}/auth/change-password`, {
+  const response = await fetchUpstream(`${getAuthApiBaseUrl()}/auth/change-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

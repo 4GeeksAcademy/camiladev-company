@@ -11,7 +11,7 @@ from jose import JWTError, jwt
 from passlib.hash import bcrypt
 from pydantic import BaseModel, EmailStr
 
-from email_service import send_password_reset_email
+from email_service import EmailDeliveryError, send_password_reset_email
 from services import (
     consume_password_reset_token,
     create_password_reset_token,
@@ -19,6 +19,7 @@ from services import (
     get_user_by_email,
     get_user_by_id,
     invalidate_password_reset_tokens,
+    remove_password_reset_token,
     update_user,
 )
 
@@ -63,6 +64,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 def create_access_token(user_id: str):
+    if not JWT_SECRET:
+        raise HTTPException(500, "No se pudo iniciar sesión.")
+
     expiration = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
@@ -72,16 +76,38 @@ def create_access_token(user_id: str):
         "exp": expiration
     }
 
-    return jwt.encode(
-        payload,
-        JWT_SECRET,
-        algorithm=ALGORITHM
-    )
+    try:
+        return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
+    except (JWTError, TypeError, ValueError):
+        raise HTTPException(500, "No se pudo iniciar sesión.") from None
+
+
+def hash_password(password: str):
+    if len(password.encode("utf-8")) > 72:
+        raise HTTPException(400, "La contraseña supera la longitud permitida.")
+
+    try:
+        return bcrypt.hash(password)
+    except (ValueError, TypeError):
+        raise HTTPException(500, "No se pudo procesar la contraseña.") from None
+
+
+def verify_password(password: str, hashed_password: str):
+    if len(password.encode("utf-8")) > 72:
+        return False
+
+    try:
+        return bcrypt.verify(password, hashed_password)
+    except (ValueError, TypeError):
+        raise HTTPException(500, "No se pudo validar la contraseña.") from None
 
 
 def get_current_user(
     token: str = Depends(oauth2_scheme)
 ):
+    if not JWT_SECRET:
+        raise HTTPException(500, "No se pudo validar la sesión.")
+
     try:
         payload = jwt.decode(
             token,
@@ -89,23 +115,23 @@ def get_current_user(
             algorithms=[ALGORITHM]
         )
 
-        user_id = payload.get("sub")
-
-        user = get_user_by_id(user_id)
-
-        if not user:
-            raise HTTPException(
-                status_code=401,
-                detail="Usuario no válido"
-            )
-
-        return user
-
     except JWTError:
         raise HTTPException(
             status_code=401,
             detail="Token inválido o expirado"
-        )
+        ) from None
+    except (TypeError, ValueError):
+        raise HTTPException(500, "No se pudo validar la sesión.") from None
+
+    user_id = payload.get("sub")
+    if not isinstance(user_id, str) or not user_id:
+        raise HTTPException(401, "Token inválido o expirado")
+
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(401, "Usuario no válido")
+
+    return user
 
 
 @router.post("/login")
@@ -123,7 +149,7 @@ def login(
             detail="Email o contraseña incorrectos"
         )
 
-    if not bcrypt.verify(
+    if not verify_password(
         form.password,
         user["hashed_password"]
     ):
@@ -176,18 +202,9 @@ def forgot_password(data: ForgotPasswordRequest):
 
         try:
             send_password_reset_email(user["email"], reset_url)
-        except Exception as error:
-            logger.warning(
-                "Password reset email delivery failed (%s, status=%s)",
-                type(error).__name__,
-                getattr(error, "status_code", getattr(error, "code", "n/a")),
-            )
-            from database import password_reset_tokens_table
-            from tinydb import Query
-
-            password_reset_tokens_table.remove(
-                Query().token_hash == token_hash
-            )
+        except EmailDeliveryError:
+            logger.warning("Password reset email delivery failed")
+            remove_password_reset_token(token_hash)
 
     return {
         "message": "Si el email está registrado, recibirás un enlace para restablecer tu contraseña."
@@ -196,6 +213,7 @@ def forgot_password(data: ForgotPasswordRequest):
 
 @router.post("/reset-password")
 def reset_password(data: ResetPasswordRequest):
+    hashed_password = hash_password(data.new_password)
     token_hash = hashlib.sha256(data.token.encode("utf-8")).hexdigest()
     reset_record = consume_password_reset_token(token_hash)
 
@@ -213,7 +231,7 @@ def reset_password(data: ResetPasswordRequest):
             detail="El enlace no es válido, ha caducado o ya fue utilizado.",
         )
 
-    update_user(user["id"], {"hashed_password": bcrypt.hash(data.new_password)})
+    update_user(user["id"], {"hashed_password": hashed_password})
     return {"message": "La contraseña se actualizó correctamente."}
 
 
@@ -222,12 +240,12 @@ def change_password(
     data: ChangePasswordRequest,
     current_user: dict = Depends(get_current_user),
 ):
-    if not bcrypt.verify(data.current_password, current_user["hashed_password"]):
+    if not verify_password(data.current_password, current_user["hashed_password"]):
         raise HTTPException(status_code=400, detail="La contraseña actual es incorrecta.")
 
     update_user(
         current_user["id"],
-        {"hashed_password": bcrypt.hash(data.new_password)},
+        {"hashed_password": hash_password(data.new_password)},
     )
     invalidate_password_reset_tokens(current_user["id"])
     return {"message": "La contraseña se actualizó correctamente."}

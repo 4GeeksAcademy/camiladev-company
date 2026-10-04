@@ -1,4 +1,10 @@
-import { getBackendApiBaseUrl, passthroughResponse } from "@/lib/backend-api";
+import {
+  fetchUpstream,
+  getBackendApiBaseUrl,
+  invalidRequestBodyResponse,
+  passthroughResponse,
+  readRequestBody,
+} from "@/lib/backend-api";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,7 +21,7 @@ export async function GET(request: Request) {
     backendUrl.searchParams.set("category", category);
   }
 
-  const response = await fetch(backendUrl.toString(), {
+  const response = await fetchUpstream(backendUrl.toString(), {
     method: "GET",
     cache: "no-store",
   });
@@ -24,9 +30,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const payload = await request.text();
+  const payload = await readRequestBody(request);
+  if (payload === null) {
+    return invalidRequestBodyResponse();
+  }
 
-  const response = await fetch(`${getBackendApiBaseUrl()}/suppliers`, {
+  const response = await fetchUpstream(`${getBackendApiBaseUrl()}/suppliers`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

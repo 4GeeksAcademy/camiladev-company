@@ -29,12 +29,8 @@ export function useSuppliers() {
     try {
       const data = await getSuppliers(nextFilters);
       setSuppliers(data);
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo cargar el directorio de proveedores",
-      );
+    } catch {
+      setError("No se pudo cargar el directorio de proveedores. Comprueba tu conexión e inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }
@@ -64,9 +60,9 @@ export function useSuppliers() {
     const currentCountry = filters.country;
     const currentCategory = filters.category;
 
-    const countryMatches = !currentCountry || createdSupplier.country === currentCountry;
+    const countryMatches = !currentCountry || createdSupplier?.country === currentCountry;
     const categoryMatches =
-      !currentCategory || createdSupplier.categories.includes(currentCategory);
+      !currentCategory || (createdSupplier?.categories?.includes(currentCategory) ?? false);
 
     if (countryMatches && categoryMatches) {
       setSuppliers((currentSuppliers) => [createdSupplier, ...currentSuppliers]);

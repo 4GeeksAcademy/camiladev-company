@@ -1,4 +1,5 @@
 import { clearToken, getToken, LOGIN_ROUTE, setToken } from "@/lib/auth-storage";
+import { fetchApi, publicHttpErrorMessage, readResponseText } from "@/lib/api-request";
 import type {
   AuthUser,
   ChangePasswordInput,
@@ -45,7 +46,7 @@ function extractFieldErrors(detail: unknown): Record<string, string> {
 
     const location = Array.isArray(issue.loc) ? issue.loc : [];
     const field = location.length > 0 ? String(location[location.length - 1]) : "form";
-    const message = typeof issue.msg === "string" ? issue.msg : "Valor inválido";
+    const message = typeof issue.msg === "string" ? "Revisa este campo." : "Valor inválido";
 
     fieldErrors[field] = message;
   }
@@ -54,10 +55,6 @@ function extractFieldErrors(detail: unknown): Record<string, string> {
 }
 
 function extractMessage(detail: unknown, fallback: string): string {
-  if (typeof detail === "string" && detail.trim()) {
-    return detail;
-  }
-
   if (Array.isArray(detail)) {
     const messages = Object.values(extractFieldErrors(detail));
 
@@ -70,7 +67,7 @@ function extractMessage(detail: unknown, fallback: string): string {
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
-  const text = await response.text();
+  const text = await readResponseText(response);
   let parsed: unknown = null;
 
   if (text) {
@@ -82,6 +79,13 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
 
   if (response.ok) {
+    if (parsed === null) {
+      throw new ApiError(
+        "El servicio devolvió una respuesta inesperada. Inténtalo de nuevo.",
+        response.status,
+      );
+    }
+
     return parsed as T;
   }
 
@@ -91,7 +95,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
       : null;
 
   throw new ApiError(
-    extractMessage(detail, text || "No se pudo completar la solicitud"),
+    extractMessage(detail, publicHttpErrorMessage(response.status)),
     response.status,
     extractFieldErrors(detail),
   );
@@ -104,14 +108,14 @@ function authHeaders(): HeadersInit {
 
 // Una llamada protegida que devuelve 401 implica sesión inválida: limpiar y volver al login.
 async function authorizedFetch(input: string, init: RequestInit = {}): Promise<Response> {
-  const response = await fetch(input, {
+  const response = await fetchApi(input, {
     ...init,
     cache: "no-store",
     headers: {
       ...(init.headers ?? {}),
       ...authHeaders(),
     },
-  });
+  }, "No se pudo conectar con el servicio. Comprueba tu conexión e inténtalo de nuevo.");
 
   if (response.status === 401) {
     clearToken();
@@ -127,24 +131,29 @@ async function authorizedFetch(input: string, init: RequestInit = {}): Promise<R
 }
 
 export async function login(credentials: LoginInput): Promise<string> {
-  const response = await fetch(`${API_PREFIX}/login`, {
+  const response = await fetchApi(`${API_PREFIX}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
-  });
+  }, "No se pudo iniciar sesión. Comprueba tu conexión e inténtalo de nuevo.");
 
   const data = await parseResponse<LoginResponse>(response);
-  setToken(data.access_token);
+  const accessToken = data?.access_token;
+  if (!accessToken) {
+    throw new ApiError("No se pudo iniciar sesión. Inténtalo de nuevo.", response.status);
+  }
 
-  return data.access_token;
+  setToken(accessToken);
+
+  return accessToken;
 }
 
 export async function register(payload: RegisterInput): Promise<void> {
-  const response = await fetch("/api/users", {
+  const response = await fetchApi("/api/users", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  });
+  }, "No se pudo crear la cuenta. Comprueba tu conexión e inténtalo de nuevo.");
 
   await parseResponse<unknown>(response);
 }
@@ -155,23 +164,23 @@ export async function getCurrentUser(): Promise<AuthUser> {
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
-  const response = await fetch(`${API_PREFIX}/forgot-password`, {
+  const response = await fetchApi(`${API_PREFIX}/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
     cache: "no-store",
-  });
+  }, "No se pudo enviar la solicitud. Comprueba tu conexión e inténtalo de nuevo.");
 
   await parseResponse<unknown>(response);
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  const response = await fetch(`${API_PREFIX}/reset-password`, {
+  const response = await fetchApi(`${API_PREFIX}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, new_password: newPassword }),
     cache: "no-store",
-  });
+  }, "No se pudo actualizar la contraseña. Comprueba tu conexión e inténtalo de nuevo.");
 
   await parseResponse<unknown>(response);
 }

@@ -1,5 +1,6 @@
 from pathlib import Path
 from tinydb import TinyDB
+from errors import SafeJSONStorage
 
 
 
@@ -8,7 +9,7 @@ DATA_DIR = BASE_DIR / "data"
 
 DATA_DIR.mkdir(exist_ok=True)
 
-db = TinyDB(DATA_DIR / "db.json")
+db = TinyDB(DATA_DIR / "db.json", storage=SafeJSONStorage)
 
 users_table = db.table("users")
 profiles_table = db.table("profiles")

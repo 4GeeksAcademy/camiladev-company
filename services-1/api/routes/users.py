@@ -4,10 +4,9 @@ from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
-from passlib.hash import bcrypt
 from pydantic import BaseModel
 
-from routes.auth import get_current_user
+from routes.auth import get_current_user, hash_password
 from services import (
     create_user,
     delete_user,
@@ -86,7 +85,7 @@ def register(data: UserCreate):
         "email": data.email,
 
         # bcrypt genera y guarda el hash.
-        "hashed_password": bcrypt.hash(data.password),
+        "hashed_password": hash_password(data.password),
 
         "is_active": True,
         "role": "user",
@@ -154,6 +153,9 @@ def edit_user(
         current_user
     )
 
+    if not get_user_by_id(user_id):
+        raise HTTPException(404, "Usuario no encontrado")
+
     changes = data.model_dump(
         exclude_none=True
     )
@@ -173,7 +175,7 @@ def edit_user(
             )
 
     if "password" in changes:
-        changes["hashed_password"] = bcrypt.hash(
+        changes["hashed_password"] = hash_password(
             changes.pop("password")
         )
 
@@ -191,6 +193,9 @@ def edit_user(
         user_id,
         changes
     )
+
+    if not user:
+        raise HTTPException(404, "Usuario no encontrado")
 
     return public_user(user)
 

@@ -22,12 +22,14 @@ function ProfileContent() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [form, setForm] = useState<ProfileUpdateInput>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const loadUser = useCallback(async () => {
     setIsLoading(true);
+    setLoadFailed(false);
     setError("");
 
     try {
@@ -38,12 +40,9 @@ function ProfileContent() {
         phone: currentUser.profile?.phone ?? "",
         address: currentUser.profile?.address ?? "",
       });
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo cargar el perfil",
-      );
+    } catch {
+      setLoadFailed(true);
+      setError("No se pudo cargar el perfil. Comprueba tu conexión e inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }
@@ -69,12 +68,8 @@ function ProfileContent() {
 
       setUser((current) => (current ? { ...current, profile } : current));
       setSuccessMessage("Perfil actualizado correctamente");
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo actualizar el perfil",
-      );
+    } catch {
+      setError("No se pudo guardar el perfil. Revisa los datos e inténtalo de nuevo.");
     } finally {
       setIsSaving(false);
     }
@@ -96,7 +91,7 @@ function ProfileContent() {
           )}
         </header>
 
-        {error && (
+        {error && !loadFailed && (
           <p
             role="alert"
             className="rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-sm text-rose-200"
@@ -112,7 +107,24 @@ function ProfileContent() {
         )}
 
         {isLoading ? (
-          <p className="text-sm text-slate-400">Cargando perfil...</p>
+          <p role="status" className="flex items-center gap-2 text-sm text-slate-400">
+            <span
+              aria-hidden="true"
+              className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-cyan-300"
+            />
+            Cargando perfil...
+          </p>
+        ) : loadFailed ? (
+          <div role="alert" className="grid gap-3 rounded-md border border-rose-900 bg-rose-950/60 p-4 text-sm text-rose-200">
+            <p>{error}</p>
+            <button
+              type="button"
+              onClick={() => void loadUser()}
+              className="justify-self-start rounded-md border border-rose-700 px-3 py-1.5 hover:bg-rose-900/50"
+            >
+              Reintentar carga
+            </button>
+          </div>
         ) : (
           <form
             onSubmit={handleSubmit}

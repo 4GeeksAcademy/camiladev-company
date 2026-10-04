@@ -15,6 +15,7 @@ function SuppliersContent() {
     isLoading,
     error,
     setError,
+    loadSuppliers,
     onFilterChange,
     onCreateSupplier,
     onPatchRate,
@@ -60,9 +61,16 @@ function SuppliersContent() {
         </header>
 
         {error && (
-          <p className="rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-sm text-rose-200">
-            {error}
-          </p>
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-sm text-rose-200">
+            <p>{error}</p>
+            <button
+              type="button"
+              onClick={() => void loadSuppliers(filters)}
+              className="rounded-md border border-rose-700 px-3 py-1.5 hover:bg-rose-900/50"
+            >
+              Reintentar carga
+            </button>
+          </div>
         )}
 
         <SupplierTable

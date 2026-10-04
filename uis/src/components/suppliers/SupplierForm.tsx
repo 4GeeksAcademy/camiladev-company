@@ -86,12 +86,8 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
       });
 
       setForm(INITIAL_STATE);
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "No se pudo registrar el proveedor",
-      );
+    } catch {
+      setError("No se pudo registrar el proveedor. Revisa los datos y vuelve a pulsar «Crear proveedor».");
     } finally {
       setIsSaving(false);
     }
@@ -248,7 +244,7 @@ export function SupplierForm({ onSubmit }: SupplierFormProps) {
         </div>
 
         {error && (
-          <p className="rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
+          <p role="alert" className="rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
             {error}
           </p>
         )}

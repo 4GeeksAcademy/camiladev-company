@@ -78,7 +78,16 @@ http://127.0.0.1:8000
 	- Formulario para crear proveedor
 	- Usa los campos del modelo backend
 	- Envía POST a suppliers
-	- Muestra mensaje de error de API cuando backend rechaza entrada
+	- Muestra errores legibles y permite volver a intentar el envío
+
+## Gestión de errores y estados de carga
+
+- Las llamadas de autenticación y proveedores usan `src/lib/api-request.ts` para capturar fallos de red y lectura de respuestas, y mostrar mensajes públicos en español.
+- Las respuestas HTTP con error se traducen a mensajes seguros; no se muestra en la interfaz el body crudo ni detalles internos del backend.
+- Las rutas proxy de `src/app/api/` capturan fallos al conectar con el backend, devuelven errores controlados y validan los cuerpos recibidos. Un JSON inválido o nulo en el inicio de sesión produce una respuesta 400 controlada.
+- El directorio de proveedores y la carga del perfil muestran un indicador mientras consultan datos. Si la carga falla, ofrecen una acción para reintentar.
+- Los errores de las acciones por fila ofrecen un botón de reintento. Los formularios conservan sus controles para corregir los datos o volver a enviar la operación.
+- Los estados de envío y carga se limpian en bloques `finally`; los accesos a datos opcionales usan valores seguros para evitar errores al renderizar.
 
 ## Endpoints consumidos por el frontend
 
@@ -108,7 +117,13 @@ http://127.0.0.1:8000
 6. src/lib/suppliers-api.ts
 	- Cliente API para operaciones CRUD/PATCH
 
-7. src/app/api/suppliers/*
+7. `src/lib/auth-api.ts` y `src/lib/api-request.ts`
+	- Cliente de autenticación y manejo común de errores HTTP/red
+
+8. `src/lib/backend-api.ts`
+	- Conexión protegida y normalización de respuestas en las rutas proxy
+
+9. `src/app/api/suppliers/*` y `src/app/api/auth/*`
 	- Rutas internas de Next que hacen proxy al backend
 
 ## Configuracion de URL de Proveedores en HTML estatico

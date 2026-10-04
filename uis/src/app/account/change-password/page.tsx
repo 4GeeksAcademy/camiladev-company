@@ -35,12 +35,8 @@ function ChangePasswordContent() {
       setNewPassword("");
       setConfirmation("");
       setSuccessMessage("Tu contraseña se actualizó correctamente.");
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo actualizar la contraseña.",
-      );
+    } catch {
+      setError("No se pudo actualizar la contraseña. Revisa los datos y vuelve a pulsar «Guardar contraseña».");
     } finally {
       setIsSubmitting(false);
     }

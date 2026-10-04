@@ -84,7 +84,7 @@ export default function RegisterPage() {
         }
 
         if (Object.keys(fieldErrors).length === 0) {
-          fieldErrors.form = requestError.message;
+          fieldErrors.form = "No se pudo crear la cuenta. Revisa los datos e inténtalo de nuevo.";
         }
 
         setErrors(fieldErrors);
@@ -92,10 +92,7 @@ export default function RegisterPage() {
       }
 
       setErrors({
-        form:
-          requestError instanceof Error
-            ? requestError.message
-            : "No se pudo crear la cuenta",
+        form: "No se pudo crear la cuenta. Revisa los datos y vuelve a pulsar «Registrarme».",
       });
     } finally {
       setIsSubmitting(false);

@@ -1,4 +1,4 @@
-import { getBackendApiBaseUrl, passthroughResponse } from "@/lib/backend-api";
+import { fetchUpstream, getBackendApiBaseUrl, passthroughResponse } from "@/lib/backend-api";
 
 export async function DELETE(
   _request: Request,
@@ -6,7 +6,7 @@ export async function DELETE(
 ) {
   const { supplierId } = await context.params;
 
-  const response = await fetch(`${getBackendApiBaseUrl()}/suppliers/${supplierId}`, {
+  const response = await fetchUpstream(`${getBackendApiBaseUrl()}/suppliers/${supplierId}`, {
     method: "DELETE",
   });
 
