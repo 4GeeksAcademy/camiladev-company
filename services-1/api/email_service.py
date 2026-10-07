@@ -3,11 +3,15 @@ import os
 import resend
 
 
+class EmailDeliveryError(Exception):
+    pass
+
+
 def send_password_reset_email(email: str, reset_url: str):
     api_key = os.getenv("RESEND_API_KEY")
 
     if not api_key:
-        raise RuntimeError("RESEND_API_KEY is not configured")
+        raise EmailDeliveryError("El servicio de correo no está disponible.")
 
     resend.api_key = api_key
     sender = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev")
@@ -35,4 +39,7 @@ def send_password_reset_email(email: str, reset_url: str):
             '</div>'
         ),
     }
-    resend.Emails.send(payload)
+    try:
+        resend.Emails.send(payload)
+    except Exception:
+        raise EmailDeliveryError("No se pudo enviar el correo.") from None

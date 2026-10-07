@@ -19,12 +19,8 @@ export default function ForgotPasswordPage() {
     try {
       await requestPasswordReset(email.trim());
       setHasSubmitted(true);
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo enviar la solicitud. Inténtalo de nuevo.",
-      );
+    } catch {
+      setError("No se pudo enviar la solicitud. Vuelve a intentarlo con «Enviar enlace».");
     } finally {
       setIsSubmitting(false);
     }

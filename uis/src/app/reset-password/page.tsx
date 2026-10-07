@@ -31,12 +31,8 @@ function ResetPasswordForm() {
       await resetPassword(token, newPassword);
       clearToken();
       router.replace("/login?passwordReset=success");
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "El enlace no es válido o ha caducado. Solicita uno nuevo.",
-      );
+    } catch {
+      setError("No se pudo actualizar la contraseña. Solicita un enlace nuevo e inténtalo otra vez.");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,12 +1,25 @@
-import { getAuthApiBaseUrl, passthroughResponse } from "@/lib/backend-api";
+import {
+  fetchUpstream,
+  getAuthApiBaseUrl,
+  invalidRequestBodyResponse,
+  passthroughResponse,
+} from "@/lib/backend-api";
 
 export async function POST(request: Request) {
-  const { email, password } = (await request.json()) as {
-    email?: string;
-    password?: string;
-  };
+  let payload: unknown;
+  try {
+    payload = await request.json();
+  } catch {
+    return invalidRequestBodyResponse();
+  }
 
-  if (!email || !password) {
+  if (!payload || typeof payload !== "object") {
+    return invalidRequestBodyResponse();
+  }
+
+  const { email, password } = payload as { email?: unknown; password?: unknown };
+
+  if (typeof email !== "string" || !email || typeof password !== "string" || !password) {
     return Response.json(
       { detail: "Email y contraseña son obligatorios" },
       { status: 400 },
@@ -16,7 +29,7 @@ export async function POST(request: Request) {
   // El backend expone /auth/login como OAuth2 password flow (form-urlencoded).
   const form = new URLSearchParams({ username: email, password });
 
-  const response = await fetch(`${getAuthApiBaseUrl()}/auth/login`, {
+  const response = await fetchUpstream(`${getAuthApiBaseUrl()}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: form.toString(),

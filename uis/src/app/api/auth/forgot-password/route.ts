@@ -1,9 +1,18 @@
-import { getAuthApiBaseUrl, passthroughResponse } from "@/lib/backend-api";
+import {
+  fetchUpstream,
+  getAuthApiBaseUrl,
+  invalidRequestBodyResponse,
+  passthroughResponse,
+  readRequestBody,
+} from "@/lib/backend-api";
 
 export async function POST(request: Request) {
-  const payload = await request.text();
+  const payload = await readRequestBody(request);
+  if (payload === null) {
+    return invalidRequestBodyResponse();
+  }
 
-  const response = await fetch(`${getAuthApiBaseUrl()}/auth/forgot-password`, {
+  const response = await fetchUpstream(`${getAuthApiBaseUrl()}/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload,

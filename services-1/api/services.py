@@ -54,6 +54,10 @@ def create_password_reset_token(user_id: str, token_hash: str, expires_at: str):
     })
 
 
+def remove_password_reset_token(token_hash: str):
+    password_reset_tokens_table.remove(ResetToken.token_hash == token_hash)
+
+
 def consume_password_reset_token(token_hash: str):
     records = password_reset_tokens_table.search(
         ResetToken.token_hash == token_hash
@@ -66,6 +70,8 @@ def consume_password_reset_token(token_hash: str):
 
     try:
         expires_at = datetime.fromisoformat(record["expires_at"])
+        if expires_at.tzinfo is None:
+            raise ValueError("Missing timezone")
     except (KeyError, TypeError, ValueError):
         password_reset_tokens_table.remove(ResetToken.token_hash == token_hash)
         return None

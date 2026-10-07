@@ -35,42 +35,62 @@ Exponer una API REST para gestionar proveedores (`suppliers`) con validación de
 - `services/api/routes/suppliers.py`:
 	Endpoints HTTP de proveedores (`POST /suppliers`, `GET /suppliers` con filtros por `country` y `category`, alias `GET /suppliers/by-category`, `PATCH` de `status`, `PATCH` de `rate` y `DELETE /suppliers/{id}`).
 
+### Gestión de errores implementada
+
+- [api/errors.py](api/errors.py) define `SafeJSONStorage`: captura errores de lectura, JSON corrupto y escritura en la operación de almacenamiento concreta, sin envolver handlers completos.
+- [api/main.py](api/main.py) registra manejadores para errores HTTP, validación y excepciones inesperadas. Las respuestas conservan el formato JSON `{"detail": ...}`.
+- Los errores `422` incluyen ubicación, tipo y un mensaje de validación seguro; omiten valores de entrada y contexto interno. Los errores `500` devuelven un mensaje genérico, sin excepciones crudas, rutas internas ni tracebacks.
+- [api/routes/suppliers.py](api/routes/suppliers.py) responde `400` ante filtros no válidos sin reflejar la entrada recibida, `404` cuando el proveedor no existe y `500` si un registro almacenado no puede validarse al serializarlo.
+- Los logs propios de error usan mensajes fijos, sin datos del proveedor ni detalles de excepciones. La salida del seeder conserva únicamente el recuento de registros insertados.
+
+#### Verificaciones realizadas
+
+Se comprobaron errores de lectura/escritura simulados, filtros inválidos, registros corruptos y proveedores inexistentes. Las solicitudes ASGI verificaron respuestas `200`, `404`, `422` y `500`, sin valores sensibles de prueba ni tracebacks en el cuerpo. Se usó almacenamiento en memoria, sin modificar la base de datos real; los diagnósticos del editor y `git diff --check` no detectaron errores.
+
 ### Cómo ejecutarlo
 
-1. Activar entorno virtual desde la raíz del repositorio:
+1. Crear el entorno virtual si es un nuevo Codespaces:
+```bash
+python -m venv myenv
+```
+
+2. Activar entorno virtual desde la raíz del repositorio:
 
 ```bash
 source myenv/bin/activate
 ```
 
-2. Levantar la API:
-
-Si `services-1/api` ya está usando el puerto predeterminado `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo.
+3. Entrar en el directorio del servicio:
 
 ```bash
 cd services/api
-uvicorn main:app --reload --port 8001
 ```
 
-3. Con myenv activo (myenv) instalar las dependencias si estamos en un nuevo Codespaces
+4. Con myenv activo (myenv) instalar las dependencias si estamos en un nuevo Codespaces
 
 ```bash
 pip install fastapi uvicorn tinydb pydantic
 ```
 
-4. Ejecutar:
+5. Ejecutar:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-5. Sembrar datos de ejemplo desde services/api/
+Si `services-1/api` ya está usando el puerto `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo:
+
+```bash
+uvicorn main:app --reload --port 8001
+```
+
+6. Sembrar datos de ejemplo desde services/api/
 
 ```bash
 python seed.py
 ```
 
-6. Probar endpoints:
+7. Probar endpoints:
 
 ```bash
 /suppliers

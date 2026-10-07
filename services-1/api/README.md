@@ -52,6 +52,13 @@ Desde `services-1/api/`, ejecuta:
 uv run uvicorn main:app --reload
 ```
 
+Si `services/api` ya está usando el puerto `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo:
+
+```bash
+  uv run uvicorn main:app --reload --8001
+  ```
+
+
 Deja esa terminal abierta. La API queda disponible en `http://127.0.0.1:8000`;
 la documentación interactiva está en `http://127.0.0.1:8000/docs`.
 
@@ -116,8 +123,9 @@ Vuelve a iniciar sesión con `NEW_PASSWORD`; debe funcionar. Una solicitud a
 
 ## 6. Probar el restablecimiento por email
 
-Solicita un enlace para una cuenta existente. La API siempre responde `200` y
-usa el mismo mensaje para evitar revelar si el email está registrado:
+Solicita un enlace para una cuenta existente. Si la solicitud es válida y no
+falla la persistencia, la API responde `200` con el mismo mensaje para evitar
+revelar si el email está registrado:
 
 ```bash
 curl -i -X POST http://127.0.0.1:8000/auth/forgot-password \
@@ -149,3 +157,20 @@ tras 30 minutos y solo se pueden utilizar una vez.
 Si no llega el email, revisa la terminal de Uvicorn y **Emails/Logs** en Resend.
 El mensaje `200` de `forgot-password` no confirma el envío. No imprimas ni
 compartas la API key, contraseñas o el token de restablecimiento.
+
+## Gestión de errores implementada
+
+- [errors.py](errors.py) protege las operaciones de lectura y escritura de TinyDB mediante `SafeJSONStorage`. Los errores de disco, JSON corrupto y serialización se capturan en esa frontera, sin envolver rutas completas.
+- [main.py](main.py) registra respuestas JSON `{"detail": ...}` para errores HTTP, validación y excepciones inesperadas. Los errores `422` omiten valores de entrada y contexto interno; los `500` usan mensajes genéricos sin tracebacks, rutas, claves ni detalles de excepciones.
+- [routes/auth.py](routes/auth.py) limita la captura JWT a la decodificación o firma del token. Credenciales o tokens inválidos producen `401`; configuración JWT ausente o fallos internos producen `500`.
+- Las operaciones bcrypt se capturan por separado. Contraseñas nuevas de más de 72 bytes UTF-8 producen `400`; hashes almacenados no válidos producen `500`. La longitud se comprueba antes de consumir el token de restablecimiento.
+- [routes/users.py](routes/users.py) y [routes/profiles.py](routes/profiles.py) devuelven `404` al actualizar un usuario o perfil inexistente, en lugar de serializar un resultado nulo.
+- [email_service.py](email_service.py) captura fallos únicamente alrededor del envío a Resend y los traduce a `EmailDeliveryError`, sin exponer la excepción del proveedor. Si falta la configuración de correo, también genera ese error seguro.
+- Ante un fallo de entrega, `forgot-password` elimina el token recién creado y conserva la respuesta uniforme para evitar enumerar cuentas. Un `200` no garantiza el envío; una entrada inválida puede devolver `422` y un fallo de persistencia, `500`.
+- [services.py](services.py) rechaza y elimina tokens con fechas corruptas o sin zona horaria. Los logs propios usan mensajes fijos, sin destinatarios, contraseñas, claves ni enlaces de recuperación.
+
+### Verificaciones realizadas
+
+Se probaron JWT inválido y configuración ausente, contraseñas demasiado largas, hashes corruptos, usuarios/perfiles inexistentes y fallos simulados de Resend. También se verificaron la limpieza de tokens y el rechazo de fechas sin zona horaria.
+
+Las solicitudes ASGI comprobaron respuestas `401`, `422` y `500` en JSON, sin valores sensibles de prueba ni tracebacks. Las pruebas usaron mocks y TinyDB en memoria: no enviaron correos ni modificaron la base de datos real. Los diagnósticos del editor y `git diff --check` no detectaron errores.

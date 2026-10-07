@@ -29,6 +29,10 @@ export function SupplierTable({
 }: SupplierTableProps) {
   const [error, setError] = useState<string>("");
   const [busyRowId, setBusyRowId] = useState<number | null>(null);
+  const [retryAction, setRetryAction] = useState<{
+    supplierId: number;
+    run: () => Promise<void>;
+  } | null>(null);
 
   const [draftRates, setDraftRates] = useState<Record<number, string>>({});
   const [draftStatuses, setDraftStatuses] = useState<Record<number, SupplierStatus>>({});
@@ -52,12 +56,10 @@ export function SupplierTable({
 
     try {
       await action();
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo ejecutar la acción sobre el proveedor",
-      );
+      setRetryAction(null);
+    } catch {
+      setRetryAction({ supplierId, run: action });
+      setError("No se pudo completar la acción. Reinténtala con el control de la fila o «Reintentar acción».");
     } finally {
       setBusyRowId(null);
     }
@@ -83,9 +85,19 @@ export function SupplierTable({
       </div>
 
       {error && (
-        <p className="mb-3 rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
-          {error}
-        </p>
+        <div role="alert" className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
+          <p>{error}</p>
+          {retryAction && (
+            <button
+              type="button"
+              disabled={busyRowId !== null}
+              onClick={() => void runRowAction(retryAction.supplierId, retryAction.run)}
+              className="rounded-md border border-rose-700 px-3 py-1.5 hover:bg-rose-900/50 disabled:opacity-50"
+            >
+              Reintentar acción
+            </button>
+          )}
+        </div>
       )}
 
       <div className="overflow-x-auto">
@@ -242,7 +254,15 @@ export function SupplierTable({
         </table>
       </div>
 
-      {isLoading && <p className="mt-3 text-xs text-slate-400">Cargando proveedores...</p>}
+      {isLoading && (
+        <p role="status" className="mt-3 flex items-center gap-2 text-xs text-slate-400">
+          <span
+            aria-hidden="true"
+            className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-600 border-t-cyan-300"
+          />
+          Cargando proveedores...
+        </p>
+      )}
       {!isLoading && suppliers.length === 0 && (
         <p className="mt-3 text-xs text-slate-400">No hay proveedores para los filtros actuales.</p>
       )}

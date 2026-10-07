@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime, timezone
+from pydantic import ValidationError
 
 from database import suppliers_table
 from models import Suppliers, SupplierStatusPatch, SupplierRatePatch, SupplierRead, Category, Country
@@ -11,11 +12,19 @@ router = APIRouter(
 
 
 def serialize_document(document):
+    if document is None:
+        raise HTTPException(404, "Proveedor no encontrado")
+
     payload = {
         "id": document.doc_id,
         **document
     }
-    return SupplierRead(**payload).model_dump(mode="json")
+    try:
+        supplier = SupplierRead(**payload)
+    except ValidationError:
+        raise HTTPException(500, "No se pudieron recuperar los datos del proveedor.") from None
+
+    return supplier.model_dump(mode="json")
 
 
 def filter_suppliers(country: str | None = None, category: str | None = None):
@@ -33,7 +42,7 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
             valid_country = [item.value for item in Country]
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid country '{country}'. Valid options are: {valid_country}"
+                detail=f"País no válido. Opciones permitidas: {valid_country}"
             )
         # Filtra solo proveedores del país solicitado.
         documents = [doc for doc in documents if doc.get("country") == country_value]
@@ -46,7 +55,7 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
             valid_categories = [item.value for item in Category]
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid category '{category}'. Valid options are: {valid_categories}"
+                detail=f"Categoría no válida. Opciones permitidas: {valid_categories}"
             )
         # Filtra proveedores que contengan esa categoría en su lista de categorías.
         documents = [doc for doc in documents if category_value in doc.get("categories", [])]

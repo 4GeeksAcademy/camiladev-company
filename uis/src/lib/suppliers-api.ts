@@ -4,6 +4,7 @@ import type {
   SupplierFilters,
   SupplierStatus,
 } from "@/types/suppliers";
+import { fetchApi, publicHttpErrorMessage, readResponseText } from "@/lib/api-request";
 
 interface ApiErrorShape {
   detail?: unknown;
@@ -28,7 +29,7 @@ function buildQuery(filters?: SupplierFilters): string {
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
-  const text = await response.text();
+  const text = await readResponseText(response);
   let parsed: T | ApiErrorShape | null = null;
 
   if (text) {
@@ -74,7 +75,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
         return "Solicitud invalida. Revisa los campos e intenta de nuevo.";
       }
 
-      return "Unexpected API error";
+      return publicHttpErrorMessage(response.status);
     };
 
     const detail =
@@ -82,35 +83,35 @@ async function parseResponse<T>(response: Response): Promise<T> {
         ? formatDetail(parsed.detail)
         : parsed && typeof parsed === "object" && "message" in parsed
           ? parsed.message
-          : text || "Unexpected API error";
+              : publicHttpErrorMessage(response.status);
 
-    throw new Error(String(detail ?? "Unexpected API error"));
+            throw new Error(String(detail ?? publicHttpErrorMessage(response.status)));
   }
 
   if (parsed === null) {
-    throw new Error("La API devolvio una respuesta invalida");
+    throw new Error("El servicio devolvió una respuesta inesperada. Inténtalo de nuevo.");
   }
 
   return parsed as T;
 }
 
 export async function getSuppliers(filters?: SupplierFilters): Promise<Supplier[]> {
-  const response = await fetch(`${API_PREFIX}${buildQuery(filters)}`, {
+  const response = await fetchApi(`${API_PREFIX}${buildQuery(filters)}`, {
     method: "GET",
     cache: "no-store",
-  });
+  }, "No se pudo cargar el directorio. Comprueba tu conexión e inténtalo de nuevo.");
 
   return parseResponse<Supplier[]>(response);
 }
 
 export async function createSupplier(payload: SupplierCreateInput): Promise<Supplier> {
-  const response = await fetch(API_PREFIX, {
+  const response = await fetchApi(API_PREFIX, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
-  });
+  }, "No se pudo registrar el proveedor. Comprueba tu conexión e inténtalo de nuevo.");
 
   return parseResponse<Supplier>(response);
 }
@@ -119,13 +120,13 @@ export async function patchSupplierStatus(
   supplierId: number,
   status: SupplierStatus,
 ): Promise<Supplier> {
-  const response = await fetch(`${API_PREFIX}/${supplierId}/status`, {
+  const response = await fetchApi(`${API_PREFIX}/${supplierId}/status`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ status }),
-  });
+  }, "No se pudo actualizar el estado. Comprueba tu conexión e inténtalo de nuevo.");
 
   return parseResponse<Supplier>(response);
 }
@@ -134,21 +135,21 @@ export async function patchSupplierRate(
   supplierId: number,
   monthlyRate: number,
 ): Promise<Supplier> {
-  const response = await fetch(`${API_PREFIX}/${supplierId}/rate`, {
+  const response = await fetchApi(`${API_PREFIX}/${supplierId}/rate`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ monthly_rate: monthlyRate }),
-  });
+  }, "No se pudo actualizar la tarifa. Comprueba tu conexión e inténtalo de nuevo.");
 
   return parseResponse<Supplier>(response);
 }
 
 export async function deleteSupplier(supplierId: number): Promise<{ message: string }> {
-  const response = await fetch(`${API_PREFIX}/${supplierId}`, {
+  const response = await fetchApi(`${API_PREFIX}/${supplierId}`, {
     method: "DELETE",
-  });
+  }, "No se pudo eliminar el proveedor. Comprueba tu conexión e inténtalo de nuevo.");
 
   return parseResponse<{ message: string }>(response);
 }

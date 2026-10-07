@@ -33,12 +33,8 @@ function LoginContent() {
     try {
       await login({ email, password });
       router.replace(HOME_ROUTE);
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo iniciar sesión",
-      );
+    } catch {
+      setError("No se pudo iniciar sesión. Comprueba tus datos e inténtalo de nuevo o recupera tu contraseña.");
     } finally {
       setIsSubmitting(false);
     }
