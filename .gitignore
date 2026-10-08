@@ -5,6 +5,8 @@ services-1/api/data/db.json
 services/api/db.json
 .venv/
 __pycache__/
+.pytest_cache/
+.coverage*
 *.pem
 *.key
 *.p12

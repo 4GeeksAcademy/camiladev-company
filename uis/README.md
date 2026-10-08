@@ -1,3 +1,4 @@
+
 # Frontend UI (Next.js)
 
 Este frontend está construido con Next.js, React, TypeScript y Tailwind CSS.

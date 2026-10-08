@@ -1,0 +1,16 @@
+[dependency-groups]
+dev = ["api", "pytest>=9.1.1", "pytest-cov>=7.1.0"]
+
+[tool.uv.workspace]
+members = ["services-1/api"]
+
+[tool.uv.sources]
+api = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["services-1/api/tests"]
+pythonpath = ["services-1/api"]
+addopts = "--cov=routes.auth --cov-report=term-missing --cov-fail-under=70"
+
+[tool.coverage.run]
+source = ["routes.auth"]
