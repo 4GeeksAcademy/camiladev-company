@@ -17,7 +17,7 @@ Instala las dependencias y crea el entorno virtual:
 ```bash
 cd services-1/api
 uv sync
-```
+```u
 
 ## 2. Configurar variables locales
 
