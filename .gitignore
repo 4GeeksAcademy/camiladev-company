@@ -11,3 +11,8 @@ __pycache__/
 *.key
 *.p12
 *.pfx
+node_modules
+.next
+next-env.d.ts
+test-results
+*.tsbuildinfo
