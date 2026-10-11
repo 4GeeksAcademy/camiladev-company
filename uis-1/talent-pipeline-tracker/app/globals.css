@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --background: #020617;
+  --foreground: #f1f5f9;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+}
+
+@layer base {
+  body { @apply m-0 text-sm leading-relaxed; font-family: var(--font-body), sans-serif; letter-spacing: 0; }
+  button, input, select, textarea { font: inherit; letter-spacing: 0; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  button, select { @apply cursor-pointer; }
+  button:disabled, input:disabled, select:disabled, textarea:disabled { @apply cursor-wait opacity-60; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-cyan-300; }
+  h1, h2, .brand { font-family: var(--font-heading), sans-serif; }
+  h1 { @apply text-3xl font-bold leading-tight text-white; overflow-wrap: anywhere; }
+  h2 { @apply text-lg font-bold leading-normal text-white; }
+  fieldset { @apply m-0 min-w-0 border-0 p-0; }
+  label { @apply flex min-w-0 flex-col gap-2 text-sm font-semibold text-slate-200; }
+  input, select, textarea { @apply min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 font-normal text-slate-100 transition focus:border-cyan-300; }
+  select { @apply pr-7; }
+  option { @apply bg-slate-950 text-slate-100; }
+  textarea { @apply min-h-28 resize-y; }
+  input::placeholder, textarea::placeholder { @apply text-slate-400; }
+  table { @apply w-full border-collapse text-left; }
+  th { @apply bg-slate-900/75 px-4 py-3 text-xs font-semibold whitespace-nowrap text-slate-400; }
+  td { @apply min-w-35 border-t border-slate-800 px-4 py-4 text-slate-200; overflow-wrap: anywhere; }
+  td:first-child { @apply min-w-50; }
+  td:last-child { @apply whitespace-nowrap; }
+  tbody tr { @apply transition hover:bg-slate-800/50; }
+}
+
+@layer components {
+  .page-heading { @apply mb-7 flex items-center justify-between gap-5; }
+  .page-heading .muted { @apply mt-2; }
+  .eyebrow { @apply mb-2 text-xs font-semibold text-cyan-300; }
+  .muted { @apply text-slate-400; }
+  .button { @apply inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-transparent bg-cyan-300 px-5 py-2.5 text-center text-sm font-bold text-slate-950 transition; }
+  .button:hover:not(:disabled) { @apply bg-cyan-200; }
+  .button.secondary { @apply border-slate-500 bg-transparent text-slate-100; }
+  .button.secondary:hover:not(:disabled) { @apply border-cyan-300 bg-cyan-300/10 text-cyan-200; }
+  .button.destructive { @apply border-rose-300/40 bg-rose-300 text-slate-950; }
+  .button.destructive:hover:not(:disabled) { @apply bg-rose-200; }
+  .text-button, .back-link { @apply border-0 bg-transparent p-0 font-semibold text-cyan-300 transition hover:text-cyan-200; }
+  .text-button:hover, .back-link:hover, .candidate-name:hover { @apply underline underline-offset-4; }
+  .text-button.danger { @apply text-rose-300 hover:text-rose-200; }
+  .back-link { @apply mb-6 inline-block; }
+  .metrics { @apply mb-7 grid grid-cols-3 gap-3; }
+  .metrics > div { @apply flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/75 p-4; }
+  .metrics span { @apply text-xs text-slate-400; }
+  .metrics strong { @apply text-2xl font-bold text-cyan-300 tabular-nums; }
+  .metrics > div:nth-child(3) strong { @apply text-emerald-300; }
+  .filters { @apply mb-7 grid items-end gap-4; grid-template-columns: minmax(200px, 1fr) 190px 235px auto; }
+  .list-caption { @apply my-4 flex items-center justify-between gap-4 text-sm text-slate-400; }
+  .table-wrap { @apply overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/40; }
+  .candidate-name { @apply font-semibold text-white transition hover:text-cyan-300; }
+  .badge { @apply inline-flex rounded-full border border-slate-700 bg-slate-800/70 px-3 py-1 text-xs font-semibold whitespace-nowrap text-slate-200; }
+  .badge.in_progress { @apply border-cyan-300/40 bg-cyan-300/10 text-cyan-100; }
+  .badge.selected { @apply border-emerald-300/40 bg-emerald-300/10 text-emerald-300; }
+  .badge.discarded { @apply border-rose-300/40 bg-rose-300/10 text-rose-300; }
+  .empty { @apply border-y border-slate-800 px-5 py-14 text-center; }
+  .empty p { @apply mt-2 text-slate-300; }
+  .loading { @apply flex items-center gap-3 py-10 text-slate-300; }
+  .spinner { @apply size-5 shrink-0 rounded-full border-2 border-slate-700 border-t-cyan-300 motion-safe:animate-spin; }
+  .notice { @apply mb-5 border-l-2 px-4 py-3; overflow-wrap: anywhere; }
+  .notice.success { @apply border-emerald-300 bg-emerald-300/10 text-emerald-300; }
+  .notice.error { @apply border-rose-300 bg-rose-300/10 text-rose-200; }
+  .notice.error .button { @apply mt-3; }
+  .candidate-form { @apply max-w-[900px]; }
+  .form-grid { @apply grid grid-cols-2 gap-6 pt-3 pb-7; }
+  .actions { @apply flex flex-wrap items-center gap-3; }
+  .pipeline-section { @apply mb-7 border-y border-slate-800/80 bg-slate-900/40 p-6; }
+  .pipeline-controls { @apply mt-4 flex flex-wrap items-center gap-5; }
+  .pipeline-controls label { @apply w-[285px] max-w-full; }
+  .detail-section { @apply border-b border-slate-800 pt-6 pb-8; }
+  .section-heading { @apply flex flex-wrap items-center justify-between gap-4; }
+  .privacy-toggle { @apply flex-row items-center font-medium text-slate-300; }
+  .privacy-toggle input { @apply size-4 min-h-4 accent-cyan-300; }
+  .details-grid { @apply mt-6 grid grid-cols-2 gap-x-9 gap-y-6; }
+  .details-grid dt { @apply mb-1 text-xs text-slate-400; }
+  .details-grid dd { @apply m-0 font-medium text-slate-200; overflow-wrap: anywhere; }
+  .notes-section { @apply max-w-[900px] pt-8; }
+  .notes-section > .section-heading { @apply mb-5; }
+  .notes-list { @apply mb-6 list-none p-0; }
+  .notes-list li { @apply border-b border-slate-800 py-5; }
+  .notes-list time { @apply text-xs text-slate-400; }
+  .note-content { @apply mt-3 whitespace-pre-wrap text-slate-200; overflow-wrap: anywhere; }
+  .note-form { @apply mt-6; }
+  .note-form button { @apply mt-4; }
+  .empty-notes { @apply py-4; }
+  .delete-confirm { @apply mt-4 border-l-2 border-rose-300 bg-rose-300/10 p-4 text-rose-200; }
+  .delete-confirm .actions { @apply mt-3; }
+
+  @media (max-width: 980px) {
+    .filters { @apply grid-cols-2; }
+    .search-field { @apply col-span-full; }
+    .metrics > div { @apply flex-col items-start gap-2; }
+  }
+  @media (max-width: 600px) {
+    .page-heading { @apply flex-col items-start gap-4; }
+    .metrics { @apply gap-2; }
+    .metrics > div { @apply p-3; }
+    .metrics span { @apply text-[11px]; }
+    .filters { @apply grid-cols-1; }
+    .filters .button { @apply justify-self-start; }
+    .form-grid, .details-grid { @apply grid-cols-1; }
+    .pipeline-section { @apply p-4; }
+    .pipeline-controls label { @apply w-full; }
+  }
+}
