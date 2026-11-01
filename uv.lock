@@ -4,12 +4,12 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
-    "api",
+    "nexova-backoffice-api",
 ]
 
 [manifest.dependency-groups]
 dev = [
-    { name = "api", virtual = "services-1/api" },
+    { name = "nexova-backoffice-api", virtual = "backoffice/services" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
@@ -43,53 +43,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a9/d2/f4d173e22df740bc37b1db102b386ba719b66e95b0f0d751f556b387e6d2/anyio-4.15.1.tar.gz", hash = "sha256:9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94", size = 276966, upload-time = "2026-09-05T10:42:39.44Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/12/b8/4bd346e22b28902df4d651910f5242c28d84e4a5c2435ca5c3f797ed7e2e/anyio-4.15.1-py3-none-any.whl", hash = "sha256:6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101", size = 132079, upload-time = "2026-09-05T10:42:37.923Z" },
-]
-
-[[package]]
-name = "api"
-version = "0.1.0"
-source = { virtual = "services-1/api" }
-dependencies = [
-    { name = "bcrypt" },
-    { name = "fastapi" },
-    { name = "libpass", extra = ["bcrypt"] },
-    { name = "passlib", extra = ["bcrypt"] },
-    { name = "pydantic", extra = ["email"] },
-    { name = "python-dotenv" },
-    { name = "python-jose", extra = ["cryptography"] },
-    { name = "python-multipart" },
-    { name = "resend" },
-    { name = "tinydb" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "bcrypt", specifier = "<5" },
-    { name = "fastapi", specifier = ">=0.141.1" },
-    { name = "libpass", extras = ["bcrypt"], specifier = ">=1.9.3" },
-    { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
-    { name = "pydantic", extras = ["email"], specifier = ">=2.13.5" },
-    { name = "python-dotenv", specifier = ">=1.2.3" },
-    { name = "python-jose", extras = ["cryptography"], specifier = ">=3.5.0" },
-    { name = "python-multipart", specifier = ">=0.0.32" },
-    { name = "resend", specifier = ">=2.49.0" },
-    { name = "tinydb", specifier = ">=4.9.0" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.52.4" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
 
 [[package]]
@@ -702,6 +655,50 @@ wheels = [
 bcrypt = [
     { name = "bcrypt" },
 ]
+
+[[package]]
+name = "nexova-backoffice-api"
+version = "0.1.0"
+source = { virtual = "backoffice/services" }
+dependencies = [
+    { name = "bcrypt" },
+    { name = "fastapi" },
+    { name = "libpass", extra = ["bcrypt"] },
+    { name = "passlib", extra = ["bcrypt"] },
+    { name = "pydantic", extra = ["email"] },
+    { name = "python-dotenv" },
+    { name = "python-jose", extra = ["cryptography"] },
+    { name = "python-multipart" },
+    { name = "resend" },
+    { name = "tinydb" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "bcrypt", specifier = "<5" },
+    { name = "fastapi", specifier = ">=0.141.1" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28.1" },
+    { name = "libpass", extras = ["bcrypt"], specifier = ">=1.9.3" },
+    { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
+    { name = "pydantic", extras = ["email"], specifier = ">=2.13.5" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.1.1" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=7.1.0" },
+    { name = "python-dotenv", specifier = ">=1.2.3" },
+    { name = "python-jose", extras = ["cryptography"], specifier = ">=3.5.0" },
+    { name = "python-multipart", specifier = ">=0.0.32" },
+    { name = "resend", specifier = ">=2.49.0" },
+    { name = "tinydb", specifier = ">=4.9.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.52.4" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "opentelemetry-api"

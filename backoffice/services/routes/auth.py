@@ -9,8 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.hash import bcrypt
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ValidationError
 
+from email_validation import NormalizedEmail
 from email_service import EmailDeliveryError, send_password_reset_email
 from services import (
     consume_password_reset_token,
@@ -45,7 +46,7 @@ PASSWORD_RESET_EXPIRE_MINUTES = 30
 
 
 class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
+    email: NormalizedEmail
 
 
 class ResetPasswordRequest(BaseModel):
@@ -141,7 +142,10 @@ def login(
     # Swagger llama "username" al campo.
     # Nosotros usamos ese campo para enviar el email.
 
-    user = get_user_by_email(form.username)
+    try:
+        user = get_user_by_email(form.username)
+    except ValidationError:
+        raise HTTPException(401, "Email o contraseña incorrectos") from None
 
     if not user:
         raise HTTPException(
@@ -201,9 +205,11 @@ def forgot_password(data: ForgotPasswordRequest):
         )
 
         try:
-            send_password_reset_email(user["email"], reset_url)
-        except EmailDeliveryError:
-            logger.warning("Password reset email delivery failed")
+            send_password_reset_email(str(data.email), reset_url)
+        except EmailDeliveryError as exc:
+            logger.warning(
+                "Password reset email delivery failed: reason=%s", exc.reason
+            )
             remove_password_reset_token(token_hash)
 
     return {

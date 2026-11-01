@@ -1,17 +1,40 @@
 import os
+from typing import Literal
 
 import resend
+from resend.exceptions import InvalidApiKeyError, MissingApiKeyError, ResendError
+
+
+DeliveryFailureReason = Literal[
+    "missing_api_key",
+    "credentials_rejected",
+    "connection_failed",
+    "provider_unavailable",
+    "provider_rejected",
+]
 
 
 class EmailDeliveryError(Exception):
-    pass
+    """Expose only a fixed diagnostic category; never log provider messages."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        reason: DeliveryFailureReason = "provider_rejected",
+    ):
+        super().__init__(message)
+        self.reason = reason
 
 
 def send_password_reset_email(email: str, reset_url: str):
     api_key = os.getenv("RESEND_API_KEY")
 
     if not api_key:
-        raise EmailDeliveryError("El servicio de correo no está disponible.")
+        raise EmailDeliveryError(
+            "El servicio de correo no está disponible.",
+            reason="missing_api_key",
+        )
 
     resend.api_key = api_key
     sender = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev")
@@ -41,5 +64,18 @@ def send_password_reset_email(email: str, reset_url: str):
     }
     try:
         resend.Emails.send(payload)
-    except Exception:
-        raise EmailDeliveryError("No se pudo enviar el correo.") from None
+    except (InvalidApiKeyError, MissingApiKeyError):
+        raise EmailDeliveryError(
+            "No se pudo enviar el correo.",
+            reason="credentials_rejected",
+        ) from None
+    except ResendError as exc:
+        reason: DeliveryFailureReason = "provider_rejected"
+        if exc.error_type == "HttpClientError":
+            reason = "connection_failed"
+        elif exc.code in (500, "500", 502, "502", 503, "503", 504, "504"):
+            reason = "provider_unavailable"
+        raise EmailDeliveryError(
+            "No se pudo enviar el correo.",
+            reason=reason,
+        ) from None

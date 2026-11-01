@@ -1,13 +1,18 @@
+import logging
 from datetime import datetime, timezone
 
+from fastapi import HTTPException
+from pydantic import ValidationError
 from tinydb import Query
 
+from email_validation import normalize_email
 from models import User, Profile
 from database import users_table, profiles_table, password_reset_tokens_table
 
 User = Query()
 Profile = Query()
 ResetToken = Query()
+logger = logging.getLogger(__name__)
 
 
 def get_user_by_id(user_id: str):
@@ -17,9 +22,24 @@ def get_user_by_id(user_id: str):
 
 
 def get_user_by_email(email: str):
-    return users_table.get(
-        User.email == email
-    )
+    normalized_email = normalize_email(email)
+
+    def matches_email(stored_email):
+        if not isinstance(stored_email, str):
+            logger.warning("Stored user email is invalid")
+            return False
+        try:
+            return normalize_email(stored_email) == normalized_email
+        except ValidationError:
+            logger.warning("Stored user email is invalid")
+            return False
+
+    matches = users_table.search(User.email.test(matches_email))
+    if len(matches) > 1:
+        logger.error("Multiple users share the same normalized email")
+        raise HTTPException(500, "No se pudo procesar la solicitud.")
+
+    return matches[0] if matches else None
 
 
 def get_all_users():

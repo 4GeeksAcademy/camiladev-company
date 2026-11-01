@@ -6,6 +6,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from email_validation import NormalizedEmail
 from routes.auth import get_current_user, hash_password
 from services import (
     create_user,
@@ -31,7 +32,7 @@ class Role(str, Enum):
 
 
 class UserCreate(BaseModel):
-    email: str
+    email: NormalizedEmail
     password: str
     name: Optional[str] = None
     phone: Optional[str] = None
@@ -39,7 +40,7 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    email: Optional[str] = None
+    email: Optional[NormalizedEmail] = None
     password: Optional[str] = None
     role: Optional[Role] = None
     is_active: Optional[bool] = None

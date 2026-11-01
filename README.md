@@ -24,7 +24,7 @@ Sitio corporativo para la empresa ficticia Nexova Solutions, consultora B2B de R
 
 ## Instalacion y ejecucion
 
-1. Asegura tener Node.js 18+ instalado.
+1. Asegura tener Node.js 22 LTS instalado.
 2. Desde la raiz del proyecto ejecuta:
 
 ```bash
@@ -32,25 +32,31 @@ npm install
 npm run dev
 ```
 
-3. Abre `http://127.0.0.1:8080` en el navegador.
+3. Abre `http://127.0.0.1:3001` en el navegador.
 
-En Codespaces, abre el puerto `8080` en la pestaña **Ports** y luego usa **Open in Browser**.
+En Codespaces, abre el puerto `3001` en la pestaña **Ports** y luego usa **Open in Browser**.
 
 ## Suppliers route note
 
-The `/suppliers` page belongs to the Next.js app inside `uis/`.
+The `/suppliers` and `/candidates` pages belong to the Next.js app inside
+`backoffice/uis/`.
 
-- Running `npm run dev` from the repository root starts a static server only (port `8080`).
-- The static server does not provide `/suppliers` and will return `404` for that route.
-- To use the suppliers UI, run the frontend from `uis/`:
+- Running `npm run dev` from the repository root starts the public website
+  on port `3001`, not the backoffice.
+- To use the backoffice, run its frontend:
 
 ```bash
-cd uis
+cd backoffice/uis
 npm install
 npm run dev
 ```
 
 Then open `http://127.0.0.1:3000/suppliers`.
+
+Follow the [frontend guide](backoffice/uis/README.md) and
+[API guide](backoffice/services/README.md) for configuration, Codespaces,
+password recovery and supplier seeds. Backend tests run from the repository
+root with `uv run pytest`; frontend tests run from `backoffice/uis/`.
 
 ## Chequeo rapido de rutas
 

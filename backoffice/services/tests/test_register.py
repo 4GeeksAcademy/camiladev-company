@@ -1,5 +1,6 @@
 import pytest
 from fastapi import HTTPException
+from pydantic import ValidationError
 
 import services
 from routes.auth import verify_password
@@ -40,8 +41,8 @@ def test_oversized_password_creates_no_records():
     assert len(services.profiles_table) == 0
 
 
-def test_empty_credentials_are_currently_accepted():
-    result = register(UserCreate(email="", password=""))
-    stored = services.get_user_by_id(result["user"]["id"])
-    assert stored["email"] == ""
-    assert verify_password("", stored["hashed_password"])
+def test_empty_email_is_rejected():
+    with pytest.raises(ValidationError):
+        UserCreate(email="", password="")
+    assert services.get_all_users() == []
+    assert len(services.profiles_table) == 0
