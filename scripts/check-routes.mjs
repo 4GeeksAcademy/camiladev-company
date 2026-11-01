@@ -1,10 +1,9 @@
-const baseUrl = process.env.BASE_URL || "http://127.0.0.1:8080";
+const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3001";
 
 const routes = [
   "/",
-  "/validation.js",
-  "/pages/contact_form.html",
-  "/pages/vacant.html"
+  "/formulario",
+  "/vacantes"
 ];
 
 async function checkRoute(route) {
@@ -13,11 +12,9 @@ async function checkRoute(route) {
   try {
     const response = await fetch(url);
     const body = await response.text();
-    const expectsJs = route.endsWith(".js");
     const hasHtml = /<!doctype html>/i.test(body);
-    const hasJs = /function|const|let|=>/.test(body);
 
-    if (!response.ok || (!expectsJs && !hasHtml) || (expectsJs && !hasJs)) {
+    if (!response.ok || !hasHtml) {
       console.log(`FAIL ${response.status} ${url}`);
       return false;
     }
