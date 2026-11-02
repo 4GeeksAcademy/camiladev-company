@@ -70,6 +70,95 @@ en esta variable publica. Reinicia Next.js despues de cambiarla. Utiliza solo
 candidaturas de prueba autorizadas: el servicio es compartido y la semilla
 local de proveedores no lo modifica.
 
+### Operaciones de candidaturas
+
+Las acciones de `/candidates` llaman directamente a la API compartida de
+Talent Tracker. Con `NEXT_PUBLIC_API_URL` configurada como se indica arriba,
+la interfaz realiza estas operaciones:
+
+| Accion en la interfaz | Peticion a la API externa |
+|---|---|
+| Abrir o actualizar el listado | `GET /records?page=...`; el cliente carga todas las paginas. |
+| Buscar por nombre o email, filtrar por estado o etapa | Filtrado local de los registros cargados. |
+| Abrir el detalle | `GET /records/:id`. |
+| Crear una candidatura | `POST /records`. |
+| Editar datos de una candidatura | `PUT /records/:id`. |
+| Cambiar estado o etapa | `PATCH /records/:id`. |
+| Ver notas internas | `GET /records/:id/notes`. |
+| Anadir una nota | `POST /records/:id/notes`. |
+| Confirmar la eliminacion de una nota | `DELETE /records/:id/notes/:note_id`. |
+
+El cambio de estado y etapa se guarda al elegir una opcion, sin boton
+adicional de guardar. La busqueda por nombre/email se hace en el navegador y
+no se anade a la URL; los filtros de estado/etapa se conservan en la URL.
+Los datos de contacto estan ocultos por defecto en el detalle, pero esto es
+solo una proteccion visual y no sustituye los permisos del servicio.
+
+### Comprobacion manual segura
+
+La API es compartida y sus escrituras persisten. Antes de probar, confirma que
+tienes autorizacion para usar el entorno y sus datos. No cambies candidaturas
+reales, no elimines notas ajenas, no publiques capturas con datos personales
+y no inspecciones ni compartas tokens o respuestas con datos de candidatos.
+
+Para comprobar la interfaz sin tocar registros ajenos:
+
+1. Abre `/candidates`, espera a que cargue el listado y compara el total con
+   las filas. Si el servicio devuelve mas de una pagina, el cliente debe
+   cargarlas todas. Usa **Actualizar listado** para repetir la lectura.
+2. Prueba la busqueda por nombre y email y combina filtros de estado y etapa.
+   Comprueba que **Limpiar** restablece los filtros. La ausencia de resultados
+   debe mostrar **Sin coincidencias**, no un error de conexion.
+3. Abre una candidatura autorizada para lectura. Confirma que email, telefono,
+   LinkedIn y CV estan ocultos hasta activar **Mostrar datos de contacto**.
+   Evita divulgar lo que revelan.
+4. Si tienes autorizacion expresa para crear datos de prueba, crea una
+   candidatura con nombre identificable como prueba y un email ficticio unico.
+   Comprueba el detalle, la busqueda y la persistencia tras recargar. No repitas
+   el registro si el detalle falla: vuelve al listado y comprueba si se creo.
+5. Realiza ediciones y cambios de estado o etapa solamente en esa candidatura
+   de prueba. Confirma que editar y cancelar se comportan por separado y que
+   los cambios se conservan al recargar.
+6. Para notas, anade una nota identificada como prueba en la candidatura de
+   prueba. Verifica que aparece en el detalle y persiste. Para comprobar
+   eliminacion, elimina solo una nota creada por ti; la accion es irreversible.
+7. Para comprobar un ID inexistente, abre una ruta con un identificador
+   sintactico pero ficticio, como `/candidates/id-inexistente-para-pruebas`.
+   Debe mostrarse el error de no disponible y una opcion de reintento; reintentar
+   no crea la candidatura.
+
+Los estados disponibles son **Recibida**, **En proceso**, **Seleccionada** y
+**Descartada**. Las etapas son **Pendiente de revision**, **En revision**,
+**Entrevista personal**, **Entrevista tecnica** y **Oferta presentada**. Al
+crear una candidatura, comprueba los valores que devuelve el servicio: no
+presupongas un estado ni una etapa inicial.
+
+El formulario de alta y edicion requiere nombre, email, telefono, puesto y
+experiencia. Rechaza email invalido, experiencia negativa y enlaces de
+LinkedIn/CV que no sean URL HTTP o HTTPS validas. LinkedIn y CV son opcionales;
+nombre y puesto admiten hasta 200 caracteres, email 254 y telefono 40. Prueba
+campos invalidos solo en una candidatura de prueba y confirma que no se muestra
+un mensaje de exito ni se pierden los valores escritos ante un error.
+
+La app no ofrece un boton para eliminar candidaturas. Coordina cualquier
+limpieza de registros de prueba con la persona responsable de la API. Solo
+puedes eliminar notas creadas por ti; la eliminacion confirmada es irreversible.
+
+Si no tienes permiso para escribir en el servicio compartido, limita la
+comprobacion a listado, filtros y lectura de detalles autorizados. Un listado
+vacio, la paginacion en un conjunto grande o fallos de red intencionados
+requieren un entorno de prueba adecuado; si no esta disponible, registra el
+caso como **No probado** en vez de alterar datos compartidos para simularlo.
+
+Para observar estados de carga, puedes usar **Slow 3G** en las herramientas de
+red del navegador durante una prueba autorizada y volver a **Sin limitacion**
+al terminar. Los botones de envio deben bloquearse mientras hay una operacion
+en curso para evitar duplicados. Para probar recuperacion de red, utiliza solo
+un entorno de prueba: tras una interrupcion no reenvies una escritura hasta
+comprobar en el listado o detalle si la primera solicitud llego a guardarse.
+Un resultado correcto en la interfaz no verifica por si solo permisos, filtros
+del servidor ni codigos HTTP.
+
 Configura primero sus variables siguiendo el
 [README de la API](../services/README.md). Luego ejecuta:
 

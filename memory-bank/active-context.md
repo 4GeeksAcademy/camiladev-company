@@ -9,8 +9,16 @@ Ultima actualizacion: 2026-11-02.
   proveedores segun [su README](../backoffice/services/README.md).
 - El backoffice documenta candidatos conectados a una API externa. No se ha
   verificado aqui el funcionamiento en ejecucion de las aplicaciones.
-- Esta entrega introduce contexto y configuracion de agentes, sin cambiar
-  aplicaciones, datos, dependencias ni crear commits.
+- Los README del backoffice documentan operaciones de proveedores y
+  autenticacion, gestion de usuarios/perfiles y health check; el README UI
+  documenta candidaturas y comprobaciones seguras para su API compartida.
+  Fuentes: [API](../backoffice/services/README.md#operaciones-disponibles)
+  y [frontend](../backoffice/uis/README.md#operaciones-de-candidaturas).
+- El usuario reporto el 2026-11-02 que pasaron `npx tsc --noEmit`,
+  `npm run lint`, `npm test -- --runInBand`, `npm run build` en
+  `backoffice/uis/` y `uv run pytest` desde la raiz. Estos resultados son
+  reportados por el usuario y no se volvieron a ejecutar en esta actualizacion
+  documental.
 - Los resultados historicos de [TESTING.md](../TESTING.md) no equivalen a
   pruebas ejecutadas en esta sesion. Consultar evidencia vigente en cada entrega.
 

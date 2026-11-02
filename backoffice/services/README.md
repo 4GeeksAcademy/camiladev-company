@@ -148,6 +148,99 @@ Tambien puedes abrir:
 
 Deten el servidor con `Ctrl+C` en la terminal donde lo iniciaste.
 
+## Operaciones disponibles
+
+### Proveedores
+
+La API del backoffice expone las siguientes rutas bajo `/suppliers`:
+
+| Metodo y ruta | Operacion |
+|---|---|
+| `GET /suppliers` | Listar proveedores. Admite filtros opcionales `country` y `category`, que se pueden combinar. |
+| `GET /suppliers/by-category?category=...` | Alias compatible para filtrar por categoria; para nuevas integraciones, usa `GET /suppliers?category=...`. |
+| `POST /suppliers` | Crear un proveedor con el modelo `Suppliers`. |
+| `PATCH /suppliers/{supplier_id}/status` | Cambiar el estado (`active` o `suspended`). |
+| `PATCH /suppliers/{supplier_id}/rate` | Cambiar la tarifa mensual; debe ser mayor que cero. |
+| `DELETE /suppliers/{supplier_id}` | Eliminar un proveedor por su ID numerico de TinyDB. |
+
+Paises permitidos para el filtro: `Spain` y `USA`. Categorias: `job_boards`,
+`ats_software`, `assessment_tools`, `training_platforms`,
+`payroll_and_hr_software`, `video_interview`, `background_check`,
+`office_and_facilities` e `it_and_software_licenses`. `GET /suppliers`
+devuelve todos los proveedores si no se indican filtros.
+
+Ejemplos de lectura seguros:
+
+```sh
+curl --fail http://127.0.0.1:8000/suppliers
+curl --fail 'http://127.0.0.1:8000/suppliers?country=Spain'
+curl --fail 'http://127.0.0.1:8000/suppliers?category=job_boards'
+curl --fail 'http://127.0.0.1:8000/suppliers?country=USA&category=job_boards'
+curl --fail 'http://127.0.0.1:8000/suppliers/by-category?category=job_boards'
+```
+
+Consulta `/docs` para ver los campos requeridos de creacion y los esquemas de
+las solicitudes. `POST`, `PATCH` y `DELETE` escriben en la base activa.
+`DELETE` elimina el documento de la base; respalda los datos antes y limita las
+pruebas de escritura a proveedores de prueba autorizados.
+
+### Salud de la API
+
+| Metodo y ruta | Uso |
+|---|---|
+| `GET /` | Comprobar que la API responde; devuelve `{"message":"API funcionando"}`. No requiere sesion. |
+
+### Autenticacion
+
+| Metodo y ruta | Uso y acceso |
+|---|---|
+| `POST /auth/login` | Iniciar sesion con `application/x-www-form-urlencoded`; el campo `username` contiene el email. No requiere sesion. |
+| `GET /auth/me` | Consultar la cuenta autenticada; requiere sesion Bearer. |
+| `POST /auth/forgot-password` | Solicitar un enlace por email; la respuesta es uniforme y no confirma la entrega. No requiere sesion. |
+| `POST /auth/reset-password` | Cambiar la contrasena con `token` y `new_password`; el enlace caduca a los 30 minutos y solo sirve una vez. No requiere sesion. |
+| `POST /auth/change-password` | Cambiar la contrasena con `current_password` y `new_password`; requiere sesion Bearer. |
+
+Un login invalido devuelve `401`. Un token de restablecimiento invalido,
+caducado o ya utilizado devuelve `400`. Las contrasenas nuevas de mas de
+72 bytes UTF-8 tambien se rechazan con `400`.
+
+### Usuarios
+
+Las rutas siguientes usan el prefijo `/users`. Salvo `POST /users`, requieren
+sesion Bearer:
+
+| Metodo y ruta | Uso y permisos |
+|---|---|
+| `POST /users` | Registrar una cuenta y su perfil; email valido y unico. No requiere sesion. |
+| `GET /users` | Listar los datos publicos de todos los usuarios autenticados. |
+| `GET /users/{user_id}` | Consultar los datos publicos del usuario propio o de cualquier usuario si quien consulta es admin. |
+| `PUT /users/{user_id}` | Actualizar email, contrasena o estado de la cuenta propia; un admin tambien puede cambiar el rol. |
+| `DELETE /users/{user_id}` | Eliminar la cuenta propia o cualquier cuenta si quien la elimina es admin. Es una operacion destructiva. |
+
+La respuesta publica del usuario no incluye el hash de contrasena. Un email
+duplicado al registrar o actualizar devuelve `400`; un usuario inexistente
+devuelve `404`; intentar consultar, editar o eliminar la cuenta de otra
+persona sin rol admin devuelve `403`. El endpoint de lista requiere
+autenticacion, pero no filtra por rol admin.
+
+### Perfil propio
+
+Ambas rutas requieren sesion Bearer y operan sobre el perfil de la cuenta
+autenticada; no aceptan un `user_id` en la URL:
+
+| Metodo y ruta | Uso |
+|---|---|
+| `GET /profiles/me` | Consultar el propio perfil. |
+| `PUT /profiles/me` | Actualizar los campos enviados de nombre, telefono o direccion; los campos omitidos no se modifican. |
+
+Si la cuenta no tiene perfil, ambas operaciones devuelven `404`.
+
+El frontend ofrece `/register`, `/login`, `/forgot-password` y
+`/account/change-password`. El formulario enlazado desde el correo abre
+`/reset-password?token=...`. Usa cuentas autorizadas y no compartas tokens,
+contrasenas ni cabeceras de autenticacion. La recuperacion por correo y el
+cambio de contrasena autenticado son flujos distintos.
+
 ## Sembrar proveedores para comprobar la aplicacion
 
 **ADVERTENCIA: este comando sobrescribe los datos de proveedores de la base
