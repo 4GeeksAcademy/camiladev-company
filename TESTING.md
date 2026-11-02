@@ -48,7 +48,7 @@ malformadas, mensajes internos sensibles, storage inaccesible y window ausente.
 ## Ejecucion
 
 Backend desde la raiz: `uv run pytest` y `uv run pytest --cov`.
-Frontend desde `uis/`: `npm exec -- jest --coverage` (o `npm test -- --coverage`).
+Frontend desde `backoffice/uis/`: `npm exec -- jest --coverage` (o `npm test -- --coverage`).
 La cobertura backend debe ser al menos 70% en `routes.auth`; la configuracion
 de pytest aplica este umbral, tambien cuando se ejecuta `--cov` sin argumento.
 El workspace uv de la raiz instala las dependencias de la API; no la empaqueta.
@@ -60,11 +60,10 @@ base de datos real. Jest usa Node y dobles de navegador, no React ni Next.js.
 - Bloqueo preexistente corregido: el import incompleto de `tests/conftest.py`
     impedia recoger tests. Ahora se usan fixtures con TinyDB en memoria.
 - Configuracion Jest completada para TypeScript con ts-jest ya instalado.
-- Defecto de negocio confirmado por
-    `test_empty_credentials_are_currently_accepted`: `/users` permite email y
-    password vacios. El test caracteriza el comportamiento actual; no lo considera
-    una politica segura. La validacion del registro queda pendiente, sin introducir
-    cambios de negocio en esta bateria de pruebas.
+- El registro y la actualizacion ahora validan y normalizan emails.
+    `test_empty_email_is_rejected` comprueba que un email vacio se rechaza sin
+    crear registros. Este cambio no introduce una politica de longitud minima
+    para contrasenas.
 - Backend: 61 pruebas, 100% de lineas en `routes.auth` (umbral obligatorio: 70%).
 - Frontend: 94 pruebas; 98.81% de lineas y 94.21% de ramas en los archivos
     seleccionados. Auth API, storage y validacion Next de login: 100% de lineas.

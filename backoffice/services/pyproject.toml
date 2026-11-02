@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexova-backoffice-api"
+version = "0.1.0"
+description = "API del BackOffice de Nexova"
+requires-python = ">=3.12"
+dependencies = [
+    "bcrypt<5",
+    "fastapi>=0.141.1",
+    "libpass[bcrypt]>=1.9.3",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic[email]>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.32",
+    "resend>=2.49.0",
+    "tinydb>=4.9.0",
+    "uvicorn[standard]>=0.52.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--cov=routes.auth --cov-report=term-missing --cov-fail-under=70"
+
+[tool.uv]
+package = false

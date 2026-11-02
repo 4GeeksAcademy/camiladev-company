@@ -47,10 +47,12 @@ ai-engineering-company-project-monorepo/
 ├── packages/
 │   └── shared/               # Paquete compartido (@repo/shared-types)
 ├── scripts/                  # Convenciones/documentación de scripts
-├── services/                 # APIs y workers en segundo plano
+├── backoffice/
+│   ├── services/             # API unificada FastAPI y TinyDB
+│   └── uis/                  # Frontend interno Next.js
+├── public-website/           # Sitio publico Next.js
 ├── shared/                   # Recursos/convenciones compartidas a nivel repo
 ├── skills/                   # Skills reutilizables para agentes
-├── uis/                      # Interfaces de usuario (React, Next.js, Streamlit, HTML)
 └── workflows/                # Documentación de automatizaciones/orquestación
 ```
 
@@ -61,8 +63,8 @@ ai-engineering-company-project-monorepo/
 1. **Usa este repositorio como plantilla** y crea tu propio repo de proyecto.
 2. **Clona** tu repositorio (o ábrelo en Codespaces).
 3. **Reemplaza** `CONTEXT.md` con el contexto completo de tu empresa asignada.
-4. **Revisa** los `README.md` de cada carpeta raíz para entender responsabilidades (`uis/`, `services/`, `data/`, `skills/`, etc.).
-5. **Empieza a implementar** entregables por hito en `uis/` y `services/`, reutilizando `packages/shared/` y `data/` según corresponda.
+4. **Revisa** las guias de [frontend](backoffice/uis/README.md) y [backend](backoffice/services/README.md), y la documentacion de cada area.
+5. **Empieza a implementar** entregables internos en `backoffice/uis/` y `backoffice/services/`, reutilizando `packages/shared/` y `data/` según corresponda.
 
 ## Ejecutar la web
 
@@ -73,25 +75,28 @@ npm install
 npm run dev
 ```
 
-Esto levanta el servidor estático en `http://127.0.0.1:8080` sirviendo la raíz del proyecto (`.`), donde ahora están `index.html`, `validation.js` y la carpeta `pages/`.
+Esto levanta el sitio publico Next.js en `http://127.0.0.1:3001`, no el backoffice.
 
-En Codespaces, abre el puerto `8080` desde la pestaña **Ports** y selecciona **Open in Browser**.
+En Codespaces, abre el puerto `3001` desde la pestaña **Ports** y selecciona **Open in Browser**.
 
 ## Nota sobre la ruta de Proveedores
 
-La pantalla `/suppliers` pertenece a la app Next.js dentro de `uis/`.
+Las pantallas `/suppliers` y `/candidates` pertenecen a la app Next.js dentro de `backoffice/uis/`.
 
-- Ejecutar `npm run dev` desde la raíz solo levanta el servidor estático (puerto `8080`).
-- Ese servidor no expone `/suppliers` y devolverá `404` en esa ruta.
-- Para usar el directorio de Proveedores, levanta el frontend desde `uis/`:
+- Ejecutar `npm run dev` desde la raíz levanta el sitio publico (puerto `3001`).
+- Para usar el directorio de Proveedores, levanta el frontend del backoffice:
 
 ```bash
-cd uis
+cd backoffice/uis
 npm install
 npm run dev
 ```
 
 Luego abre `http://127.0.0.1:3000/suppliers`.
+
+Configura e inicia la API unificada siguiendo su
+[README](backoffice/services/README.md). La API externa de candidaturas se
+configura por separado segun el [README del frontend](backoffice/uis/README.md).
 
 ## Verificación durante desarrollo
 
