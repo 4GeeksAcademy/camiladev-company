@@ -7,6 +7,10 @@ Ultima actualizacion: 2026-11-02.
 - El repositorio ya contiene sitio publico, UI interna y API; no parte de cero.
 - La API unificada del backoffice tiene autenticacion, usuarios, perfiles y
   proveedores segun [su README](../backoffice/services/README.md).
+- El 2026-11-03 se inicializo y verifico la conexion SQLModel/psycopg2 hacia
+  Supabase en `backoffice/services/database.py`; TinyDB sigue disponible y
+  `get_db()` entrega sesiones por peticion. La verificacion fue `SELECT 1`.
+  Los modelos y endpoints de inventario aun no estan implementados.
 - El backoffice documenta candidatos conectados a una API externa. No se ha
   verificado aqui el funcionamiento en ejecucion de las aplicaciones.
 - Los README del backoffice documentan operaciones de proveedores y

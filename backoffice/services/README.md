@@ -61,6 +61,29 @@ Puedes generar un secreto para `JWT_SECRET` localmente:
 uv run python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
+### Mantener `JWT_SECRET` entre Codespaces
+
+`JWT_SECRET` firma los tokens de acceso. Debe permanecer igual en todos los
+Codespaces que usan esta API; si cambia, los tokens emitidos con el valor
+anterior dejaran de ser validos. No generes uno nuevo cada vez que crees un
+Codespace.
+
+Para compartirlo de forma segura entre Codespaces:
+
+1. Genera el valor una sola vez con el comando anterior y guardalo en un
+   gestor de contrasenas. No lo compartas por chat ni lo agregues al repositorio.
+2. En GitHub, abre el repositorio y ve a **Settings → Secrets and variables →
+   Codespaces**. Selecciona **New repository secret**, usa `JWT_SECRET` como
+   nombre y pega el valor generado como secreto.
+3. Los Codespaces nuevos recibiran el secreto al crearse. Reinicia los
+   Codespaces que ya estaban abiertos para que reciban un secreto nuevo o
+   actualizado.
+
+La aplicacion carga `.env` y luego lee `JWT_SECRET` del entorno. En Codespaces,
+la variable inyectada como secreto tiene prioridad sobre el valor local de
+`.env`. Para desarrollo fuera de Codespaces, configura el valor localmente en
+`.env`, que esta excluido de Git.
+
 - No compartas ni subas `.env` a Git. Guarda las claves solo en la configuracion
   local o en el gestor de secretos del despliegue.
 - `FRONTEND_URL` debe ser la URL accesible del backoffice, sin incluir

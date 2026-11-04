@@ -40,6 +40,14 @@ Variables locales: `JWT_SECRET`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `FRONTEND_URL`,
 En Codespaces `FRONTEND_URL` debe apuntar al HTTPS reenviado del frontend,
 no al puerto de la API ni a localhost del destinatario del correo.
 
+Desde 2026-11-03, `backoffice/services/database.py` conserva el cliente TinyDB
+para la persistencia existente e inicializa un motor PostgreSQL para Supabase
+con SQLModel y `psycopg2`. `get_db()` proporciona una sesión por petición y la
+cierra al terminar; no se mantiene una sesión global. `DATABASE_URL` se lee del
+entorno o del `.env` local, que no se versiona. La conexión se verifico con una
+consulta de solo lectura `SELECT 1`; esto no implica que existan tablas ni
+endpoints de inventario.
+
 El frontend usa `AUTH_API_BASE_URL` y `SUPPLIERS_API_BASE_URL` para la API
 interna (por defecto `http://127.0.0.1:8000`). El flujo de candidatos usa la
 API externa definida por `NEXT_PUBLIC_API_URL`; no asumir almacenamiento local.
