@@ -1,7 +1,9 @@
 # API del backoffice
 
-API FastAPI para usuarios, perfiles, autenticacion y proveedores. Usa TinyDB
-para persistencia y Resend para enviar enlaces de recuperacion de contrasena.
+API FastAPI para usuarios, perfiles, autenticacion, proveedores e inventario.
+TinyDB conserva la persistencia existente; SQLModel conecta con PostgreSQL en
+Supabase para activos y movimientos. Resend envia enlaces de recuperacion de
+contrasena. Las entidades de inventario siguen [BRIEFING.md](../../BRIEFING.md).
 
 ## 1. Instalar uv
 
@@ -31,13 +33,16 @@ desde este directorio, no desde el backend antiguo `services-1/api/`.
 uv sync --python 3.12
 ```
 
-`uv sync` crea el entorno `.venv/` e instala las dependencias declaradas en
-[pyproject.toml](pyproject.toml). Si Python 3.12 no esta disponible, `uv` puede
+`uv sync` crea el entorno `.venv/` del workspace e instala las dependencias
+declaradas en [pyproject.toml](pyproject.toml). En este monorepo, el entorno
+compartido puede estar en la raiz, no dentro del servicio. Si Python 3.12 no esta disponible, `uv` puede
 descargarlo automaticamente. La primera instalacion necesita acceso a internet.
 
 El stack de autenticacion incluye `tinydb`, `bcrypt`, `python-jose[cryptography]`,
 `python-dotenv` y `resend`. `email-validator` se instala mediante
 `pydantic[email]`; el hash de contrasenas se utiliza a traves de Passlib.
+El inventario usa `sqlmodel` y `psycopg2-binary`, incluidos en las dependencias;
+no necesitas instalarlos por separado despues de `uv sync`.
 
 No necesitas activar manualmente el entorno: `uv run` ejecuta los comandos
 dentro de `.venv/`. No uses el Python global para arrancar esta API.
@@ -53,7 +58,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 FRONTEND_URL=http://localhost:3000
 RESEND_API_KEY=reemplazar_por_la_clave_de_resend
 RESEND_FROM_EMAIL=Acceso <no-reply@tu-dominio-verificado.com>
+DATABASE_URL="postgresql+psycopg2://postgres.PROJECT_REF:DB_PASSWORD@POOLER_HOST:6543/postgres?sslmode=require"
 ```
+
+La URI anterior es un ejemplo, no una conexion valida. Para inventario necesitas
+`DATABASE_URL` y `JWT_SECRET`; Resend y `FRONTEND_URL` son necesarios para los
+flujos de recuperacion por correo, no para registrar movimientos.
 
 Puedes generar un secreto para `JWT_SECRET` localmente:
 
@@ -91,16 +101,61 @@ la variable inyectada como secreto tiene prioridad sobre el valor local de
 - `RESEND_FROM_EMAIL` debe usar un dominio verificado en Resend para enviar a
   usuarios reales. `onboarding@resend.dev` es un remitente de prueba restringido
   al correo asociado a la cuenta de Resend.
-- Actualmente la API usa `load_dotenv()` sin una ruta explicita. Mantener
-  `.env` en este directorio evita depender de un archivo de configuracion
-  ubicado en un directorio padre. Las variables ya exportadas en el proceso
-  tienen prioridad sobre `.env`.
+- `database.py` carga explicitamente el `.env` de este directorio; otras partes
+  de la API tambien utilizan `load_dotenv()`. Ejecutar desde este directorio
+  mantiene la configuracion local consistente. Las variables ya exportadas
+  en el proceso tienen prioridad sobre `.env`.
+
+### Preparar las bases de datos
+
+| Base | Datos | Como se pone en marcha |
+|---|---|---|
+| TinyDB | Usuarios, perfiles, tokens de recuperacion y proveedores | `database.py` abre `data/db.json` dentro del servicio y crea el archivo si falta. No requiere servidor, Docker ni comando de arranque propio. |
+| Supabase PostgreSQL | `asset`, `assetentry` y `assetexit` | Crea o utiliza un proyecto de desarrollo activo en Supabase y configura `DATABASE_URL`. PostgreSQL se ejecuta en Supabase, no en el Codespace. |
+
+Para configurar Supabase:
+
+1. Abre [el panel de Supabase](https://supabase.com/dashboard). Si no tienes
+   proyecto, crea uno y guarda su contrasena de base de datos en un gestor de
+   contrasenas. Espera a que el proyecto este disponible.
+2. Selecciona **Connect → Direct → Transaction pooler** y **Type: URI**.
+   Copia la cadena de tu proyecto, incluido el host y el puerto proporcionados.
+3. Sustituye `[YOUR-PASSWORD]` por la contrasena de la base de datos, sin los
+   corchetes; no uses una API key ni la contrasena de tu cuenta de Supabase.
+   Codifica para URI los caracteres especiales de la contrasena.
+4. Guarda la cadena completa en `DATABASE_URL` dentro del `.env` local. El
+   motor selecciona `psycopg2` explicitamente tanto para `postgresql://` como
+   para `postgresql+psycopg2://`. Usa SSL, por ejemplo `sslmode=require` en la
+   query de la URI, conservando los parametros que ya tenga.
+5. Para persistir la configuracion entre Codespaces, guarda `DATABASE_URL`
+   como secreto **Codespaces** del repositorio, igual que `JWT_SECRET`.
+   Reinicia Codespaces existentes para recibir el secreto. Nunca publiques
+   la URI ni la copies en codigo, capturas o commits.
+
+No se usa Supabase Auth ni se replica una tabla de usuarios. `user_uuid` de cada
+orden es una cadena con el ID del usuario de TinyDB, sin FK entre bases.
+No borres ni sustituyas `data/db.json`: contiene las cuentas locales y no se
+recupera automaticamente desde Supabase. Crear otro Codespace no replica ese
+archivo; los secretos solo conservan configuracion, no los registros de TinyDB.
 
 ## 5. Iniciar la API
 
 ```sh
 uv run uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
+
+Este comando levanta una sola API con ambas conexiones. Al arrancar, el
+lifespan de [main.py](main.py) ejecuta `SQLModel.metadata.create_all(engine)`
+para crear las tablas de inventario que falten y sus FK en Supabase. La
+conexion debe tener permiso para crear el esquema; si falta `DATABASE_URL`
+o Supabase no esta disponible, el servicio no puede arrancar correctamente.
+No hay un segundo backend ni un PostgreSQL local que debas iniciar.
+
+`create_all` no migra tablas existentes ni siembra registros. Una modificacion
+posterior del modelo que requiera cambiar una tabla necesita una migracion
+planificada, no borrar la tabla y volver a arrancar. [database.py](database.py)
+mantiene el motor compartido, mientras `get_db()` crea y cierra una sesion
+SQLModel por peticion; no hay sesiones globales.
 
 `--reload` reinicia el servidor cuando modificas codigo y es solo para
 desarrollo. Para permitir conexiones externas en un contenedor o Codespace,
@@ -172,6 +227,131 @@ Tambien puedes abrir:
 Deten el servidor con `Ctrl+C` en la terminal donde lo iniciaste.
 
 ## Operaciones disponibles
+
+### Inventario
+
+Gestiona equipos y materiales de Nexova en Valencia y Miami: compras o
+entregas recibidas (`AssetEntry`), asignaciones a empleados y consumos
+(`AssetExit`). Los endpoints conservan el nombre `/products`, pero la entidad
+de negocio se llama `Asset`.
+
+Las lecturas son publicas; las escrituras requieren Bearer JWT de un usuario
+activo de TinyDB. Los datos de inventario se guardan en Supabase y el UUID del
+creador de cada orden se toma de la sesion autenticada, no del request.
+
+| Metodo y ruta | Operacion |
+|---|---|
+| `GET /inventory/products` | Listar activos con `current_stock`. Admite `office=Valencia` o `office=Miami`. |
+| `POST /inventory/products` | Crear un `Asset` con stock inicial calculado de cero. SKU duplicado devuelve `409`. |
+| `GET /inventory/products/{id}` | Consultar un activo con su stock; devuelve `404` si no existe. |
+| `POST /inventory/orders/inbound` | Registrar un `AssetEntry` con cantidad positiva. |
+| `POST /inventory/orders/outbound` | Registrar un `AssetExit`; exige `assigned_to` en asignaciones y nulo en consumos. |
+| `GET /inventory/orders` | Listar entradas y salidas con `order_type`, `user_uuid` y `asset` anidado. Admite filtro `office`. |
+
+`current_stock` es la suma de entradas menos salidas; no se acepta en requests
+ni se guarda como columna. Una salida superior al stock devuelve `400` antes
+de insertar. Ambas clases de orden bloquean el activo durante su transaccion
+para serializar movimientos concurrentes. Las listas usan agregaciones y joins,
+sin consultas adicionales por cada orden.
+
+Las respuestas son schemas Pydantic, no objetos ORM. Los campos extra, las
+cantidades invalidas y las asignaciones incompletas devuelven `422`; un activo
+inexistente en una orden devuelve `404`. La oficina de cada orden debe coincidir
+con la del activo; en caso contrario devuelve `400` sin registrar el movimiento.
+Las escrituras deben probarse solo
+con datos de desarrollo autorizados. El arranque no siembra activos; consulta
+la seccion de semillas de inventario para preparar la base de desarrollo.
+
+#### Entidades y archivos
+
+| Entidad | Campos de request | Campos adicionales de respuesta |
+|---|---|---|
+| `Asset` | `name`, `sku`, `category`, `office` | `id`, `current_stock` |
+| `AssetEntry` | `asset_id`, `quantity`, `supplier`, `office` | `id`, `created_at`, `user_uuid` |
+| `AssetExit` | `asset_id`, `quantity`, `exit_type`, `assigned_to`, `office` | `id`, `created_at`, `user_uuid` |
+
+Categorias permitidas: `hardware`, `peripherals`, `office_supplies` y
+`training_materials`. Oficinas: `Valencia` y `Miami`. Los nombres y SKU no
+pueden estar vacios y `sku` es unico. `quantity` debe ser un entero positivo.
+`created_at` se genera automaticamente en UTC; el cliente no puede enviar
+ID de orden, fecha, `user_uuid` ni stock. `asset_id` debe referenciar un activo
+existente; ambas tablas de ordenes tienen FK hacia `asset.id`.
+
+Los modelos de tabla estan en [models.py](models.py), los requests y responses
+Pydantic en [schemas.py](schemas.py), y las rutas en
+[routers/inventory.py](routers/inventory.py). Los endpoints convierten sus
+resultados a schemas Pydantic; no devuelven objetos ORM directamente.
+
+#### Flujo de uso
+
+Con la API activa, abre <http://127.0.0.1:8000/docs> o la URL privada reenviada
+en Codespaces:
+
+1. Si aun no existe una cuenta de desarrollo, registrala con `POST /users`.
+2. Inicia sesion con `POST /auth/login`: `username` contiene tu email y
+   `password` tu contrasena, en formato `application/x-www-form-urlencoded`.
+   En Swagger puedes usar **Authorize** con ese flujo. Para otros clientes,
+   envia `Authorization: Bearer <access_token>` en cada escritura. No publiques
+   tokens ni captures la respuesta del login.
+3. Crea un activo con `POST /inventory/products`; empieza con stock cero:
+
+   ```json
+   {"name":"Equipo de demostracion","sku":"DEMO-IT-001","category":"hardware","office":"Valencia"}
+   ```
+
+4. Usa el `id` devuelto como `asset_id` en `POST /inventory/orders/inbound`.
+   El siguiente ejemplo supone que el activo creado tiene ID `1`; sustituyelo
+   por el ID real:
+
+   ```json
+   {"asset_id":1,"quantity":5,"supplier":"Proveedor Demo","office":"Valencia"}
+   ```
+
+5. Registra una salida con `POST /inventory/orders/outbound`:
+
+   ```json
+   {"asset_id":1,"quantity":2,"exit_type":"allocation","assigned_to":"Empleado Demo","office":"Valencia"}
+   ```
+
+   Para consumo, usa `"exit_type":"consumption"` y `"assigned_to":null`.
+   Tras estos movimientos, el stock de ese activo sera `5 - 2 = 3`.
+6. Consulta el stock y el historial con los GET siguientes. Las ordenes
+   incluyen `order_type` (`inbound` o `outbound`), datos del activo en `asset`
+   y el UUID de su creador; el stock anidado es el actual, no una instantanea
+   del momento de la orden.
+
+```sh
+curl --fail http://127.0.0.1:8000/inventory/products
+curl --fail 'http://127.0.0.1:8000/inventory/products?office=Valencia'
+curl --fail http://127.0.0.1:8000/inventory/orders
+curl --fail 'http://127.0.0.1:8000/inventory/orders?office=Miami'
+```
+
+Los POST anteriores escriben en la base configurada: no los ejecutes antes de
+la semilla si quieres usarla en tablas vacias, ni sobre una base de produccion.
+No hay rutas para editar stock ni modificar o borrar ordenes.
+
+#### Errores de inventario
+
+| Estado | Causa |
+|---|---|
+| `401` | Escritura sin token o con token invalido o expirado. |
+| `403` | Usuario inactivo o ID del usuario sin formato UUID valido. |
+| `404` | El activo consultado o referenciado por la orden no existe. |
+| `409` | SKU ya registrado. |
+| `422` | Campos extra, cantidad invalida, categoria/oficina invalida o asignacion inconsistente. |
+| `400` | Oficina de la orden distinta de la del activo, o salida superior al stock. |
+
+En sobregiro el mensaje es:
+
+```text
+Insufficient stock for asset '{name}'. Available: {available}, requested: {quantity}.
+```
+
+Ante un fallo de conexion, comprueba que el proyecto Supabase este activo, la
+URI y contrasena sean correctas y que la red permita llegar al pooler. Revisa
+los logs sin publicar credenciales. `GET /` solo confirma que FastAPI responde;
+un GET de inventario exitoso tambien comprueba el acceso a las tablas Supabase.
 
 ### Proveedores
 
@@ -263,6 +443,51 @@ El frontend ofrece `/register`, `/login`, `/forgot-password` y
 `/reset-password?token=...`. Usa cuentas autorizadas y no compartas tokens,
 contrasenas ni cabeceras de autenticacion. La recuperacion por correo y el
 cambio de contrasena autenticado son flujos distintos.
+
+## Sembrar inventario de desarrollo
+
+`seed_inventory.py` inserta los seis activos, cuatro entradas y tres salidas
+del briefing en Supabase. Requiere las tablas inicializadas por el arranque
+de la API y un usuario activo existente en TinyDB; todas las ordenes llevan
+su UUID. No modifica usuarios ni proveedores.
+
+Para una instalacion nueva: configura ambas bases, arranca la API hasta que
+complete el startup y crea una cuenta con `POST /users` si no tienes ninguna.
+Puedes obtener tu UUID mediante `GET /auth/me` con sesion autenticada. Antes
+de crear activos o movimientos manuales, ejecuta la semilla en otra terminal.
+Usa [seed_inventory.py](seed_inventory.py), no `seed.py`: este ultimo es la
+semilla destructiva de proveedores, no la de inventario.
+
+Desde `backoffice/services/`, solo sobre una base de desarrollo autorizada:
+
+```sh
+uv run python seed_inventory.py
+```
+
+Si hay exactamente un usuario activo, se usa como creador. Si hay varios,
+selecciona uno explicitamente:
+
+```sh
+uv run python seed_inventory.py --user-uuid UUID_DEL_USUARIO_ACTIVO
+```
+
+La semilla exige las tres tablas de inventario vacias. Bloquea esas tablas y
+confirma todos los registros en una sola transaccion, comprobando el stock
+antes del commit. Si hay datos existentes, se niega a ejecutarse sin borrar
+ni sobrescribir nada. No elimines registros para repetirla sobre una base real.
+
+| SKU | Entradas | Salidas | Stock calculado |
+|---|---:|---:|---:|
+| NXV-IT-001 | 15 | 3 | 12 |
+| NXV-IT-002 | 8 | 2 | 6 |
+| NXV-PER-001 | 0 | 0 | 0 |
+| NXV-PER-002 | 0 | 0 | 0 |
+| NXV-OFF-001 | 20 | 4 | 16 |
+| NXV-TRN-001 | 0 | 0 | 0 |
+
+Las asignaciones usan empleados ficticios y el consumo tiene `assigned_to`
+nulo. `GET /inventory/products` y `GET /inventory/orders` permiten comprobar
+los resultados sin nuevas escrituras.
 
 ## Sembrar proveedores para comprobar la aplicacion
 
