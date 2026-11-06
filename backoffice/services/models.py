@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
 from typing import List
+from sqlmodel import DateTime, SQLModel, Field as ORMField
 
 
 
@@ -83,3 +84,55 @@ class SupplierRatePatch(BaseModel):
 
 class SupplierRead(Suppliers):
     id: int
+
+
+class AssetCategory(str, Enum):
+    hardware = "hardware"
+    peripherals = "peripherals"
+    office_supplies = "office_supplies"
+    training_materials = "training_materials"
+
+
+class Office(str, Enum):
+    Valencia = "Valencia"
+    Miami = "Miami"
+
+
+class ExitType(str, Enum):
+    allocation = "allocation"
+    consumption = "consumption"
+
+
+class Asset(SQLModel, table=True):
+    id: int | None = ORMField(default=None, primary_key=True)
+    name: str = ORMField(min_length=1)
+    sku: str = ORMField(min_length=1, unique=True, index=True)
+    category: AssetCategory
+    office: Office = ORMField(index=True)
+
+
+class AssetEntry(SQLModel, table=True):
+    id: int | None = ORMField(default=None, primary_key=True)
+    asset_id: int = ORMField(foreign_key="asset.id", index=True)
+    quantity: int = ORMField(gt=0)
+    supplier: str = ORMField(min_length=1)
+    office: Office = ORMField(index=True)
+    created_at: datetime = ORMField(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_type=DateTime(timezone=True),
+    )
+    user_uuid: str
+
+
+class AssetExit(SQLModel, table=True):
+    id: int | None = ORMField(default=None, primary_key=True)
+    asset_id: int = ORMField(foreign_key="asset.id", index=True)
+    quantity: int = ORMField(gt=0)
+    exit_type: ExitType
+    assigned_to: str | None = None
+    office: Office = ORMField(index=True)
+    created_at: datetime = ORMField(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_type=DateTime(timezone=True),
+    )
+    user_uuid: str
