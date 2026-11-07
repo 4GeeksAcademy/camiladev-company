@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 
 import { PrivateRoute } from "@/components/auth/PrivateRoute";
-import { SessionBar } from "@/components/auth/SessionBar";
 import { changePassword } from "@/lib/auth-api";
 
 function ChangePasswordContent() {
@@ -45,7 +44,6 @@ function ChangePasswordContent() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <section className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-8 sm:px-6">
-        <SessionBar />
         <header className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <p className="text-xs uppercase tracking-[0.14em] text-cyan-300">Mi cuenta</p>
           <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">

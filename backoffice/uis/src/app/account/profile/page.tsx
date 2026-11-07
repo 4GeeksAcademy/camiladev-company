@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 
 import { PrivateRoute } from "@/components/auth/PrivateRoute";
-import { SessionBar } from "@/components/auth/SessionBar";
 import { getCurrentUser, updateMyProfile } from "@/lib/auth-api";
 import type { AuthUser, ProfileUpdateInput } from "@/types/auth";
 
@@ -78,8 +78,6 @@ function ProfileContent() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <section className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-8 sm:px-6">
-        <SessionBar email={user?.email} />
-
         <header className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <p className="text-xs uppercase tracking-[0.14em] text-cyan-300">Mi cuenta</p>
           <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">Perfil</h1>
@@ -89,6 +87,9 @@ function ProfileContent() {
           {user?.role && (
             <p className="mt-1 text-sm text-slate-400">Rol: {user.role}</p>
           )}
+          <Link className="mt-4 inline-block text-sm font-semibold text-cyan-300 hover:text-cyan-200" href="/account/change-password">
+            Cambiar contraseña
+          </Link>
         </header>
 
         {error && !loadFailed && (

@@ -1,7 +1,6 @@
 "use client";
 
 import { PrivateRoute } from "@/components/auth/PrivateRoute";
-import { SessionBar } from "@/components/auth/SessionBar";
 import { SupplierFilters } from "@/components/suppliers/SupplierFilters";
 import { SupplierForm } from "@/components/suppliers/SupplierForm";
 import { SupplierTable } from "@/components/suppliers/SupplierTable";
@@ -46,8 +45,6 @@ function SuppliersContent() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <section className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-8 sm:px-6 lg:px-8">
-        <SessionBar />
-
         <header className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <p className="text-xs uppercase tracking-[0.14em] text-cyan-300">
             Directorio de proveedores

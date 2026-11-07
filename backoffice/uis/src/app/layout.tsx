@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Manrope, Sora } from "next/font/google";
+import { SessionBar } from "@/components/auth/SessionBar";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -29,9 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/suppliers" className="brand text-xl font-bold text-white">Nexova</Link>
             <nav aria-label="Navegación principal" className="flex items-center gap-5">
               <Link href="/suppliers" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Proveedores</Link>
+              <Link href="/inventory/products" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Inventario</Link>
               <Link href="/candidates" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Candidaturas</Link>
             </nav>
-            <span className="ml-auto hidden text-xs text-slate-400 sm:block">BackOffice · People</span>
+            <SessionBar />
           </div>
         </header>
         {children}

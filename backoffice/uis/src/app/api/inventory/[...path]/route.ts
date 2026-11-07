@@ -10,6 +10,7 @@ import {
 import { getInventoryErrorMessage } from "@/lib/inventory";
 
 type InventoryContext = { params: Promise<{ path: string[] }> };
+const UPSTREAM_TIMEOUT_MS = 15_000;
 
 async function forwardInventory(request: Request, context: InventoryContext) {
   const { path } = await context.params;
@@ -30,6 +31,7 @@ async function forwardInventory(request: Request, context: InventoryContext) {
   const session = await fetchUpstream(`${getAuthApiBaseUrl()}/auth/me`, {
     headers: authorization,
     cache: "no-store",
+    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
   if (!session.ok) {
     return passthroughResponse(session);
@@ -55,6 +57,7 @@ async function forwardInventory(request: Request, context: InventoryContext) {
     },
     ...(payload !== null ? { body: payload } : {}),
     cache: "no-store",
+    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
 
   if (response.ok) return passthroughResponse(response);
