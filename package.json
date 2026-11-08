@@ -2,11 +2,11 @@
   "name": "camiladev-company",
   "private": true,
   "version": "1.0.0",
-  "description": "Static web runtime scripts for the camiladev-company workspace",
+  "description": "Workspace scripts for the Nexova website and applications",
   "scripts": {
-    "dev": "npm --prefix public-website run dev -- --hostname 0.0.0.0 --port 3001",
-    "build": "npm --prefix public-website run build",
-    "start": "npm --prefix public-website run start -- --hostname 0.0.0.0",
+    "dev": "npm --prefix uis/website run dev -- --hostname 0.0.0.0 --port 3001",
+    "build": "npm --prefix uis/website run build",
+    "start": "npm --prefix uis/website run start -- --hostname 0.0.0.0",
     "check:routes": "node ./scripts/check-routes.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx src/utils/validations.test.ts"

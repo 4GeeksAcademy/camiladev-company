@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+**/node_modules
+**/.next
+**/__pycache__
+**/.pytest_cache
+**/*.py[cod]
+**/*.tsbuildinfo
+**/data/db.json
+.venv
+coverage
+test-results

@@ -1,30 +1,30 @@
 # Contexto tecnico
 
-Revision: 2026-11-02. Fuentes: [README.md](../README.md),
+Revision: 2026-11-08. Fuentes: [README.md](../README.md),
 [CONTEXT.md](../CONTEXT.md), [TESTING.md](../TESTING.md) y README de cada modulo.
 
 ## Mapa y limites
 
 | Ruta | Responsabilidad |
 | --- | --- |
-| `public-website/` | Sitio publico Next.js; leer su README antes de escribir |
-| `backoffice/uis/` | Aplicacion interna Next.js; seguir su README y AGENTS.md |
-| `backoffice/services/` | API FastAPI del backoffice: usuarios, perfiles, autenticacion y proveedores |
+| `uis/website/` | Sitio publico Next.js; leer su README antes de escribir |
+| `uis/backoffice/` | Aplicacion interna Next.js; seguir su README y AGENTS.md |
+| `services/` | API FastAPI del backoffice: usuarios, perfiles, autenticacion y proveedores |
 | `packages/shared/` | Tipos compartidos existentes; reutilizar si corresponden |
 | `agents/`, `skills/`, `mcps/` | Modulos de agentes, habilidades e integraciones de producto |
 | `data/`, `infra/`, `internal/`, `scripts/`, `workflows/` | Datos, infraestructura y utilidades segun sus README |
 | `.agents/`, `memory-bank/`, `AGENTS.md` | Configuracion y contexto persistente de herramientas de desarrollo |
 
-Hay directorios anteriores o alternativos `uis/`, `uis-1/`, `services/` y
-`services-1/`. Su existencia no autoriza nuevas apps alli, borrados ni
-migraciones. Las apps nuevas y sus ampliaciones pertenecen a `public-website/`
-y `backoffice/`. No crear un arbol paralelo ni copiar una base antigua.
+`uis/legacy/` y `services/legacy-api/` conservan la UI y API anteriores; no
+son los proyectos vigentes. `uis-1/` y `services-1/` siguen siendo arboles
+alternativos no migrados. Las aplicaciones actuales estan en `uis/website/`,
+`uis/backoffice/` y `services/`. No copiar bases antiguas entre servicios.
 
 ## API interna y configuracion
 
 La API usa Python 3.12+, uv, FastAPI, Pydantic, TinyDB, JWT, Passlib/bcrypt y
-Resend. [Su README](../backoffice/services/README.md) define instalacion y entorno.
-Desde `backoffice/services/`:
+Resend. [Su README](../services/README.md) define instalacion y entorno.
+Desde `services/`:
 
 ```sh
 uv sync --python 3.12
@@ -40,7 +40,23 @@ Variables locales: `JWT_SECRET`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `FRONTEND_URL`,
 En Codespaces `FRONTEND_URL` debe apuntar al HTTPS reenviado del frontend,
 no al puerto de la API ni a localhost del destinatario del correo.
 
-Desde 2026-11-03, `backoffice/services/database.py` conserva el cliente TinyDB
+El comando predeterminado `docker compose up` usa `compose.yaml` para desarrollo.
+El `.env` raiz se usa para interpolacion; Compose inyecta las variables al API.
+El backoffice recibe `BACKEND_INTERNAL_URL` como `AUTH_API_BASE_URL` y
+`SUPPLIERS_API_BASE_URL`, con `http://api:8000` como direccion interna. `uis/Dockerfile`
+instala ambas UIs y `uis/start.sh` las ejecuta en 3000/3001 con bind mounts.
+`services/Dockerfile.dev` instala `services/requirements.txt` y ejecuta Uvicorn
+con `--reload`. La red se llama `nexova-development`; TinyDB se guarda en el
+volumen `api-development-data`, separado del host.
+
+La configuracion de produccion se conserva en `compose.prod.yaml`, junto a
+`services/Dockerfile`, `uis/website/Dockerfile` y
+`uis/backoffice/Dockerfile`. TinyDB persiste en `api-data`. PostgreSQL no se
+inicializa localmente: la API necesita el `DATABASE_URL` del entorno. Para
+enlaces de recuperacion en desarrollo, Compose usa `http://localhost:3001`;
+produccion lee `FRONTEND_URL` del entorno.
+
+Desde 2026-11-03, `services/database.py` conserva el cliente TinyDB
 para la persistencia existente e inicializa un motor PostgreSQL para Supabase
 con SQLModel y `psycopg2`. `get_db()` proporciona una sesión por petición y la
 cierra al terminar; no se mantiene una sesión global. `DATABASE_URL` se lee del
@@ -55,10 +71,10 @@ los campos, FK de ambas ordenes hacia `asset.id`, unicidad de `sku` y fechas
 con zona horaria, sin insertar filas. No hay columna `current_stock` ni tabla
 SQLModel de usuarios; `user_uuid` es una cadena sin FK.
 `create_all` inicializa tablas ausentes, no migra las ya
-existentes. Fuentes: `backoffice/services/models.py`, `main.py` y comprobacion
+existentes. Fuentes: `services/models.py`, `main.py` y comprobacion
 del catalogo PostgreSQL ejecutada en esta entrega.
 
-El 2026-11-04 se crearon en `backoffice/services/schemas.py` los schemas
+El 2026-11-04 se crearon en `services/schemas.py` los schemas
 Pydantic `AssetCreate`/`AssetRead`, `AssetEntryCreate`/`AssetEntryRead` y
 `AssetExitCreate`/`AssetExitRead`, sin importar el ORM. `current_stock` solo
 existe en `AssetRead`; su calculo corresponde a las rutas. Los
@@ -91,7 +107,7 @@ salidas, trazables al usuario activo de TinyDB. El script exige tablas vacias,
 las bloquea y confirma la semilla atomicamente tras validar stock; no borra
 inventario, proveedores ni usuarios. Stock por SKU: IT-001=12, IT-002=6,
 PER-001=0, PER-002=0, OFF-001=16, TRN-001=0 (todos con prefijo NXV-).
-Evidencia: ejecucion desde `backoffice/services/`, verificacion de registros,
+Evidencia: ejecucion desde `services/`, verificacion de registros,
 oficinas y UUID sin revelar su valor; GET de productos y ordenes correctos.
 Segunda ejecucion rechazada y conteos intactos. Fuente: script y README.
 
@@ -104,7 +120,7 @@ API externa definida por `NEXT_PUBLIC_API_URL`; no asumir almacenamiento local.
 - Los comandos de raiz no sustituyen las comprobaciones de cada aplicacion.
   Consultar el `package.json` del modulo antes de seleccionar scripts.
 - Para Python usar el entorno uv del backend, nunca el Python global.
-  Ejemplo enfocado existente, desde `backoffice/services/`:
+  Ejemplo enfocado existente, desde `services/`:
   `uv run --extra dev pytest tests/test_forgot_password.py --no-cov`.
   Instalar el extra dev solo si hace falta y con permiso para instalar.
 - `--no-cov` sirve para una ejecucion parcial; no acredita el umbral global.

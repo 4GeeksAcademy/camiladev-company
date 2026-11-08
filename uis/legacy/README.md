@@ -5,13 +5,14 @@ Este frontend está construido con Next.js, React, TypeScript y Tailwind CSS.
 
 ## Objetivo
 
-Implementar el directorio de proveedores conectado al backend de services/api.
+Frontend archivado de proveedores, conectado al backend anterior en
+`services/legacy-api/api/`. No es la aplicacion activa del backoffice.
 
 ## Arranque rápido
 
 1. Ir a la carpeta del frontend:
 
-cd uis/
+cd uis/legacy/
 
 2. Instalar dependencias (si es la primera vez en el Codespace):
 
@@ -29,7 +30,8 @@ http://localhost:3000
 
 - La pantalla de Proveedores (`/suppliers`) pertenece a esta app Next.js dentro de `uis/`.
 - Debes ejecutar `npm run dev` desde `uis/` para que `/suppliers` exista.
-- Si ejecutas `npm run dev` desde la raiz del repositorio, se levanta un servidor estatico y la ruta `/suppliers` devolvera 404.
+- Para ejecutar esta copia antigua, trabaja desde `uis/legacy/`. La interfaz
+	vigente esta en `uis/backoffice/` y la web publica en `uis/website/`.
 
 ## Backend requerido
 
@@ -37,7 +39,7 @@ Para que el frontend funcione, la API debe estar levantada en paralelo:
 
 1. Ir a la carpeta del servicio API:
 
-cd services/api
+cd services/legacy-api/api
 
 2. Levantar la API:
 
@@ -142,5 +144,5 @@ npm run build
 
 ## Nota importante sobre datos semilla
 
-Si ejecutas seed.py en services/api, el seeder limpia e inserta datos desde cero.
+Si ejecutas seed.py en `services/legacy-api/api/`, el seeder limpia e inserta datos desde cero.
 Por eso, cambios manuales previos (por ejemplo tarifa o estado) pueden perderse.

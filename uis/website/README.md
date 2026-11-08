@@ -3,19 +3,26 @@
 Migracion de los tres HTML originales a Next.js App Router y React con
 TypeScript. Se conservan contenido, fuentes, metadatos, popovers y Tailwind.
 
+## Docker Compose
+
+Desde la raíz, `docker compose up` levanta este sitio en
+`http://localhost:3000` y el backoffice en `http://localhost:3001`, con ambos
+directorios montados para recarga en caliente. Producción usa
+`docker compose -f compose.prod.yaml up --build`.
+
 ## Requisitos
 
 - Node.js 22 LTS y npm.
 - Acceso a internet para instalar dependencias y cargar las fuentes de Google.
 - Ejecutar desde este repositorio: el formulario estructurado reutiliza la
-	disponibilidad de [collections.ts](../src/utils/collections.ts).
+	disponibilidad de [collections.ts](../../src/utils/collections.ts).
 
 ## Levantar en desarrollo
 
 Desde la raiz del repositorio:
 
 ```sh
-cd public-website
+cd uis/website
 npm install
 npm run dev 
 ```
@@ -25,7 +32,7 @@ la pagina al editar los archivos. Detenerlo con `Ctrl+C` en la terminal.
 
 El puerto 3001 permite ejecutar el sitio junto al backoffice, cuyo enlace
 actual usa el 3000. Si esta ocupado, sustituirlo por otro, por ejemplo 3002.
-Si la terminal ya esta dentro de este directorio, omitir `cd public-website`.
+Si la terminal ya esta dentro de este directorio, omitir `cd uis/website`.
 
 Una vez sincronizado el archivo de bloqueo con las dependencias, se puede
 usar `npm ci` para instalaciones reproducibles.

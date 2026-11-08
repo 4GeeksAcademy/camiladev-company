@@ -2,14 +2,14 @@
 dev = ["nexova-backoffice-api", "pytest>=9.1.1", "pytest-cov>=7.1.0"]
 
 [tool.uv.workspace]
-members = ["backoffice/services"]
+members = ["services"]
 
 [tool.uv.sources]
 nexova-backoffice-api = { workspace = true }
 
 [tool.pytest.ini_options]
-testpaths = ["backoffice/services/tests"]
-pythonpath = ["backoffice/services"]
+testpaths = ["services/tests"]
+pythonpath = ["services"]
 addopts = "--cov=routes.auth --cov-report=term-missing --cov-fail-under=70"
 
 [tool.coverage.run]

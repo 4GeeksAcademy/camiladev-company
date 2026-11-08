@@ -20,19 +20,19 @@ Exponer una API REST para gestionar proveedores (`suppliers`) con validación de
 - Pydantic
 - TinyDB
 
-### Archivos Python en `services/api`
+### Archivos Python en `api/`
 
-- `services/api/main.py`:
+- `api/main.py`:
 	Punto de entrada de la API. Crea la app de FastAPI e incluye las rutas de proveedores.
-- `services/api/database.py`:
+- `api/database.py`:
 	Configura TinyDB y expone la tabla `suppliers_table` compartida por el servicio.
-- `services/api/models.py`:
+- `api/models.py`:
 	Define el modelo Pydantic `Suppliers` y reglas de validación (country, status, currency, categories).
-- `services/api/seed.py`:
+- `api/seed.py`:
 	Carga datos semilla: valida con Pydantic, limpia la tabla e inserta registros iniciales.
-- `services/api/routes/__init__.py`:
+- `api/routes/__init__.py`:
 	Inicializador del paquete de rutas.
-- `services/api/routes/suppliers.py`:
+- `api/routes/suppliers.py`:
 	Endpoints HTTP de proveedores (`POST /suppliers`, `GET /suppliers` con filtros por `country` y `category`, alias `GET /suppliers/by-category`, `PATCH` de `status`, `PATCH` de `rate` y `DELETE /suppliers/{id}`).
 
 ### Gestión de errores implementada
@@ -63,7 +63,7 @@ source myenv/bin/activate
 3. Entrar en el directorio del servicio:
 
 ```bash
-cd services/api
+cd services/legacy-api/api
 ```
 
 4. Con myenv activo (myenv) instalar las dependencias si estamos en un nuevo Codespaces
@@ -84,7 +84,7 @@ Si `services-1/api` ya está usando el puerto `8000`, inicia esta API en el puer
 uvicorn main:app --reload --port 8001
 ```
 
-6. Sembrar datos de ejemplo desde services/api/
+6. Sembrar datos de ejemplo desde `services/legacy-api/api/`
 
 ```bash
 python seed.py

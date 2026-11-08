@@ -25,8 +25,8 @@ alcance coincida con la tarea, incluso si el cambio solo afecta documentacion.
 | Alcance (rutas relativas a la raiz) | Regla obligatoria |
 | --- | --- |
 | Todo el repositorio | [Repositorio](.agents/rules/repository.md) |
-| `public-website/**`, `backoffice/**`; creacion o traslado de aplicaciones | [Aplicaciones](.agents/rules/applications.md) |
-| `backoffice/services/**`; cambios en autenticacion, persistencia o datos personales | [API y datos](.agents/rules/api-data.md) |
+| `uis/**`, `services/**`; creacion o traslado de aplicaciones | [Aplicaciones](.agents/rules/applications.md) |
+| `services/**`; cambios en autenticacion, persistencia o datos personales | [API y datos](.agents/rules/api-data.md) |
 
 `.agents/` configura herramientas de desarrollo. `agents/` y `skills/` son
 modulos de producto: no alojes alli esta configuracion.

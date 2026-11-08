@@ -47,10 +47,12 @@ ai-engineering-company-project-monorepo/
 ├── packages/
 │   └── shared/               # Paquete compartido (@repo/shared-types)
 ├── scripts/                  # Convenciones/documentación de scripts
-├── backoffice/
-│   ├── services/             # API unificada FastAPI y TinyDB
-│   └── uis/                  # Frontend interno Next.js
-├── public-website/           # Sitio publico Next.js
+├── uis/
+│   ├── backoffice/           # Frontend interno Next.js
+│   ├── website/              # Sitio publico Next.js
+│   └── legacy/               # Frontend anterior archivado
+├── services/                 # API unificada FastAPI y TinyDB
+│   └── legacy-api/           # API anterior archivada
 ├── shared/                   # Recursos/convenciones compartidas a nivel repo
 ├── skills/                   # Skills reutilizables para agentes
 └── workflows/                # Documentación de automatizaciones/orquestación
@@ -63,8 +65,8 @@ ai-engineering-company-project-monorepo/
 1. **Usa este repositorio como plantilla** y crea tu propio repo de proyecto.
 2. **Clona** tu repositorio (o ábrelo en Codespaces).
 3. **Reemplaza** `CONTEXT.md` con el contexto completo de tu empresa asignada.
-4. **Revisa** las guias de [frontend](backoffice/uis/README.md) y [backend](backoffice/services/README.md), y la documentacion de cada area.
-5. **Empieza a implementar** entregables internos en `backoffice/uis/` y `backoffice/services/`, reutilizando `packages/shared/` y `data/` según corresponda.
+4. **Revisa** las guias de [frontend](uis/backoffice/README.md) y [backend](services/README.md), y la documentacion de cada area.
+5. **Empieza a implementar** entregables en `uis/backoffice/`, `uis/website/` y `services/`, reutilizando `packages/shared/` y `data/` según corresponda.
 
 ## Ejecutar la web
 
@@ -79,15 +81,41 @@ Esto levanta el sitio publico Next.js en `http://127.0.0.1:3001`, no el backoffi
 
 En Codespaces, abre el puerto `3001` desde la pestaña **Ports** y selecciona **Open in Browser**.
 
+## Docker Compose
+
+Desde la raíz, ejecuta el stack completo de desarrollo:
+
+```bash
+docker compose up
+```
+
+El `.env` raíz aporta `JWT_SECRET` y `DATABASE_URL`; ambas variables deben estar
+configuradas. Compose inicia la API con Uvicorn `--reload` y las dos UIs con
+recarga en caliente: website en `http://localhost:3000`, backoffice en
+`http://localhost:3001` y API en `http://localhost:8000`. `BACKEND_INTERNAL_URL`
+usa `http://api:8000` dentro de la red. Los datos TinyDB persisten en
+`api-development-data`; `docker compose down` conserva el volumen. No uses
+`docker compose down -v` si quieres conservarlos.
+
+El stack de producción permanece separado:
+
+```bash
+docker compose -f compose.prod.yaml up --build
+```
+
+Ese modo publica el backoffice en `http://localhost:3000` y el website en
+`http://localhost:3001`, y requiere configurar `FRONTEND_URL` con la dirección
+pública correcta para los enlaces de recuperación.
+
 ## Nota sobre la ruta de Proveedores
 
-Las pantallas `/suppliers` y `/candidates` pertenecen a la app Next.js dentro de `backoffice/uis/`.
+Las pantallas `/suppliers` y `/candidates` pertenecen a la app Next.js dentro de `uis/backoffice/`.
 
-- Ejecutar `npm run dev` desde la raíz levanta el sitio publico (puerto `3001`).
+- Ejecutar `npm run dev` desde la raíz levanta el sitio público directamente en el puerto `3001`; con Docker Compose de desarrollo usa el puerto `3000`.
 - Para usar el directorio de Proveedores, levanta el frontend del backoffice:
 
 ```bash
-cd backoffice/uis
+cd uis/backoffice
 npm install
 npm run dev
 ```
@@ -95,8 +123,8 @@ npm run dev
 Luego abre `http://127.0.0.1:3000/suppliers`.
 
 Configura e inicia la API unificada siguiendo su
-[README](backoffice/services/README.md). La API externa de candidaturas se
-configura por separado segun el [README del frontend](backoffice/uis/README.md).
+[README](services/README.md). La API externa de candidaturas se
+configura por separado segun el [README del frontend](uis/backoffice/README.md).
 
 ## Verificación durante desarrollo
 

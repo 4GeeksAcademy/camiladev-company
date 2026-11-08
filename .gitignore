@@ -1,8 +1,10 @@
 .env
 .env.*
+!.env.example
 data/db.json
+services/data/db.json
 services-1/api/data/db.json
-services/api/db.json
+services/legacy-api/api/db.json
 .venv/
 __pycache__/
 .pytest_cache/

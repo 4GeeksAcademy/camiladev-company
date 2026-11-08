@@ -1,0 +1,56 @@
+name: nexova-production
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env file}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in the root .env file}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-onboarding@resend.dev}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - api-data:/workspace/services/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/').read()
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  backoffice:
+    build:
+      context: .
+      dockerfile: uis/backoffice/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://playground.4geeksacademy.com/tracker/api/v1}
+    environment:
+      AUTH_API_BASE_URL: ${BACKEND_INTERNAL_URL:-http://api:8000}
+      SUPPLIERS_API_BASE_URL: ${BACKEND_INTERNAL_URL:-http://api:8000}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  website:
+    build:
+      context: .
+      dockerfile: uis/website/Dockerfile
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+
+volumes:
+  api-data:
