@@ -2,7 +2,16 @@
 
 Aplicacion Next.js y React para acceder al backoffice. La autenticacion y la
 gestion de datos se conectan con la API FastAPI de
-[backoffice/services](../services/README.md).
+[services](../../services/README.md).
+
+## Docker Compose
+
+Desde la raíz, `docker compose up` inicia website en `http://localhost:3000`,
+backoffice en `http://localhost:3001` y FastAPI. Compose monta el código para
+recarga en caliente y asigna `BACKEND_INTERNAL_URL` a `AUTH_API_BASE_URL` y
+`SUPPLIERS_API_BASE_URL`, usando el DNS interno `http://api:8000`. El stack de
+producción se inicia por separado con
+`docker compose -f compose.prod.yaml up --build`.
 
 ## 1. Comprobar los requisitos
 
@@ -18,7 +27,7 @@ npm --version
 Desde cualquier directorio del Codespace:
 
 ```sh
-cd /workspaces/camiladev-company/backoffice/uis
+cd /workspaces/camiladev-company/uis/backoffice
 npm install
 ```
 
@@ -163,7 +172,7 @@ Configura primero sus variables siguiendo el
 [README de la API](../services/README.md). Luego ejecuta:
 
 ```sh
-cd /workspaces/camiladev-company/backoffice/services
+cd /workspaces/camiladev-company/services
 uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -183,7 +192,7 @@ La respuesta esperada es `{"message":"API funcionando"}`.
 En la terminal del frontend:
 
 ```sh
-cd /workspaces/camiladev-company/backoffice/uis
+cd /workspaces/camiladev-company/uis/backoffice
 npm run dev -- --hostname 0.0.0.0 --port 3000
 ```
 
@@ -257,7 +266,7 @@ sobre datos reales que quieras conservar ni cada vez que inicias el frontend.
 2. En una terminal, entra al backend y respalda la base existente:
 
    ```sh
-   cd /workspaces/camiladev-company/backoffice/services
+   cd /workspaces/camiladev-company/services
    cp --no-clobber data/db.json data/db.before-seed.json
    ```
 

@@ -24,7 +24,7 @@ ejecuta semillas ni autoriza por si sola commits, push o despliegues.
    la mas pequena que lo verifique, usando scripts y pruebas existentes:
    - Solo docs/configuracion: comprueba rutas, enlaces locales y frontmatter
      de skills; ejecuta `git diff --check` y revisa tambien archivos nuevos.
-   - API: desde `backoffice/services/`, selecciona el archivo o caso pytest
+  - API: desde `services/`, selecciona el archivo o caso pytest
      existente pertinente. Para recuperacion de contrasena:
      `uv run --extra dev pytest tests/test_forgot_password.py --no-cov`.
      No extrapoles cobertura global desde esta prueba parcial.

@@ -1,0 +1,70 @@
+services:
+  interfaces:
+    build:
+      context: ./uis
+      dockerfile: Dockerfile
+    command: ["bash", "./start.sh"]
+    environment:
+      AUTH_API_BASE_URL: ${BACKEND_INTERNAL_URL:-http://api:8000}
+      SUPPLIERS_API_BASE_URL: ${BACKEND_INTERNAL_URL:-http://api:8000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://playground.4geeksacademy.com/tracker/api/v1}
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./uis/website:/workspace/uis/website
+      - ./uis/backoffice:/workspace/uis/backoffice
+      - ./uis/start.sh:/workspace/uis/start.sh:ro
+      - ./src:/workspace/src
+      - uis-website-node-modules:/workspace/uis/website/node_modules
+      - uis-backoffice-node-modules:/workspace/uis/backoffice/node_modules
+      - uis-website-next:/workspace/uis/website/.next
+      - uis-backoffice-next:/workspace/uis/backoffice/.next
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - development
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./services
+      dockerfile: Dockerfile.dev
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the root .env file}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in the root .env file}
+      FRONTEND_URL: http://localhost:3001
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-onboarding@resend.dev}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./services:/workspace/services
+      - api-development-data:/workspace/services/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/').read()
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    networks:
+      - development
+    restart: unless-stopped
+
+networks:
+  development:
+    name: nexova-development
+    driver: bridge
+
+volumes:
+  api-development-data:
+  uis-backoffice-next:
+  uis-backoffice-node-modules:
+  uis-website-next:
+  uis-website-node-modules:

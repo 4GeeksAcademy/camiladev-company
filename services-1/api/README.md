@@ -52,7 +52,7 @@ Desde `services-1/api/`, ejecuta:
 uv run uvicorn main:app --reload
 ```
 
-Si `services/api` ya está usando el puerto `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo:
+Si `services/legacy-api/api` ya está usando el puerto `8000`, inicia esta API en el puerto `8001` para ejecutar ambas al mismo tiempo:
 
 ```bash
   uv run uvicorn main:app --reload --8001

@@ -1,13 +1,14 @@
 # Aplicaciones de la plantilla
 
-Alcance: `public-website/**`, `backoffice/**` y toda creacion o traslado de apps.
+Alcance: `uis/**`, `services/**` y toda creacion o traslado de apps.
 Carga: mediante la tabla del AGENTS.md raiz.
 
-- Sitio publico en `public-website/`; app interna y sus servicios en
-  `backoffice/`. No crear `apps/`, `frontend/` ni otra raiz alternativa.
-- Antes de escribir lee el README de la carpeta destino. Si no existe un
-  README en `backoffice/`, lee el del submodulo concreto (`uis/` o `services/`)
-  y comunica la ausencia, sin inventar instrucciones.
+- Sitio publico en `uis/website/`, app interna en `uis/backoffice/` y API en
+  `services/`. No crear `apps/`, `frontend/` ni otra raiz alternativa.
+- `uis/legacy/` y `services/legacy-api/` conservan aplicaciones anteriores;
+  no son destinos para nuevas funcionalidades ni sustituyen las aplicaciones
+  vigentes.
+- Antes de escribir lee el README de la aplicacion o servicio afectado.
 - Respeta los AGENTS.md locales de Next.js; no sustituyas sus bloques generados.
 - Conserva los estilos, componentes, contratos y sistema de navegacion del
   modulo. Comprueba estados vacios, errores y carga de la superficie modificada.

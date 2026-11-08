@@ -39,24 +39,24 @@ En Codespaces, abre el puerto `3001` en la pestaña **Ports** y luego usa **Open
 ## Suppliers route note
 
 The `/suppliers` and `/candidates` pages belong to the Next.js app inside
-`backoffice/uis/`.
+`uis/backoffice/`.
 
 - Running `npm run dev` from the repository root starts the public website
   on port `3001`, not the backoffice.
 - To use the backoffice, run its frontend:
 
 ```bash
-cd backoffice/uis
+cd uis/backoffice
 npm install
 npm run dev
 ```
 
 Then open `http://127.0.0.1:3000/suppliers`.
 
-Follow the [frontend guide](backoffice/uis/README.md) and
-[API guide](backoffice/services/README.md) for configuration, Codespaces,
+Follow the [frontend guide](uis/backoffice/README.md) and
+[API guide](services/README.md) for configuration, Codespaces,
 password recovery and supplier seeds. Backend tests run from the repository
-root with `uv run pytest`; frontend tests run from `backoffice/uis/`.
+root with `uv run pytest`; frontend tests run from `uis/backoffice/`.
 
 ## Chequeo rapido de rutas
 

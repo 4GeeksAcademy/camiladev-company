@@ -1,11 +1,37 @@
 # Estado activo y decisiones
 
-Ultima actualizacion: 2026-11-02.
+Ultima actualizacion: 2026-11-08.
 
 ## Estado conocido
 
+- El 2026-11-08 se anadieron Dockerfiles multi-stage de produccion para API,
+  website y backoffice, ademas de `.dockerignore` y `.env.example`. El stack
+  de produccion se conserva en `compose.prod.yaml`; sus tres imagenes
+  construyeron correctamente. No se probo `compose up` sobre la URL de ejemplo.
+- El 2026-11-08 el stack de desarrollo paso a ser el Compose predeterminado en
+  `compose.yaml`; `docker-compose.dev.yml` se retiro para evitar duplicidad.
+  `docker compose config --services` lista `api` e `interfaces`, y el Compose
+  de produccion independiente sigue listando `api`, `backoffice` y `website`.
+  Los contenedores existentes fueron reconocidos por el Compose predeterminado;
+  API healthy, website HTTP 200 en 3000, backoffice redirige con 307 en 3001 y
+  API HTTP 200 en 8000. `git diff --check` paso. No se reinicio la API para
+  evitar volver a ejecutar `create_all` sobre PostgreSQL.
+- El 2026-11-08 se reorganizaron las aplicaciones vigentes en `uis/backoffice/`,
+  `uis/website/` y `services/`. La UI previa se preservo en `uis/legacy/` y la
+  API anterior en `services/legacy-api/`; no se borraron datos ni se migraron
+  `uis-1/` o `services-1/`. Se actualizaron imports relativos, manifiestos,
+  reglas, guias y rutas de pruebas. Pasaron `npm ci` y `npm run build` en ambas
+  UIs, el build raiz del sitio, los typechecks y `python3 -m uv lock --check`.
+  `uis/website/next.config.ts` fija `turbopack.root` al repositorio, eliminando
+  el warning de deteccion de raiz sin perder el import compartido. Un override
+  de `minimatch` alineado con el backoffice dejo la auditoria del sitio en cero.
+  El backoffice conserva 6 alertas bajas solo en dependencias de desarrollo por
+  `deepmerge` (GHSA-gcqx-w48m-w2h4); `npm audit --omit=dev` reporta cero. No hay
+  version corregida y npm propone bajar Jest a 25, por lo que no se aplico ese
+  cambio incompatible. No se instalaron dependencias Python del backend ni se
+  ejecutaron sus tests.
 - El 2026-11-06, con autorizacion del usuario, se instalo `uv@0.13.7`
-  mediante `pip install --user uv`. Desde `backoffice/services/`,
+  mediante `pip install --user uv`. Desde `services/`,
   `python3 -m uv sync --python 3.12 --no-dev` preparo el entorno compartido
   de la raiz `.venv` sin cambios versionados. Se arranco la API con
   `python3 -m uv run --no-sync uvicorn main:app --host 127.0.0.1 --port 8000`.
@@ -17,11 +43,11 @@ Ultima actualizacion: 2026-11-02.
   el usuario confirmo que la API estaba activa y se verifico `GET /` correcto.
   Se mantiene activa para el desarrollo actual; comprobarla al reanudar despues.
 - El 2026-11-06 el usuario confirmo la edicion manual de
-  `backoffice/uis/.env.local` para configurar
+  `uis/backoffice/.env.local` para configurar
   `NEXT_PUBLIC_INVENTORY_API_URL=http://localhost:8000`. Fuente: confirmacion
   del usuario; no se leyo el archivo ni se verifico aun desde el frontend.
 - El 2026-11-06 se implemento la capa de integracion de inventario en
-  `backoffice/uis/src/lib/inventory.ts`: seis endpoints tipados, token desde
+  `uis/backoffice/src/lib/inventory.ts`: seis endpoints tipados, token desde
   `getToken()` de localStorage, Bearer en cada solicitud y errores explicitos
   mediante `InventoryApiError` con estado HTTP. Un 401 borra el token local.
   El proxy `src/app/api/inventory/[...path]/route.ts` limita rutas y metodos
@@ -98,7 +124,7 @@ Ultima actualizacion: 2026-11-02.
   por `src/app/icon.svg`, un monograma `Nx` de Nexova con colores del backoffice;
   no habia un logo oficial entre los assets del repositorio. `npm run build`
   paso, `/icon.svg` devuelve 200 `image/svg+xml` y `/favicon.ico` devuelve 404.
-- El 2026-11-07 se sustituyo tambien `public-website/src/app/favicon.ico` por
+- El 2026-11-07 se sustituyo tambien `uis/website/src/app/favicon.ico` por
   el mismo `src/app/icon.svg` de Nexova. El build publico paso con
   `node node_modules/next/dist/bin/next build` porque existe el paquete Next
   pero falta el enlace `node_modules/.bin/next`; el manifiesto de rutas solo
@@ -119,7 +145,7 @@ Ultima actualizacion: 2026-11-02.
   `test-exclude@8`. Posteriormente, con autorizacion del usuario, se anadieron
   overrides por rango vulnerable para `glob@14.0.4` y `minimatch@11.0.5`,
   sin modificar `minimatch@3` de ESLint ni Jest/Next.js; lockfile actualizado.
-  Fuente: `backoffice/uis/package.json`, `npm install` y
+  Fuente: `uis/backoffice/package.json`, `npm install` y
   `npm ls glob minimatch --all` (salida 0). `npm run lint` paso sin avisos.
   La prueba existente `auth-storage.test.ts` paso sus 10 casos
   con instrumentacion y cobertura del 100 % en ese archivo, no global.
@@ -134,9 +160,9 @@ Ultima actualizacion: 2026-11-02.
   instalacion pendientes ni se cambio la API durante la tarea de dependencias.
 - El repositorio ya contiene sitio publico, UI interna y API; no parte de cero.
 - La API unificada del backoffice tiene autenticacion, usuarios, perfiles y
-  proveedores segun [su README](../backoffice/services/README.md).
+  proveedores segun [su README](../services/README.md).
 - El 2026-11-03 se inicializo y verifico la conexion SQLModel/psycopg2 hacia
-  Supabase en `backoffice/services/database.py`; TinyDB sigue disponible y
+  Supabase en `services/database.py`; TinyDB sigue disponible y
   `get_db()` entrega sesiones por peticion. La verificacion fue `SELECT 1`.
   La conexion se conserva para el inventario.
 - El 2026-11-04 se implementaron `Asset`, `AssetEntry` y `AssetExit` en SQLModel
@@ -174,11 +200,11 @@ Ultima actualizacion: 2026-11-02.
 - Los README del backoffice documentan operaciones de proveedores y
   autenticacion, gestion de usuarios/perfiles y health check; el README UI
   documenta candidaturas y comprobaciones seguras para su API compartida.
-  Fuentes: [API](../backoffice/services/README.md#operaciones-disponibles)
-  y [frontend](../backoffice/uis/README.md#operaciones-de-candidaturas).
+  Fuentes: [API](../services/README.md#operaciones-disponibles)
+  y [frontend](../uis/backoffice/README.md#operaciones-de-candidaturas).
 - El usuario reporto el 2026-11-02 que pasaron `npx tsc --noEmit`,
   `npm run lint`, `npm test -- --runInBand`, `npm run build` en
-  `backoffice/uis/` y `uv run pytest` desde la raiz. Estos resultados son
+  `uis/backoffice/` y `uv run pytest` desde la raiz. Estos resultados son
   reportados por el usuario y no se volvieron a ejecutar en esta actualizacion
   documental.
 - Los resultados historicos de [TESTING.md](../TESTING.md) no equivalen a
@@ -189,7 +215,7 @@ Ultima actualizacion: 2026-11-02.
 | Decision | Motivo y fuente |
 | --- | --- |
 | Negocio y tecnica se leen antes de modificar | Evitar reiniciar sin contexto; solicitud del tech lead y AGENTS.md raiz |
-| Apps en `public-website/` y `backoffice/` | Mapa de la plantilla y requisito explicito del tech lead |
+| Apps en `uis/website/`, `uis/backoffice/` y `services/` | Reorganizacion solicitada el 2026-11-08; conservar los proyectos anteriores en archivo |
 | Configuracion en `.agents/`, no en `agents/` o `skills/` | Separar herramientas de desarrollo de modulos de producto |
 | Reglas seleccionadas por rutas desde AGENTS.md | No depender del descubrimiento automatico de un editor |
 | Entrega con evidencia antes de commit y permiso explicito | Proteger calidad, cambios ajenos y datos sensibles |

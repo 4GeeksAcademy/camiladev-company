@@ -1,10 +1,11 @@
 # API, autenticacion y datos
 
-Alcance: `backoffice/services/**` y cambios de autenticacion, persistencia o
+Alcance: `services/**` y cambios de autenticacion, persistencia o
 datos personales en cualquier modulo. Carga: mediante el AGENTS.md raiz.
 
-- Trabaja desde `backoffice/services/` usando uv y Python 3.12+ segun su README.
-  No arranques el backend anterior en el mismo puerto.
+- Trabaja desde `services/` usando uv y Python 3.12+ segun su README. No uses
+  los backends archivados `services/legacy-api/` o `services-1/api/` como API
+  vigente ni los arranques en el mismo puerto.
 - Conserva contratos FastAPI/Pydantic y errores genericos de autenticacion.
   No reveles si existe una cuenta en login o recuperacion.
 - Conserva normalizacion y validacion de emails del backend; no introduzcas una

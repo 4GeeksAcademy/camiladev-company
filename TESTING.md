@@ -48,7 +48,7 @@ malformadas, mensajes internos sensibles, storage inaccesible y window ausente.
 ## Ejecucion
 
 Backend desde la raiz: `uv run pytest` y `uv run pytest --cov`.
-Frontend desde `backoffice/uis/`: `npm exec -- jest --coverage` (o `npm test -- --coverage`).
+Frontend desde `uis/backoffice/`: `npm exec -- jest --coverage` (o `npm test -- --coverage`).
 La cobertura backend debe ser al menos 70% en `routes.auth`; la configuracion
 de pytest aplica este umbral, tambien cuando se ejecuta `--cov` sin argumento.
 El workspace uv de la raiz instala las dependencias de la API; no la empaqueta.

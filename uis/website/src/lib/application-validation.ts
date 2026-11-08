@@ -1,4 +1,4 @@
-import { AVAILABILITY_MAP } from "../../../src/utils/collections";
+import { AVAILABILITY_MAP } from "../../../../src/utils/collections";
 
 export { AVAILABILITY_MAP };
 

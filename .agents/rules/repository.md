@@ -8,7 +8,10 @@ Carga: obligatoria desde el AGENTS.md raiz.
 - Lee instrucciones y README del modulo objetivo. Reutiliza convenciones,
   utilidades y tipos existentes; evita abstracciones y archivos innecesarios.
 - Respeta cambios ajenos. No restaures, borres ni migres archivos sin solicitud.
-- No crees nuevas apps fuera de `public-website/` y `backoffice/`.
+- Mantén las aplicaciones vigentes en `uis/website/`, `uis/backoffice/` y
+  `services/`; no crees otra raiz de aplicaciones.
+- `uis/legacy/` y `services/legacy-api/` son archivos historicos, no destinos
+  para nuevas aplicaciones.
 - No mezcles `.agents/` (configuracion) con `agents/` y `skills/` (producto).
 - No añadas dependencias, cambies contratos o hagas refactors fuera del alcance.
 - No escribas pruebas nuevas sin peticion explicita; selecciona las existentes
