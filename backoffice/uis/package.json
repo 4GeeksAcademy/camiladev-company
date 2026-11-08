@@ -28,5 +28,12 @@
     "tailwindcss": "^4",
     "ts-jest": "^29.4.14",
     "typescript": "^5"
+  },
+  "overrides": {
+    "glob@>=9.0.0 <=14.0.1": "^14.0.4",
+    "minimatch@>=7.0.0 <11.0.1": "^11.0.5",
+    "babel-plugin-istanbul": {
+      "test-exclude": "^8.0.0"
+    }
   }
 }

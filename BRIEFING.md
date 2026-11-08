@@ -1,5 +1,9 @@
-# BRIEFING —  Gestión de Inventario Backend
-## Empresa: Nexova Consultora de Recursos Humanos
+# Gestión de Inventario Backend
+## Empresa: Nexova
+
+**Ruta:** `05-backend-inventory-orm/nexova-BRIEFING.es.md`
+
+---
 
 ## Tu Empresa
 

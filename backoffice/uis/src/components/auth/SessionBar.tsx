@@ -1,34 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { logout } from "@/lib/auth-api";
+import { AUTH_CHANGE_EVENT, hasToken } from "@/lib/auth-storage";
 
-export function SessionBar({ email }: { email?: string }) {
+export function SessionBar() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const syncSession = () => setIsAuthenticated(hasToken());
+
+    syncSession();
+    window.addEventListener(AUTH_CHANGE_EVENT, syncSession);
+    window.addEventListener("storage", syncSession);
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, syncSession);
+      window.removeEventListener("storage", syncSession);
+    };
+  }, []);
+
+  if (!isAuthenticated) return null;
+
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3">
-      <div className="flex items-center gap-4 text-sm">
-        <Link href="/suppliers" className="text-slate-300 hover:text-cyan-300">
-          Proveedores
-        </Link>
-        <Link href="/account/profile" className="text-slate-300 hover:text-cyan-300">
+    <div className="ml-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm">
+      <Link href="/account/profile" className="font-semibold text-slate-300 transition hover:text-cyan-300">
           Mi perfil
-        </Link>
-        <Link href="/account/change-password" className="text-slate-300 hover:text-cyan-300">
-          Cambiar contraseña
-        </Link>
-      </div>
-
-      <div className="flex items-center gap-3 text-sm">
-        {email && <span className="text-slate-400">{email}</span>}
-        <button
-          type="button"
-          onClick={logout}
-          className="rounded-md border border-slate-700 px-3 py-1.5 text-slate-200 hover:border-rose-700 hover:text-rose-200"
-        >
-          Cerrar sesión
-        </button>
-      </div>
+      </Link>
+      <span className="whitespace-nowrap text-xs text-slate-400">BackOffice · People</span>
+      <button
+        type="button"
+        onClick={logout}
+        className="min-h-10 rounded-md border border-slate-700 px-3 py-1.5 text-slate-200 transition hover:border-rose-700 hover:text-rose-200"
+      >
+        Cerrar sesión
+      </button>
     </div>
   );
 }
