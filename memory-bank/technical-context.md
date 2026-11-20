@@ -74,6 +74,52 @@ SQLModel de usuarios; `user_uuid` es una cadena sin FK.
 existentes. Fuentes: `services/models.py`, `main.py` y comprobacion
 del catalogo PostgreSQL ejecutada en esta entrega.
 
+El 2026-11-18 se anadio a `services/models.py` el modelo SQLModel `Incident`,
+con enums de categoria, estado, origen y sede según `BRIEFING.md`, ID entero
+autogenerado, fechas timezone-aware en UTC y `updated_at` con `onupdate`.
+Restricciones SQL exigen título y descripción no vacíos y limitan categoría,
+estado, origen y sede a los valores acordados. El lifespan existente detectará
+la nueva tabla mediante `create_all`; este mecanismo no modifica tablas
+existentes. El 2026-11-18, tras instalar `uv` y sincronizar las dependencias
+Python 3.12 con `python3 -m uv sync --python 3.12 --no-dev`, se validó el modelo
+en SQLite en memoria: ID y estado predeterminados, fechas generadas,
+actualización automática de `updated_at`, y rechazo de estado, categoría,
+origen, sede, título y descripción inválidos. No se escribió en PostgreSQL.
+También pasaron `git diff --check` y la comprobación de errores estática.
+
+El 2026-11-18 se añadió `scripts/seed_incidents.py` para importar el CSV del
+analizador, y `packages/shared/incident_seed_validation.py` como lógica Python
+compartida de transformación/validación. Mapea estados y categorías de
+`BRIEFING.md`, usa primeros 120 caracteres no vacíos de descripción como
+título, conserva la descripción original, parsea fecha estricta como medianoche
+UTC, y fija origen `customer` y sede `central`. Informa filas inválidas y
+contabiliza filas insertadas/omitidas. La idempotencia persiste un SHA-256 de
+`ticket_id` (o título+fecha si falta) en la tabla `incidentseedsource`, sin
+guardar el ID CSV en `Incident`; también detecta incidencias previas del
+fallback. La creación de la tabla se realiza por el `create_all` existente.
+Smoke test con SQLite efímero pasó transformaciones, invalidación, duplicados
+en archivo y repetición completa (2 insertados la primera vez; 0 la segunda).
+No se ejecutó contra PostgreSQL. El CSV de briefing no está presente en este
+workspace (búsqueda bajo `/workspaces` sin resultados), por lo que falta
+contrastar los 96 registros y sus totales esperados con el fichero real.
+Pasaron compilación de Python, `git diff --check` y comprobación de errores
+estática. Fuente: BRIEFING.md y el código del seed.
+
+El 2026-11-18 se implementaron y registraron las rutas de gestión de
+incidencias en `services/routers/incidents.py`: creación, listado con filtros,
+detalle, cambio de estado y resumen por estado/categoría/origen/sede. Los
+schemas están en `services/schemas.py`; el handler global convierte errores de
+validación a HTTP 400 con `field` y mensaje legible, y conserva HTTP 500
+genérico para errores no controlados. El detalle inexistente devuelve 400 y se
+aplican las transiciones definidas en `BRIEFING.md`. Verificación aislada con
+SQLite efímero pasó creación, filtro, métricas con registros y con tabla vacía,
+detalle ausente, transición inválida y estructura del error 400. También pasó
+`compileall` de los módulos modificados y comprobación estática. No se probó
+con PostgreSQL real ni se añadieron archivos de prueba. La comprobación HTTP
+completa no pudo usar `TestClient` porque el entorno no tiene `httpx2`; se
+verificaron directamente handlers y funciones del router. Fuente: petición del
+usuario, `BRIEFING.md` y los módulos API.
+
 El 2026-11-04 se crearon en `services/schemas.py` los schemas
 Pydantic `AssetCreate`/`AssetRead`, `AssetEntryCreate`/`AssetEntryRead` y
 `AssetExitCreate`/`AssetExitRead`, sin importar el ORM. `current_stock` solo

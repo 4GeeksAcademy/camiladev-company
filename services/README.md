@@ -2,7 +2,7 @@
 
 API FastAPI para usuarios, perfiles, autenticacion, proveedores e inventario.
 TinyDB conserva la persistencia existente; SQLModel conecta con PostgreSQL en
-Supabase para activos y movimientos. Resend envia enlaces de recuperacion de
+Supabase para activos, movimientos e incidencias. Resend envia enlaces de recuperacion de
 contrasena. Las entidades de inventario siguen [BRIEFING.md](../BRIEFING.md).
 
 ## Docker Compose
@@ -134,7 +134,7 @@ la variable inyectada como secreto tiene prioridad sobre el valor local de
 | Base | Datos | Como se pone en marcha |
 |---|---|---|
 | TinyDB | Usuarios, perfiles, tokens de recuperacion y proveedores | `database.py` abre `data/db.json` dentro del servicio y crea el archivo si falta. No requiere servidor, Docker ni comando de arranque propio. |
-| Supabase PostgreSQL | `asset`, `assetentry` y `assetexit` | Crea o utiliza un proyecto de desarrollo activo en Supabase y configura `DATABASE_URL`. PostgreSQL se ejecuta en Supabase, no en el Codespace. |
+| Supabase PostgreSQL | `asset`, `assetentry`, `assetexit`, `incident` y `incidentseedsource` | Crea o utiliza un proyecto de desarrollo activo en Supabase y configura `DATABASE_URL`. PostgreSQL se ejecuta en Supabase, no en el Codespace. |
 
 Para configurar Supabase:
 
@@ -179,6 +179,27 @@ posterior del modelo que requiera cambiar una tabla necesita una migracion
 planificada, no borrar la tabla y volver a arrancar. [database.py](database.py)
 mantiene el motor compartido, mientras `get_db()` crea y cierra una sesion
 SQLModel por peticion; no hay sesiones globales.
+
+### Incidencias
+
+Las rutas de incidencias son públicas y usan SQLModel/PostgreSQL. La creación
+establece `status=open`; ID y fechas los genera el servidor. `GET /summary`
+incluye todas las opciones de los enums, incluso con conteo cero.
+
+| Método y ruta | Operación |
+|---|---|
+| `POST /api/incidents` | Crear incidencia con `title`, `description`, `category`, `origin` y `branch`; devuelve `201`. |
+| `GET /api/incidents` | Listar; filtros opcionales `status`, `origin`, `branch` y `category`. |
+| `GET /api/incidents/{id}` | Consultar por ID; devuelve `400` si no existe. |
+| `PATCH /api/incidents/{id}/status` | Cambiar solo el estado; respeta las transiciones del briefing. |
+| `GET /api/incidents/summary` | Total y conteos por estado, categoría, origen y sede. |
+
+Las validaciones de request devuelven `400` con `detail` como lista de objetos
+`field`/`message`. Los cambios de estado permitidos son `open` a
+`in_progress` o `discarded`, e `in_progress` a `resolved` o `discarded`;
+`resolved` y `discarded` son terminales. Una excepción no controlada devuelve
+`500` con un mensaje genérico, sin exponer el traceback. Lista y resumen
+funcionan con la tabla vacía (lista vacía y métricas en cero).
 
 `--reload` reinicia el servidor cuando modificas codigo y es solo para
 desarrollo. Para permitir conexiones externas en un contenedor o Codespace,
@@ -278,7 +299,7 @@ para serializar movimientos concurrentes. Las listas usan agregaciones y joins,
 sin consultas adicionales por cada orden.
 
 Las respuestas son schemas Pydantic, no objetos ORM. Los campos extra, las
-cantidades invalidas y las asignaciones incompletas devuelven `422`; un activo
+cantidades invalidas y las asignaciones incompletas devuelven `400`; un activo
 inexistente en una orden devuelve `404`. La oficina de cada orden debe coincidir
 con la del activo; en caso contrario devuelve `400` sin registrar el movimiento.
 Las escrituras deben probarse solo
@@ -362,7 +383,7 @@ No hay rutas para editar stock ni modificar o borrar ordenes.
 | `403` | Usuario inactivo o ID del usuario sin formato UUID valido. |
 | `404` | El activo consultado o referenciado por la orden no existe. |
 | `409` | SKU ya registrado. |
-| `422` | Campos extra, cantidad invalida, categoria/oficina invalida o asignacion inconsistente. |
+| `400` | Error de validacion con campo y mensaje claro; oficina de orden distinta de la del activo o salida superior al stock. |
 | `400` | Oficina de la orden distinta de la del activo, o salida superior al stock. |
 
 En sobregiro el mensaje es:
@@ -565,7 +586,7 @@ conservar. No es necesario ejecutarlo cada vez que inicias la aplicacion.
 Ejecuta siempre el script de este backend, no el de `legacy-api/api/`.
 No copies una base antigua completa sobre la base unificada.
 
-## Persistencia y recuperacion de contrasena
+## Persistencia y recuperacion de contraseña
 
 La API utiliza `data/db.json`, relativo a este directorio, para las tablas
 `users`, `profiles`, `password_reset_tokens` y `suppliers`. No comparte

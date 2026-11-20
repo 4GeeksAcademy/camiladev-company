@@ -3,6 +3,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
+from models import IncidentBranch, IncidentCategory, IncidentOrigin, IncidentStatus
+
 
 Office = Literal["Valencia", "Miami"]
 AssetCategory = Literal[
@@ -72,3 +74,33 @@ class AssetEntryOrder(AssetEntryRead):
 class AssetExitOrder(AssetExitRead):
     order_type: Literal["outbound"] = "outbound"
     asset: AssetRead
+
+
+class IncidentSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class IncidentCreate(IncidentSchema):
+    title: NonEmptyString
+    description: NonEmptyString
+    category: IncidentCategory
+    origin: IncidentOrigin
+    branch: IncidentBranch
+
+
+class IncidentStatusPatch(IncidentSchema):
+    status: IncidentStatus
+
+
+class IncidentRead(IncidentSchema):
+    id: int
+    title: str
+    description: str
+    category: IncidentCategory
+    status: IncidentStatus
+    origin: IncidentOrigin
+    branch: IncidentBranch
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(extra="forbid", from_attributes=True)
