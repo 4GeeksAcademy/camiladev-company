@@ -30,14 +30,50 @@ Al ejecutar FastAPI directamente en el host, la API carga `services/.env`.
 
 ## 1. Instalar uv
 
-Necesitas `uv` y Python 3.12 o superior. Si no tienes `uv`, sigue las
-[instrucciones oficiales](https://docs.astral.sh/uv/getting-started/installation/).
+Necesitas `uv` y Python 3.12 o superior. Instala `uv` con el método oficial
+correspondiente a tu sistema operativo:
 
-Comprueba que esta disponible:
+### Linux, macOS o GitHub Codespaces
+
+En una terminal, ejecuta el instalador oficial:
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+El instalador suele colocar `uv` en `$HOME/.local/bin`. Si el comando no se
+reconoce después de instalar, añade esa carpeta al `PATH` de la terminal actual
+y vuelve a comprobarlo:
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+uv --version
+```
+
+Para conservar el cambio entre terminales, añade la línea `export PATH=...` al
+archivo de configuración de tu shell (por ejemplo, `~/.bashrc` o `~/.zshrc`)
+y abre una terminal nueva.
+
+### Windows
+
+En PowerShell, ejecuta el instalador oficial:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Cierra y vuelve a abrir la terminal si `uv` aún no se reconoce.
+
+### Verificar la instalación
+
+Ejecuta este comando y confirma que muestra una versión de `uv`:
 
 ```sh
 uv --version
 ```
+
+Consulta alternativas y solución de problemas en la
+[guía oficial de instalación de uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## 2. Entrar al directorio de la API
 

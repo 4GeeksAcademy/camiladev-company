@@ -4,6 +4,11 @@ Ultima actualizacion: 2026-11-08.
 
 ## Estado conocido
 
+- El 2026-11-20 se amplió `services/README.md` con pasos de instalación de
+  `uv` para Linux/macOS/Codespaces y Windows, comprobación de versión y
+  solución básica de `PATH`. Evidencia: `git diff --check` correcto; solo
+  documentación modificada, sin cambios de dependencias o aplicación.
+
 - El 2026-11-08 se anadieron Dockerfiles multi-stage de produccion para API,
   website y backoffice, ademas de `.dockerignore` y `.env.example`. El stack
   de produccion se conserva en `compose.prod.yaml`; sus tres imagenes
