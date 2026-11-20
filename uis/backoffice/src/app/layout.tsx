@@ -31,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <nav aria-label="Navegación principal" className="flex items-center gap-5">
               <Link href="/suppliers" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Proveedores</Link>
               <Link href="/inventory/products" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Inventario</Link>
+              <Link href="/incidents" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Incidencias</Link>
               <Link href="/candidates" className="text-sm font-semibold text-slate-300 transition hover:text-cyan-300">Candidaturas</Link>
             </nav>
             <SessionBar />

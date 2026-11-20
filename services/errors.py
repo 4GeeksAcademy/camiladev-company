@@ -39,12 +39,31 @@ def configure_error_handlers(app: FastAPI):
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_request: Request, error: RequestValidationError):
+        message_by_type = {
+            "missing": "Este campo es obligatorio.",
+            "string_too_short": "El valor no puede estar vacío.",
+            "string_type": "Debe ser un texto.",
+            "enum": "Selecciona uno de los valores permitidos.",
+            "extra_forbidden": "Este campo no está permitido.",
+            "json_invalid": "El cuerpo de la solicitud no contiene JSON válido.",
+            "int_parsing": "Debe ser un número entero válido.",
+            "int_type": "Debe ser un número entero.",
+            "greater_than": "El valor está fuera del rango permitido.",
+            "greater_than_equal": "El valor está fuera del rango permitido.",
+        }
+        issues = []
+        for issue in error.errors():
+            location = issue.get("loc", ())
+            field = ".".join(str(part) for part in location[1:])
+            issues.append({
+                **({"field": field} if field else {}),
+                "message": message_by_type.get(
+                    issue.get("type"), "El valor no es válido."
+                ),
+            })
         return JSONResponse(
-            status_code=422,
-            content={"detail": [
-                {"loc": list(issue["loc"]), "msg": "Valor no válido.", "type": issue["type"]}
-                for issue in error.errors()
-            ]},
+            status_code=400,
+            content={"detail": issues},
         )
 
     @app.exception_handler(Exception)
