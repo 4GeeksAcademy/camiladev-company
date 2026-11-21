@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from email_validation import NormalizedEmail
 from routes.auth import get_current_user, hash_password
@@ -17,6 +17,7 @@ from services import (
     get_user_by_id,
     update_user
 )
+from schemas import MessageRead, ProfileRead
 
 
 router = APIRouter(
@@ -32,6 +33,8 @@ class Role(str, Enum):
 
 
 class UserCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     email: NormalizedEmail
     password: str
     name: Optional[str] = None
@@ -40,10 +43,25 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     email: Optional[NormalizedEmail] = None
     password: Optional[str] = None
     role: Optional[Role] = None
     is_active: Optional[bool] = None
+
+
+class PublicUserRead(BaseModel):
+    id: str
+    email: str
+    is_active: bool
+    role: Role
+    created_at: datetime
+
+
+class UserRegistrationRead(BaseModel):
+    user: PublicUserRead
+    profile: ProfileRead
 
 
 def public_user(user: dict):
@@ -70,7 +88,7 @@ def owner_or_admin(
         )
 
 
-@router.post("")
+@router.post("", response_model=UserRegistrationRead)
 def register(data: UserCreate):
 
     if get_user_by_email(data.email):
@@ -112,7 +130,7 @@ def register(data: UserCreate):
     }
 
 
-@router.get("")
+@router.get("", response_model=list[PublicUserRead])
 def list_users(
     current_user: dict = Depends(get_current_user)
 ):
@@ -122,7 +140,7 @@ def list_users(
     ]
 
 
-@router.get("/{user_id}")
+@router.get("/{user_id}", response_model=PublicUserRead)
 def get_user(
     user_id: str,
     current_user: dict = Depends(get_current_user)
@@ -143,7 +161,7 @@ def get_user(
     return public_user(user)
 
 
-@router.put("/{user_id}")
+@router.put("/{user_id}", response_model=PublicUserRead)
 def edit_user(
     user_id: str,
     data: UserUpdate,
@@ -201,7 +219,7 @@ def edit_user(
     return public_user(user)
 
 
-@router.delete("/{user_id}")
+@router.delete("/{user_id}", response_model=MessageRead)
 def remove_user(
     user_id: str,
     current_user: dict = Depends(get_current_user)

@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from database import suppliers_table
-from models import Suppliers, SupplierStatusPatch, SupplierRatePatch, SupplierRead, Category, Country
+from models import SupplierCreate, SupplierStatusPatch, SupplierRatePatch, SupplierRead, Category, Country
+from schemas import MessageRead
 
 router = APIRouter(
     prefix="/suppliers", tags=["suppliers"]
@@ -68,9 +69,10 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
 
 # POST
 
-@router.post("")
-def create_suppliers(supplier: Suppliers):
+@router.post("", response_model=SupplierRead)
+def create_suppliers(supplier: SupplierCreate):
     suppliers_data = supplier.model_dump(mode="json")
+    suppliers_data["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     doc_id = suppliers_table.insert(suppliers_data)
 
     return {
@@ -80,7 +82,7 @@ def create_suppliers(supplier: Suppliers):
 
 
 # GET /suppliers  —  opcionalmente filtrado por ?country=x y/o ?category=y
-@router.get("")
+@router.get("", response_model=list[SupplierRead])
 def get_suppliers(
     country: Country | None = Query(None),
     category: Category | None = Query(None)
@@ -89,13 +91,13 @@ def get_suppliers(
 
 
 # GET /suppliers/by-category?category=Y
-@router.get("/by-category")
+@router.get("/by-category", response_model=list[SupplierRead])
 def get_suppliers_by_category(category: str = Query(...)):
     # Backward-compatible alias for clients already using this route.
     return filter_suppliers(category=category)
 
 # PATCH /suppliers/{id}/status
-@router.patch("/{supplier_id}/status")
+@router.patch("/{supplier_id}/status", response_model=SupplierRead)
 def update_supplier_status(supplier_id: int, payload: SupplierStatusPatch):
     new_status_value = payload.status.value
 
@@ -122,7 +124,7 @@ def update_supplier_status(supplier_id: int, payload: SupplierStatusPatch):
 
 
 # PATCH /suppliers/{id}/rate
-@router.patch("/{supplier_id}/rate")
+@router.patch("/{supplier_id}/rate", response_model=SupplierRead)
 def update_supplier_rate(supplier_id: int, payload: SupplierRatePatch):
   
     existing_supplier = suppliers_table.get(doc_id=supplier_id)
@@ -147,7 +149,7 @@ def update_supplier_rate(supplier_id: int, payload: SupplierRatePatch):
 
 
 # DELETE /suppliers/{id}
-@router.delete("/{supplier_id}")
+@router.delete("/{supplier_id}", response_model=MessageRead)
 def delete_supplier(supplier_id: int):
     existing_supplier = suppliers_table.get(doc_id=supplier_id)
 

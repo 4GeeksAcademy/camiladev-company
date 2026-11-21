@@ -17,6 +17,20 @@ class InventorySchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class MessageRead(BaseModel):
+    message: str
+
+
+class ProfileRead(BaseModel):
+    name: str | None
+    phone: str | None
+    address: str | None
+
+
+class HomeRead(BaseModel):
+    message: str
+
+
 class AssetCreate(InventorySchema):
     name: NonEmptyString
     sku: NonEmptyString
@@ -36,12 +50,6 @@ class AssetEntryCreate(InventorySchema):
     office: Office
 
 
-class AssetEntryRead(AssetEntryCreate):
-    id: PositiveInteger
-    created_at: datetime
-    user_uuid: NonEmptyString
-
-
 class AssetExitCreate(InventorySchema):
     asset_id: PositiveInteger
     quantity: PositiveInteger
@@ -58,17 +66,38 @@ class AssetExitCreate(InventorySchema):
         return self
 
 
-class AssetExitRead(AssetExitCreate):
+class AssetEntryRead(InventorySchema):
     id: PositiveInteger
+    asset_id: PositiveInteger
+    quantity: PositiveInteger
+    supplier: NonEmptyString
+    office: Office
     created_at: datetime
     user_uuid: NonEmptyString
 
 
-class AssetEntryOrder(AssetEntryRead):
+class AssetExitRead(InventorySchema):
+    id: PositiveInteger
+    asset_id: PositiveInteger
+    quantity: PositiveInteger
+    exit_type: ExitType
+    assigned_to: NonEmptyString | None
+    office: Office
+    created_at: datetime
+    user_uuid: NonEmptyString
+
+
+class AssetOrderRead(InventorySchema):
+    id: PositiveInteger
+    quantity: PositiveInteger
+    created_at: datetime
+    asset_name: NonEmptyString
+    asset_sku: NonEmptyString
+
+
+class AssetEntryOrder(AssetOrderRead):
     order_type: Literal["inbound"] = "inbound"
-    asset: AssetRead
 
 
-class AssetExitOrder(AssetExitRead):
+class AssetExitOrder(AssetOrderRead):
     order_type: Literal["outbound"] = "outbound"
-    asset: AssetRead

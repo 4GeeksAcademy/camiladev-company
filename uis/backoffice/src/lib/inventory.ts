@@ -45,8 +45,16 @@ interface OrderAudit {
 export type AssetEntry = AssetEntryCreate & OrderAudit;
 export type AssetExit = AssetExitCreate & OrderAudit;
 export type InventoryOrder =
-  | (AssetEntry & { order_type: "inbound"; asset: Asset })
-  | (AssetExit & { order_type: "outbound"; asset: Asset });
+  | (Pick<AssetEntry, "id" | "quantity" | "created_at"> & {
+      order_type: "inbound";
+      asset_name: string;
+      asset_sku: string;
+    })
+  | (Pick<AssetExit, "id" | "quantity" | "created_at"> & {
+      order_type: "outbound";
+      asset_name: string;
+      asset_sku: string;
+    });
 
 export class InventoryApiError extends Error {
   constructor(message: string, public readonly status: number) {

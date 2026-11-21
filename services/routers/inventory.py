@@ -8,7 +8,7 @@ from models import Asset, AssetEntry, AssetExit
 from routes.auth import get_current_user
 from schemas import (
     AssetCreate, AssetRead, AssetEntryCreate, AssetEntryRead, AssetEntryOrder,
-    AssetExitCreate, AssetExitRead, AssetExitOrder, Office,
+    AssetExitCreate, AssetExitRead, AssetExitOrder, Office, AssetOrderRead,
 )
 
 
@@ -136,5 +136,13 @@ def list_orders(
         if office is not None:
             statement = statement.where(model.office == office)
         for asset, stock, order in session.exec(statement).all():
-            orders.append(response(**order.model_dump(), asset=asset_response(asset, stock)))
+            order_data = {
+                "id": order.id,
+                "quantity": order.quantity,
+                "created_at": order.created_at,
+                "asset_name": asset.name,
+                "asset_sku": asset.sku,
+                "order_type": "inbound" if model is AssetEntry else "outbound",
+            }
+            orders.append(response(**order_data))
     return sorted(orders, key=lambda order: (order.created_at, order.order_type, order.id))
