@@ -1,7 +1,8 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from schemas import ProfileRead
 
 from routes.auth import get_current_user
 from services import (
@@ -17,12 +18,14 @@ router = APIRouter(
 
 
 class ProfileUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
 
 
-@router.get("/me")
+@router.get("/me", response_model=ProfileRead)
 def get_my_profile(
     current_user: dict = Depends(get_current_user)
 ):
@@ -36,10 +39,10 @@ def get_my_profile(
             detail="Perfil no encontrado"
         )
 
-    return profile
+    return {field: profile.get(field) for field in ("name", "phone", "address")}
 
 
-@router.put("/me")
+@router.put("/me", response_model=ProfileRead)
 def edit_my_profile(
     data: ProfileUpdate,
     current_user: dict = Depends(get_current_user)
@@ -59,4 +62,4 @@ def edit_my_profile(
     if not profile:
         raise HTTPException(404, "Perfil no encontrado")
 
-    return profile
+    return {field: profile.get(field) for field in ("name", "phone", "address")}

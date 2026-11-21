@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.hash import bcrypt
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from email_validation import NormalizedEmail
 from email_service import EmailDeliveryError, send_password_reset_email
@@ -23,6 +23,7 @@ from services import (
     remove_password_reset_token,
     update_user,
 )
+from schemas import MessageRead, ProfileRead
 
 
 load_dotenv()
@@ -45,18 +46,34 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
 PASSWORD_RESET_EXPIRE_MINUTES = 30
 
 
-class ForgotPasswordRequest(BaseModel):
+class AuthRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class ForgotPasswordRequest(AuthRequest):
     email: NormalizedEmail
 
 
-class ResetPasswordRequest(BaseModel):
+class ResetPasswordRequest(AuthRequest):
     token: str
     new_password: str
 
 
-class ChangePasswordRequest(BaseModel):
+class ChangePasswordRequest(AuthRequest):
     current_password: str
     new_password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class AuthUserRead(BaseModel):
+    id: str
+    email: str
+    role: str
+    profile: ProfileRead | None
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -135,7 +152,7 @@ def get_current_user(
     return user
 
 
-@router.post("/login")
+@router.post("/login", response_model=LoginResponse)
 def login(
     form: OAuth2PasswordRequestForm = Depends()
 ):
@@ -172,7 +189,7 @@ def login(
     }
 
 
-@router.get("/me")
+@router.get("/me", response_model=AuthUserRead)
 def get_me(
     current_user: dict = Depends(get_current_user)
 ):
@@ -186,7 +203,7 @@ def get_me(
     }
 
 
-@router.post("/forgot-password")
+@router.post("/forgot-password", response_model=MessageRead)
 def forgot_password(data: ForgotPasswordRequest):
     user = get_user_by_email(str(data.email))
 
@@ -217,7 +234,7 @@ def forgot_password(data: ForgotPasswordRequest):
     }
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=MessageRead)
 def reset_password(data: ResetPasswordRequest):
     hashed_password = hash_password(data.new_password)
     token_hash = hashlib.sha256(data.token.encode("utf-8")).hexdigest()
@@ -241,7 +258,7 @@ def reset_password(data: ResetPasswordRequest):
     return {"message": "La contraseña se actualizó correctamente."}
 
 
-@router.post("/change-password")
+@router.post("/change-password", response_model=MessageRead)
 def change_password(
     data: ChangePasswordRequest,
     current_user: dict = Depends(get_current_user),

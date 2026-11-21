@@ -59,7 +59,7 @@ class Country(str, Enum):
     USA = "USA"
 
 
-class Suppliers(BaseModel):
+class SupplierCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str
@@ -67,23 +67,31 @@ class Suppliers(BaseModel):
     categories: List[Category] = Field(min_length=1)
     monthly_rate: float = Field(gt=0)
     currency: Currency
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     status: Status
     contract_renewal_date: date | None = None
     contact_email: str | None = None
     notes: str | None = None
 
 
+# Compatibilidad con el seeder existente; el API usa SupplierCreate de forma explícita.
+Suppliers = SupplierCreate
+
+
 class SupplierStatusPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     status: Status
 
 
 class SupplierRatePatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     monthly_rate: float = Field(gt=0)
 
 
-class SupplierRead(Suppliers):
+class SupplierRead(SupplierCreate):
     id: int
+    updated_at: datetime
 
 
 class AssetCategory(str, Enum):

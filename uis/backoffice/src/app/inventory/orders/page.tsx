@@ -133,7 +133,6 @@ function OrdersContent() {
                         <th scope="col">Producto</th>
                         <th scope="col">Cantidad</th>
                         <th scope="col">Fecha de creación</th>
-                        <th scope="col">Creada por (user_uuid)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -152,9 +151,9 @@ function OrdersContent() {
                               </span>
                             </td>
                             <td>
-                              <span className="block font-semibold text-white">{order.asset.name}</span>
+                              <span className="block font-semibold text-white">{order.asset_name}</span>
                               <span className="mt-1 block font-mono text-xs text-slate-400">
-                                {order.asset.sku}
+                                {order.asset_sku}
                               </span>
                             </td>
                             <td className="font-semibold tabular-nums">
@@ -167,9 +166,6 @@ function OrdersContent() {
                               <time dateTime={order.created_at}>
                                 {formatCreatedAt(order.created_at)}
                               </time>
-                            </td>
-                            <td className="font-mono text-xs text-slate-300">
-                              <span className="block min-w-48 break-all">{order.user_uuid}</span>
                             </td>
                           </tr>
                         );

@@ -1,6 +1,4 @@
 export interface AuthProfile {
-  id: string;
-  user_id: string;
   name: string | null;
   phone: string | null;
   address: string | null;
