@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import VacancyApplicationForm from "@/components/vacancy-application-form";
+import { PublicSiteHeader } from "@/components/public-site-header";
 
 export const metadata: Metadata = {
   "title": "Vacantes abiertas | Nexova Solutions",
@@ -83,42 +84,29 @@ export default function Page() {
   return (<>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
     <div>
-  <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-cyan-300 focus:px-4 focus:py-2 focus:text-slate-950">Saltar al contenido principal</a>
-  <header className="sticky top-0 z-40 border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
-    <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Navegación principal">
-      <a href="/" className="text-xl font-bold tracking-tight text-white [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Nexova Solutions</a>
-      <ul className="hidden items-center gap-7 text-sm font-semibold lg:flex">
-        <li><a href="/#inicio" className="transition hover:text-cyan-300">Inicio</a></li>
-        <li><a href="/#evolucion" className="transition hover:text-cyan-300">Evolución</a></li>
-        <li><a href="/#servicios" className="transition hover:text-cyan-300">Servicios</a></li>
-        <li><a href="/#tecnologia" className="transition hover:text-cyan-300">Tecnología</a></li>
-        <li><a href="/#proceso" className="transition hover:text-cyan-300">Proceso</a></li>
-        <li><a href="/formulario" className="rounded-full border border-cyan-300 px-4 py-2 text-cyan-300 transition hover:bg-cyan-300 hover:text-slate-950">Formulario</a></li>
-        <li><a href="/vacantes" className="transition hover:text-cyan-300">Vacantes</a></li>
-        <li><a href="/#contacto" className="transition hover:text-cyan-300">Solicitar consulta</a></li>
-      </ul>
-      <details className="relative lg:hidden">
-        <summary className="inline-flex cursor-pointer list-none items-center rounded-lg border border-slate-700 px-3 py-2 text-slate-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-label="Abrir menú principal">
-          <span className="sr-only">Abrir menú principal</span>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm1 4a1 1 0 100 2h12a1 1 0 100-2H4z" clipRule="evenodd"/>
-          </svg>
-        </summary>
-        <div className="absolute right-0 top-14 z-50 w-72 rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-2xl shadow-slate-950/70">
-          <ul className="space-y-2 text-sm font-semibold">
-            <li><a href="/#inicio" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Inicio</a></li>
-            <li><a href="/#evolucion" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Evolución</a></li>
-            <li><a href="/#servicios" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
-            <li><a href="/#tecnologia" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
-            <li><a href="/#proceso" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
-            <li><a href="/formulario" className="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Formulario</a></li>
-            <li><a href="/vacantes" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Vacantes</a></li>
-            <li><a href="/#contacto" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Solicitar consulta</a></li>
-          </ul>
-        </div>
-      </details>
-    </nav>
-  </header>
+  <PublicSiteHeader
+    brandHref="/"
+    desktopLinks={[
+      { href: "/#inicio", label: "Inicio" },
+      { href: "/#evolucion", label: "Evolución" },
+      { href: "/#servicios", label: "Servicios" },
+      { href: "/#tecnologia", label: "Tecnología" },
+      { href: "/#proceso", label: "Proceso" },
+      { href: "/formulario", label: "Formulario", desktopVariant: "outline" },
+      { href: "/vacantes", label: "Vacantes" },
+      { href: "/#contacto", label: "Solicitar consulta" },
+    ]}
+    mobileLinks={[
+      { href: "/#inicio", label: "Inicio" },
+      { href: "/#evolucion", label: "Evolución" },
+      { href: "/#servicios", label: "Servicios" },
+      { href: "/#tecnologia", label: "Tecnología" },
+      { href: "/#proceso", label: "Proceso" },
+      { href: "/formulario", label: "Formulario", mobileVariant: "primary" },
+      { href: "/vacantes", label: "Vacantes" },
+      { href: "/#contacto", label: "Solicitar consulta" },
+    ]}
+  />
   <main id="main-content" className="bg-slate-950 text-slate-100 [font-family:'Manrope',ui-sans-serif,system-ui,sans-serif]">
     <section className="relative overflow-hidden border-y border-slate-800/80 py-16 sm:py-20 lg:py-24" aria-labelledby="vacancies-title">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_15%,rgba(34,211,238,0.22),transparent_32%),radial-gradient(circle_at_88%_0%,rgba(16,185,129,0.14),transparent_38%),linear-gradient(160deg,#020617_10%,#071225_50%,#040b17_100%)]"/>

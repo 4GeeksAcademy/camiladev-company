@@ -1,4 +1,5 @@
 import ContactForm from "@/components/contact-form";
+import { PublicSiteHeader } from "@/components/public-site-header";
 
 const organization = {
   "@context": "https://schema.org",
@@ -57,43 +58,30 @@ export default function Home() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\u003c") }} />
 <div>
-  <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-cyan-300 focus:px-4 focus:py-2 focus:text-slate-950">Saltar al contenido principal</a>
-  <header className="sticky top-0 z-40 border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
-    <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Navegación principal">
-      <a href="#inicio" className="text-xl font-bold tracking-tight text-white [font-family:'Sora',ui-sans-serif,system-ui,sans-serif]">Nexova Solutions</a>
-      <ul className="hidden items-center gap-7 text-sm font-semibold lg:flex">
-        <li><a href="#inicio" className="transition hover:text-cyan-300">Inicio</a></li>
-        <li><a href="#evolucion" className="transition hover:text-cyan-300">Evolución</a></li>
-        <li><a href="#servicios" className="transition hover:text-cyan-300">Servicios</a></li>
-        <li><a href="#tecnologia" className="transition hover:text-cyan-300">Tecnología</a></li>
-        <li><a href="#proceso" className="transition hover:text-cyan-300">Proceso</a></li>
-        <li><a href="/formulario" className="transition hover:text-cyan-300">Formulario</a></li>
-        <li><a href="/vacantes" className="transition hover:text-cyan-300">Vacantes</a></li>
-        <li><a href="#contacto" className="rounded-full bg-cyan-300 px-5 py-2.5 font-bold text-slate-950 transition hover:bg-cyan-200">Solicitar consulta</a></li>
-      </ul>
-      <details className="relative lg:hidden">
-        <summary className="inline-flex cursor-pointer list-none items-center rounded-lg border border-slate-700 px-3 py-2 text-slate-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" aria-label="Abrir menú principal">
-          <span className="sr-only">Abrir menú principal</span>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </summary>
-        <div className="absolute right-0 top-14 z-50 w-72 rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-2xl shadow-slate-950/70">
-          <ul className="space-y-2 text-sm font-semibold">
-            <li><a href="#inicio" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Inicio</a></li>
-            <li><a href="#evolucion" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Evolución</a></li>
-            <li><a href="#servicios" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Servicios</a></li>
-            <li><a href="#tecnologia" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Tecnología</a></li>
-            <li><a href="#proceso" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Proceso</a></li>
-            <li><a href="/formulario" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Formulario</a></li>
-            <li><a href="/vacantes" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Vacantes</a></li>
-            <li><a href="#contacto" className="block rounded-lg px-3 py-2 text-slate-200 hover:bg-slate-800">Solicitar consulta</a></li>
-            <li><a href="/vacantes" className="block rounded-full bg-cyan-300 px-4 py-2 text-center font-bold text-slate-950">Postularme ahora</a></li>
-          </ul>
-        </div>
-      </details>
-    </nav>
-  </header>
+  <PublicSiteHeader
+    brandHref="#inicio"
+    desktopLinks={[
+      { href: "#inicio", label: "Inicio" },
+      { href: "#evolucion", label: "Evolución" },
+      { href: "#servicios", label: "Servicios" },
+      { href: "#tecnologia", label: "Tecnología" },
+      { href: "#proceso", label: "Proceso" },
+      { href: "/formulario", label: "Formulario" },
+      { href: "/vacantes", label: "Vacantes" },
+      { href: "#contacto", label: "Solicitar consulta", desktopVariant: "primary" },
+    ]}
+    mobileLinks={[
+      { href: "#inicio", label: "Inicio" },
+      { href: "#evolucion", label: "Evolución" },
+      { href: "#servicios", label: "Servicios" },
+      { href: "#tecnologia", label: "Tecnología" },
+      { href: "#proceso", label: "Proceso" },
+      { href: "/formulario", label: "Formulario" },
+      { href: "/vacantes", label: "Vacantes" },
+      { href: "#contacto", label: "Solicitar consulta" },
+      { href: "/vacantes", label: "Postularme ahora", mobileVariant: "primary" },
+    ]}
+  />
   <main id="main-content">
     <section id="inicio" className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.25),transparent_35%),radial-gradient(circle_at_85%_5%,rgba(16,185,129,0.17),transparent_38%),linear-gradient(160deg,#020617_8%,#071225_45%,#040b17_100%)]" />

@@ -4,6 +4,41 @@ Ultima actualizacion: 2026-11-08.
 
 ## Estado conocido
 
+- El 2026-11-21 se inició la auditoría de rendimiento de `uis/website/` y
+  `uis/backoffice/` en `AUDIT.md`. Se documentaron duplicaciones del header
+  público, JSON-LD Organization y carga de activos de inventario, además de
+  una diferencia de estrategia de fuentes que debe contrastarse con Lighthouse.
+  Luego se localizaron las capturas iniciales en `audit/before/` (website y
+  backoffice, desktop y móvil). El usuario transcribió los scores: website en
+  desktop y móvil Performance 96, Accesibilidad 97, Recomendaciones 100, SEO 63;
+  backoffice en desktop y móvil Performance 97, Accesibilidad 100,
+  Recomendaciones 100, SEO 60. No se conocen ruta exacta, TTFB/LCP/CLS/INP ni
+  diagnósticos; no se elige aún un arreglo de rendimiento por score agregado.
+  SEO es el score secundario menor, pero necesita diagnósticos específicos.
+  El usuario además reportó para website y backoffice TBT 29%, CLS 25%, LCP 23%
+  (sin aclarar si son pesos/impacto; no son valores métricos confirmados) y
+  recomendaciones de seguridad sobre CSP, HSTS, COOP, XFO/CSP y Trusted Types.
+  Registrar como hallazgos transcritos, no como vulnerabilidades confirmadas;
+  verificar estado/impacto en Lighthouse y encabezados reales antes de cambiar
+  código. En un primer cambio incremental se añadió `X-Frame-Options: DENY`
+  a todas las rutas de ambos Next.js para mitigación de clickjacking; verificar
+  encabezado con los servidores reiniciados y confirmar que no se requiere
+  embedding en iframe. Segundo cambio: se añadió
+  `Cross-Origin-Opener-Policy: same-origin` en ambos; búsqueda estática no halló
+  ventanas popup/opener y el enlace `_blank` encontrado usa noopener. Falta
+  comprobación HTTP con servidores reiniciados y verificación manual de flujos.
+  CSP/Trusted Types siguen pendientes, y HSTS espera confirmar terminación TLS.
+  El usuario confirmó que tomó las capturas antes de los cambios.
+  Como extracción de mantenibilidad acotada se creó
+  `uis/website/src/components/public-site-header.tsx` y se integró en inicio,
+  formulario y vacantes, conservando enlaces y variantes por ruta. Validación:
+  `npx tsc --noEmit` y ESLint aislado del componente correctos. ESLint enfocado
+  sobre las páginas detecta además 18 enlaces internos `<a>` preexistentes
+  fuera del header; no se modificaron en este paso. No hay mejora Lighthouse
+  posterior ni `REPORT.md`; escoger la corrección de rendimiento queda pendiente
+  de que se compartan los diagnósticos iniciales. Fuente: código e informes de
+  comandos de la sesión.
+
 - El 2026-11-20 se amplió `services/README.md` con pasos de instalación de
   `uv` para Linux/macOS/Codespaces y Windows, comprobación de versión y
   solución básica de `PATH`. Evidencia: `git diff --check` correcto; solo
