@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDeferredValue, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useResource } from "@/hooks/useResource";
 import { stages, statuses } from "@/types/candidates";
@@ -27,11 +27,12 @@ export function CandidateList() {
     router.replace(next.size ? `/candidates?${next}` : "/candidates", { scroll: false });
   }
 
-  const rows = state.status === "success" ? state.data.filter((candidate) =>
+  const candidates = state.status === "success" ? state.data : [];
+  const rows = useMemo(() => candidates.filter((candidate) =>
     (!validStatus || candidate.status === validStatus) &&
     (!validStage || candidate.stage === validStage) &&
     (!query || `${candidate.full_name} ${candidate.email}`.toLocaleLowerCase("es").includes(query)),
-  ) : [];
+  ), [candidates, query, validStage, validStatus]);
 
   return <>
     <div className="page-heading">

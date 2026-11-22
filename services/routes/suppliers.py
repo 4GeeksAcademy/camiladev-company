@@ -2,12 +2,15 @@ from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime, timezone
 from pydantic import ValidationError
 
+from cache import api_cache
 from database import suppliers_table
 from models import Suppliers, SupplierStatusPatch, SupplierRatePatch, SupplierRead, Category, Country
 
 router = APIRouter(
     prefix="/suppliers", tags=["suppliers"]
     )
+
+SUPPLIER_CACHE_TTL_SECONDS = 60
 
 
 
@@ -28,7 +31,36 @@ def serialize_document(document):
 
 
 def filter_suppliers(country: str | None = None, category: str | None = None):
-    # Evita lecturas desactualizadas cuando la tabla fue modificada por otro proceso.
+    # Normalize filters so the legacy category alias shares the same cache entry.
+    try:
+        country_value = Country(country).value if country is not None else None
+    except ValueError:
+        valid_country = [item.value for item in Country]
+        raise HTTPException(
+            status_code=400,
+            detail=f"País no válido. Opciones permitidas: {valid_country}",
+        ) from None
+    try:
+        category_value = Category(category).value if category is not None else None
+    except ValueError:
+        valid_categories = [item.value for item in Category]
+        raise HTTPException(
+            status_code=400,
+            detail=f"Categoría no válida. Opciones permitidas: {valid_categories}",
+        ) from None
+    cache_key = f"country={country_value or ''}&category={category_value or ''}"
+
+    def load():
+        return _load_suppliers(country_value, category_value)
+
+    return api_cache.get_or_set(
+        "suppliers", cache_key, SUPPLIER_CACHE_TTL_SECONDS, load
+    )
+
+
+def _load_suppliers(country: str | None = None, category: str | None = None):
+    # Refresh TinyDB's internal query cache on misses; TTL entries remain
+    # process-local and are invalidated by this API's supplier mutations.
     suppliers_table.clear_cache()
 
     # Punto de partida: obtener todos los proveedores y luego aplicar filtros opcionales.
@@ -72,6 +104,7 @@ def filter_suppliers(country: str | None = None, category: str | None = None):
 def create_suppliers(supplier: Suppliers):
     suppliers_data = supplier.model_dump(mode="json")
     doc_id = suppliers_table.insert(suppliers_data)
+    api_cache.invalidate("suppliers")
 
     return {
         "id": doc_id,
@@ -114,6 +147,7 @@ def update_supplier_status(supplier_id: int, payload: SupplierStatusPatch):
         },
         doc_ids=[supplier_id]
     )
+    api_cache.invalidate("suppliers")
 
     updated_supplier = suppliers_table.get(doc_id=supplier_id)
 
@@ -140,6 +174,7 @@ def update_supplier_rate(supplier_id: int, payload: SupplierRatePatch):
         },
         doc_ids=[supplier_id]
     )
+    api_cache.invalidate("suppliers")
 
     updated_supplier = suppliers_table.get(doc_id=supplier_id)
 
@@ -158,5 +193,6 @@ def delete_supplier(supplier_id: int):
         )
 
     suppliers_table.remove(doc_ids=[supplier_id])
+    api_cache.invalidate("suppliers")
 
     return {"message": f"Supplier with id {supplier_id} deleted"}

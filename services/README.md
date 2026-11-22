@@ -410,6 +410,39 @@ las solicitudes. `POST`, `PATCH` y `DELETE` escriben en la base activa.
 `DELETE` elimina el documento de la base; respalda los datos antes y limita las
 pruebas de escritura a proveedores de prueba autorizados.
 
+### Cache de lecturas
+
+La API mantiene una cache TTL en memoria del proceso para dos lecturas que
+repiten trabajo de filtrado, serializacion o agregacion. No es una cache HTTP
+ni requiere Redis:
+
+| Lectura | Clave | TTL | Invalidacion |
+|---|---|---:|---|
+| `GET /suppliers` y `GET /suppliers/by-category` | Combinacion normalizada de `country` y `category`; el alias por categoria comparte entrada con `GET /suppliers?category=...`. | 60 s | Crear, cambiar estado o tarifa, o eliminar un proveedor invalida todas las variantes del listado. |
+| `GET /inventory/products` | Valor de `office`, incluyendo la lista sin filtro. | 5 s | Crear un activo o confirmar una entrada/salida invalida todas las variantes de la lista. |
+
+Las invalidaciones de las escrituras propias se ejecutan despues de persistir
+el cambio. El TTL limita la posible antiguedad si la base se modifica por fuera
+de esta API; aun con invalidacion local existe un intervalo pequeño entre el
+commit y la invalidacion. El cache devuelve copias de los valores guardados y
+no conserva los errores de lectura.
+
+La cache es local a cada proceso. Los comandos y configuraciones Docker de este
+repositorio arrancan un unico proceso Uvicorn por contenedor; si se agregan
+workers o replicas, cada proceso tendra su propia cache y las invalidaciones
+no se propagaran entre ellos. En ese despliegue se debe usar una cache e
+invalidacion compartida, o aceptar la ventana de antiguedad maxima del TTL.
+
+No se cachean usuarios, perfiles, autenticacion ni respuestas `/auth/me` porque
+son personales o dependen de permisos; tampoco `GET /inventory/orders`, cuyo
+historial crece y cuya frescura operacional es importante. Las lecturas por ID
+y el estado de `/` no se cachean porque su trabajo es acotado. Las estimaciones
+de frecuencia/coste son cualitativas: no
+hay telemetria de produccion ni se midio el hit ratio o la reduccion de
+latencia. Los tests de cache estan en
+[`tests/test_cache.py`](tests/test_cache.py) y
+[`tests/test_suppliers_cache.py`](tests/test_suppliers_cache.py).
+
 ### Salud de la API
 
 | Metodo y ruta | Uso |

@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, func, select
 
+from cache import api_cache
 from database import get_db
 from models import Asset, AssetEntry, AssetExit
 from routes.auth import get_current_user
@@ -13,6 +14,7 @@ from schemas import (
 
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
+PRODUCTS_CACHE_TTL_SECONDS = 5
 
 
 def inventory_user(current_user: dict = Depends(get_current_user)):
@@ -56,10 +58,20 @@ def list_assets(
     office: Office | None = Query(default=None),
     session: Session = Depends(get_db),
 ):
-    statement = asset_stock_statement().order_by(Asset.id)
-    if office is not None:
-        statement = statement.where(Asset.office == office)
-    return [asset_response(asset, stock) for asset, stock in session.exec(statement).all()]
+    cache_key = f"office={office or ''}"
+
+    def load():
+        statement = asset_stock_statement().order_by(Asset.id)
+        if office is not None:
+            statement = statement.where(Asset.office == office)
+        return [
+            asset_response(asset, stock).model_dump(mode="json")
+            for asset, stock in session.exec(statement).all()
+        ]
+
+    return api_cache.get_or_set(
+        "inventory_products", cache_key, PRODUCTS_CACHE_TTL_SECONDS, load
+    )
 
 
 @router.post("/products", response_model=AssetRead, status_code=201)
@@ -80,6 +92,7 @@ def create_asset(
             raise HTTPException(409, "Asset SKU already exists.") from None
         raise
     session.refresh(asset)
+    api_cache.invalidate("inventory_products")
     return asset_response(asset, 0)
 
 
@@ -102,6 +115,7 @@ def create_entry(
     session.add(entry)
     session.commit()
     session.refresh(entry)
+    api_cache.invalidate("inventory_products")
     return AssetEntryRead(**entry.model_dump())
 
 
@@ -122,6 +136,7 @@ def create_exit(
     session.add(exit_order)
     session.commit()
     session.refresh(exit_order)
+    api_cache.invalidate("inventory_products")
     return AssetExitRead(**exit_order.model_dump())
 
 

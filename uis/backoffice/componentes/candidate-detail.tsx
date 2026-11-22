@@ -1,14 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { api, errorMessage } from "@/lib/api";
 import { useResource } from "@/hooks/useResource";
 import { stages, statuses } from "@/types/candidates";
 import type { Stage, Status } from "@/types/candidates";
-import { CandidateForm } from "./candidate-form";
 import { CandidateNotes, formatDate } from "./candidate-notes";
 import { Failure, Loading, Notice } from "./feedback";
+
+const CandidateForm = dynamic(
+  () => import("./candidate-form").then((module) => module.CandidateForm),
+  {
+    ssr: false,
+    loading: () => <p role="status">Cargando formulario de edición…</p>,
+  },
+);
 
 function SafeLink({ url, children }: { url: string | null; children: string }) {
   if (!url) return <>No disponible</>;

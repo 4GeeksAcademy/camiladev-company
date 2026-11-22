@@ -205,6 +205,34 @@ Si esta ocupado, elige otro puerto, por ejemplo:
 npm run dev -- --hostname 0.0.0.0 --port 3002
 ```
 
+## Versiones y optimizaciones frontend
+
+El backoffice utiliza Next.js y `eslint-config-next` **16.4.6** (actualizados
+desde 16.4.3), React y React DOM 19.3.0, Tailwind CSS 4 y TypeScript 5. El
+lockfile se actualizo junto con los manifiestos. La auditoria de dependencias de
+produccion despues de la actualizacion reporto cero vulnerabilidades conocidas;
+se puede repetir con:
+
+```sh
+npm audit --omit=dev
+```
+
+En el detalle de una candidatura, `componentes/candidate-form.tsx` se carga con
+`next/dynamic` solo cuando se activa **Editar candidatura**. El modo de lectura
+no descarga el formulario de edicion; al editar, se muestra un estado de carga
+accesible mientras llega el chunk. Es code splitting, no cacheo de respuestas,
+por lo que no necesita TTL y no introduce riesgo de datos obsoletos.
+
+El filtrado local de candidaturas en `componentes/candidate-list.tsx` usa
+`useMemo` con dependencias `[candidates, query, validStage, validStatus]`. Esto
+evita repetir el recorrido y la normalizacion de nombre/email en renders donde
+los datos o criterios no cambiaron. Se recalcula al cambiar cualquiera de ellos.
+El impacto se ha justificado por la operacion O(n), pero aun no se ha medido con
+una traza de React Profiler ni con un conjunto grande de registros.
+
+El informe transversal de decisiones, limites y metodologia de medicion esta en
+[`../../CACHING_REPORT.md`](../../CACHING_REPORT.md).
+
 ## 6. Abrir el frontend en Codespaces
 
 1. Abre la pestana **Puertos** de VS Code.
