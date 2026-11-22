@@ -1,34 +1,101 @@
-# Informe técnico: optimización frontend (lazy loading y memoización)
+# Informe técnico: optimización frontend y caché backend
 
 ## Alcance y criterio
 
-Se revisaron las rutas y componentes de `uis/website/` y `uis/backoffice/`. El encargo concreto de implementación cubre dos cargas diferidas y una memoización en el frontend; no se añadió caché HTTP, de datos ni de backend. La división de código no requiere TTL: no conserva una copia de datos, sino que aplaza la descarga/ejecución del módulo hasta que la UI lo necesita.
+Este informe documenta las optimizaciones de frontend ya realizadas y la caché aplicada a dos lecturas de la API FastAPI principal (`services/main.py`). La selección prioriza respuestas reutilizables con consultas o transformación repetidas, y evita cachear respuestas personales, credenciales, tokens u órdenes de alta rotación.
 
-Las decisiones priorizan UI condicional y flujos secundarios. En ambos casos la carga inicial evita el código de un componente que un usuario puede no abrir durante la visita. La reducción exacta del bundle debe confirmarse con un análisis de build; no se dispone de mediciones de producción ni de una sesión de React Profiler en este cambio.
+No hay telemetría de producción de latencia, tasa de solicitudes, volumen de filas ni frecuencia de cambios. Las frecuencias y costes indicados son estimaciones cualitativas derivadas de los consumidores del repositorio y de la implementación; no son medidas ni estadísticas observadas.
 
-## Lazy loading
+## Decisiones en el frontend
+
+### Lazy loading
 
 | Aplicación / componente | Implementación | Justificación y coste de diferir |
 | --- | --- | --- |
-| `uis/website/src/components/vacancy-application-form.tsx` en `/vacantes` | `next/dynamic` en `lazy-vacancy-application-form.tsx`; el formulario solo se monta al abrir el popover `#apply-modal`. | Es un formulario largo (múltiples campos y opciones internacionales), con lógica de validación/sanitización en cliente. Se incluye una sola vez en un modal y no es necesario para leer el listado de vacantes. Quien no inicia una postulación evita la transferencia/parseo de ese módulo. Al abrir el popover hay una indicación accesible de carga mientras llega el chunk. El componente necesita hidratación cliente por su interacción con el formulario. |
-| `uis/backoffice/componentes/candidate-form.tsx` desde `CandidateDetail` | `next/dynamic`; se solicita cuando `editing` es `true`. | El formulario solo aparece tras elegir “Editar candidatura” y no forma parte de la vista de lectura habitual del detalle. Aplazarlo evita cargar y evaluar el módulo de formulario/API en cada visita de lectura. La espera de un chunk al activar edición es una latencia pequeña y localizada, mostrada con un estado `role="status"`. |
+| `uis/website/src/components/vacancy-application-form.tsx` en `/vacantes` | `next/dynamic` en `lazy-vacancy-application-form.tsx`; el formulario solo se monta al abrir `#apply-modal`. | Formulario largo con validaciones/opciones internacionales, dentro de un modal que un usuario puede no abrir. Se difieren su descarga y evaluación; al abrir se muestra estado de carga accesible y se añade esa espera localizada. |
+| `uis/backoffice/componentes/candidate-form.tsx` desde `CandidateDetail` | `next/dynamic`; se solicita cuando `editing` es `true`. | La vista habitual es de lectura; el formulario y su lógica solo hacen falta tras activar edición. La primera entrada en edición puede esperar el chunk. |
 
-Los imports son dinámicos y de ruta estática para que Next pueda generar chunks. No se fuerza SSR para los formularios dinámicos (ambos son UI de cliente). El formulario público se retrasa hasta abrir el popover, no solo hasta la hidratación de la página.
+Los imports dinámicos usan rutas estáticas para que Next genere chunks. No se fuerza SSR para estos formularios de cliente.
 
-## Memoización con `useMemo`
+### Memoización con `useMemo`
 
-Se memoizó el filtrado de candidaturas en `uis/backoffice/componentes/candidate-list.tsx`. Para cada candidatura se comprueban los filtros de estado y etapa, y cuando existe búsqueda se construye y normaliza el texto `nombre + email`. El cálculo es O(n) sobre el listado y puede repetirse por cambios de estado UI que no alteran ni el listado ni los criterios.
+Se memoizó el filtrado de candidaturas en `uis/backoffice/componentes/candidate-list.tsx`. El filtrado y la construcción/normalización del texto de búsqueda son O(n); ya no se repiten en renders que no cambian el listado ni sus criterios. Las dependencias son `[candidates, query, validStage, validStatus]`, por lo que los datos o filtros nuevos recalculan el resultado. No se memoizaron transformaciones triviales.
 
-Dependencias explícitas: `[candidates, query, validStage, validStatus]`. `candidates` conserva la referencia del resultado de `useResource` mientras el estado de datos no cambia; `query` es el valor normalizado/deferred; los filtros provienen de la URL. Cualquier cambio en datos o criterios recalcula el resultado. No se aplica memoización a transformaciones triviales.
+## Decisiones en el backend
 
-## Evidencia y medición
+### Inventario de endpoints expuestos
 
-- No se recogieron trazas de red/build comparables antes y después ni perfiles de React DevTools; por tanto, no se presentan como hechos tiempos de carga, porcentajes de reducción o reducción de renders.
-- No se ejecutó un seeder ni se cambió el volumen de la base de datos: este encargo limitado a frontend no altera consultas ni justifica inventar mediciones de endpoints o filas.
-- Estimación cualitativa: el código del formulario de postulación deja de ser necesario en la carga inicial de `/vacantes` y el formulario de edición deja de ser necesario en la vista de lectura del detalle. En esas rutas se suma únicamente un pequeño wrapper para resolver la carga condicional. El tiempo de primera apertura del formulario puede aumentar por la solicitud del chunk.
-- Para cuantificar el impacto, comparar en build de producción (con el mismo commit/datos) el chunk inicial y los chunks dinámicos, registrar red fría de `/vacantes` antes y después, y comprobar que el chunk del formulario solo se solicita al abrir `#apply-modal`. Para `CandidateDetail`, perfilar renderizados con una lista representativa, cambiar búsqueda/filtros y confirmar que `filter` no se vuelve a ejecutar en renders sin cambios de listado ni criterios.
-- Validación ejecutada en este cambio: `npm test` pasa (8/8); `npm run typecheck` y `git diff --check` pasan. Tras instalar dependencias faltantes e iniciar el servidor Next.js, `npm run check:routes` pasó: `/`, `/formulario` y `/vacantes` respondieron HTTP 200. El servidor de desarrollo se detuvo después de la comprobación.
+El conteo considera los 25 métodos/rutas registrados por los routers montados en `services/main.py` (incluida `/`).
 
-## Frescura y riesgos
+Frecuencia esperada significa frecuencia relativa probable según el uso visible en el backoffice, no frecuencia medida. “Coste” estima trabajo de acceso/serialización a partir del código; no supone latencias medidas.
 
-No se cachean resultados del API en esta entrega, así que no se introduce riesgo de datos obsoletos ni se requiere TTL/invalidez. Los formularios conservan sus validaciones y operaciones actuales; la nueva espera está limitada a la primera apertura/entrada en modo edición. La memoización es solo de cálculo derivado y se invalida al cambiar cualquiera de sus entradas.
+| Método y endpoint | Lectura/escritura y datos | Coste cualitativo | Frecuencia probable / cambios esperados | Decisión |
+| --- | --- | --- | --- | --- |
+| `GET /` | Estado estático | Muy bajo | Ocasional; casi nunca cambia | No cachear: no hay trabajo significativo. |
+| `POST /users` | Crea usuario y perfil | Escritura | Poco frecuente; cambia con cada alta | No cachear. |
+| `GET /users` | Lista de usuarios; requiere sesión | TinyDB lee toda la tabla y se proyecta a campos públicos | Baja/media; cambios con altas, ediciones y bajas | No cachear: datos personales, respuesta protegida y lista cambiante. |
+| `GET /users/{user_id}` | Usuario público individual; autenticado y propietario/admin | TinyDB por id | Baja; cambia con la cuenta | No cachear: datos personales/permisos. |
+| `PUT /users/{user_id}` | Actualiza email, estado, rol o contraseña | Escritura y validaciones | Baja; mutación | No cachear. |
+| `DELETE /users/{user_id}` | Elimina usuario y perfil | Escritura | Baja; mutación | No cachear. |
+| `GET /profiles/me` | Perfil personal autenticado | TinyDB por usuario | Ocasional; cambia con el perfil | No cachear: dato personal y específico de sesión. |
+| `PUT /profiles/me` | Actualiza perfil personal | Escritura | Ocasional; mutación | No cachear. |
+| `POST /auth/login` | Valida contraseña con bcrypt y emite JWT | Búsqueda más hash intencionalmente costoso | Recurrente pero no puede compartirse; cambios de credenciales | No cachear: secretos/tokens y validación de seguridad. |
+| `GET /auth/me` | Usuario y perfil de la sesión | TinyDB por usuario y perfil | Frecuente en navegación/proxy; datos pueden cambiar | No cachear: depende del token y contiene datos personales. |
+| `POST /auth/forgot-password` | Emite token y envía correo | Búsqueda, escrituras y proveedor de correo | Baja; operación con efectos secundarios | No cachear. |
+| `POST /auth/reset-password` | Consume token de un solo uso y cambia contraseña | Búsqueda/escritura | Muy baja; mutación de seguridad | No cachear. |
+| `POST /auth/change-password` | Comprueba y cambia contraseña | bcrypt y escrituras | Muy baja; mutación de seguridad | No cachear. |
+| `POST /suppliers` | Añade proveedor TinyDB | Escritura | Baja; cambia el directorio | No cachear; invalida el listado. |
+| `GET /suppliers` | Lista o filtra proveedores por país/categoría; TinyDB `.all()`, filtrado y serialización | Medio y creciente con el tamaño de la tabla | Probablemente frecuente: la página carga al entrar y al cambiar filtros; cambios por CRUD | Cacheado 60 s por combinación normalizada de filtros; invalidación en escrituras. |
+| `GET /suppliers/by-category` | Alias de compatibilidad para filtro de categoría | Medio; mismo trabajo que el anterior | Igual que listado filtrado | Comparte clave/valor con `/suppliers?category=...`. |
+| `PATCH /suppliers/{supplier_id}/status` | Cambia estado | Escritura | Baja/media; mutación | No cachear; invalida variantes del listado. |
+| `PATCH /suppliers/{supplier_id}/rate` | Cambia tarifa | Escritura | Baja/media; mutación | No cachear; invalida variantes del listado. |
+| `DELETE /suppliers/{supplier_id}` | Elimina proveedor | Escritura | Baja; mutación | No cachear; invalida variantes del listado. |
+| `GET /inventory/products` | Lista activos con stock calculado mediante dos agregaciones SQL de entradas/salidas | Medio/alto relativo: agregaciones globales, joins, serialización | Recurrente: la página carga al entrar, filtrar oficina y al actualizar manualmente; stock cambia con operaciones | Cacheado 5 s por oficina (incluida vista sin filtro); invalida en alta de activo y órdenes entrantes/salientes. |
+| `POST /inventory/products` | Crea activo | Escritura SQL | Baja; mutación | No cachear; invalida lista de stock. |
+| `GET /inventory/products/{id}` | Stock calculado de un activo | Medio: mismas agregaciones con filtro por activo | Probablemente baja; cambia con órdenes | No cachear: caché inicial limitada a dos rutas. |
+| `POST /inventory/orders/inbound` | Registra entrada, incrementa stock | Escritura SQL con bloqueo de fila | Baja/media; cada orden cambia stock | No cachear; invalida lista de stock tras commit. |
+| `POST /inventory/orders/outbound` | Valida disponibilidad y registra salida | Consultas de stock más escritura SQL con bloqueo | Baja/media; cada orden cambia stock | No cachear; invalida lista de stock tras commit. |
+| `GET /inventory/orders` | Une órdenes entrantes/salientes con activos y stock; ordena resultados | Medio/alto, respuesta crece con historial | Menos frecuente que stock; el historial crece y las órdenes son recientes | No cachear: alta rotación, payload creciente y frescura operacional. |
+
+### Política y mecanismos implementados
+
+- `services/cache.py` contiene caché TTL local al proceso y thread-safe, con copias profundas al almacenar/devolver para evitar que se mute la entrada retenida. Los errores del loader no se almacenan. Expiración con reloj monotónico.
+- La clave de proveedores normaliza país/categoría y es compartida por el alias `/by-category`. TTL de 60 segundos: el directorio es relativamente estable frente al stock y existe invalidación inmediata después de alta, cambio de estado/tarifa o borrado.
+- La clave de inventario distingue oficina e incluye la lista sin filtro. TTL de 5 segundos: el stock puede variar con órdenes y se prioriza frescura operacional. Crear activos y confirmar entradas/salidas invalida el namespace.
+- La invalidación usa generaciones por namespace para impedir que una carga iniciada antes de una escritura repueble con datos viejos después de la invalidación.
+- El TTL limita antigüedad si hay cambios que la aplicación no observa; las escrituras conocidas invalidan antes. Sigue existiendo un intervalo pequeño entre commit y ejecución de invalidación.
+
+### Alcance y coherencia de despliegue
+
+La caché es por proceso: no añade Redis ni dependencia adicional. Dockerfiles arrancan Uvicorn sin `--workers` y Compose declara una réplica del API, así que la topología declarada tiene un proceso con una caché. Escalar a workers/instancias elimina esa garantía: cada proceso tendría su copia e invalidación, y una lectura podría ver hasta el TTL de antigüedad. Para ese despliegue se debe migrar a invalidación compartida (p. ej. Redis) o aceptar/documentar la ventana.
+
+TinyDB persiste en archivo. Las mutaciones del backend invalidan localmente; una edición externa del archivo/proceso no notifica esta caché. `clear_cache()` en TinyDB ocurre al producirse un miss, pero no reemplaza invalidación de la caché TTL. El TTL de 60 s limita esa antigüedad.
+
+## Intercambios reconocidos
+
+- La reutilización evita repetir `.all()` + filtrado/serialización del directorio y agregaciones SQL de stock; el ahorro real depende de concurrencia, tamaño y patrón de uso no medidos.
+- Los TTL permiten lecturas repetidas más rápidas a costa de posible antigüedad (hasta 60 s proveedores, 5 s inventario en cambios no notificados). La invalidación conocida suele reducirla a la ventana entre commit e invalidación.
+- Cada combinación de clave mantiene valor propio y consume memoria si se crean muchas combinaciones; los filtros actuales tienen cardinalidad acotada. No hay límite LRU; conviene reevaluar si aumenta esa cardinalidad.
+- Dos misses simultáneos de la misma clave pueden duplicar trabajo de origen porque el lock no se mantiene durante I/O. Se prioriza no bloquear otras lecturas; no se implementa single-flight sin evidencia de concurrencia que lo justifique.
+- El cache de productos tiene TTL de cinco segundos aunque la UI permite refrescar manualmente; las escrituras propias invalidan inmediatamente después del commit.
+
+## Qué no se cacheó y por qué
+
+- Auth, `/auth/me`, perfiles y usuarios: dependen de identidad/permisos o contienen información personal/credenciales; no deben compartirse globalmente.
+- Login y operaciones de restablecimiento/cambio de contraseña: validan bcrypt, consumen tokens, envían correo o mutan estado; cachearlas sería incorrecto e inseguro.
+- Escrituras de proveedores e inventario: no son lecturas reutilizables. Invalidan los listados afectados.
+- `GET /inventory/orders`: historial creciente, datos operacionales y alta rotación; no se cachea por frescura y porque el coste de invalidación podría reducir el beneficio sin métricas.
+- `GET /inventory/products/{id}`: lógica SQL costosa similar, pero se limita el primer alcance a dos rutas para evitar ampliar invalidaciones sin evidencia de uso.
+- `/` y consultas por id triviales: coste cualitativo bajo; complejidad adicional sin beneficio establecido.
+
+## Evidencia y validación
+
+- No se midieron latencias, consultas/segundo, CPU, tamaño de tablas, memoria ni hit ratio. No se presentan porcentajes ni mejoras de tiempo como resultados observados.
+- La frecuencia se estima por los consumidores backoffice del repositorio: proveedores carga al entrar/cambiar filtros; inventario carga al abrir, cambiar oficina y actualizar; órdenes tienen página separada. Es un proxy del uso visible, no telemetría de usuarios.
+- `services/tests/test_cache.py` cubre expiración TTL, copia defensiva, invalidación por namespace y que errores no se almacenen; `test_suppliers_cache.py` verifica reutilización, invalidación tras alta y equivalencia del alias por categoría.
+- Validación backend: `python -m pytest -q -o addopts=''` desde `services/` pasó (66 tests). La opción desactiva el umbral global de cobertura de `routes.auth`, no aplicable a esta validación de caché; un intento inicial de tests focalizados sin desactivarlo reportó 34% de cobertura auth y falló el umbral 70%, aunque los fallos de invocación directa de tests se corrigieron. `python -m compileall` y `git diff --check` también pasaron.
+- Para cuantificar impacto, tomar baseline/comparación con datos representativos y carga idéntica: latencia p50/p95 y consultas SQL para `/inventory/products`, tiempo de lectura TinyDB para `/suppliers`, hit/miss/invalidaciones y edad de respuestas. Confirmar comportamiento con escrituras concurrentes antes de escalar procesos.
+
+## Validación frontend conservada
+
+En el cambio frontend, `npm test` pasó (8/8), `npm run typecheck` y `git diff --check` pasaron. Tras iniciar Next.js, `npm run check:routes` respondió HTTP 200 para `/`, `/formulario` y `/vacantes`. Next.js y `eslint-config-next` quedaron en 16.4.6; builds de ambas aplicaciones pasaron y auditorías de producción reportaron cero vulnerabilidades en ese momento. Esa evidencia corresponde al trabajo frontend anterior, no mide ni valida el rendimiento de caché backend.
