@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import VacancyApplicationForm from "@/components/vacancy-application-form";
+import LazyVacancyApplicationForm from "@/components/lazy-vacancy-application-form";
 
 export const metadata: Metadata = {
   "title": "Vacantes abiertas | Nexova Solutions",
@@ -1136,7 +1136,7 @@ export default function Page() {
         </div>
         <button type="button" popoverTarget="apply-modal" popoverTargetAction="hide" className="inline-flex rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-cyan-300 hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300">Cerrar</button>
       </div>
-      <VacancyApplicationForm />
+      <LazyVacancyApplicationForm />
     </div>
   </div>
   <footer className="border-t border-slate-800 bg-slate-950 py-10">

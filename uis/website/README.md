@@ -60,8 +60,11 @@ El primer comando comprueba los tipos; el segundo ejecuta ESLint.
 
 ## Versiones
 
-Como en el backoffice: Next 16.4.3, React y React DOM 19.3.0,
-Tailwind y su plugin PostCSS ^4, TypeScript ^5.
+Next.js y `eslint-config-next` 16.4.6 (actualizados desde 16.4.3), React y
+React DOM 19.3.0, Tailwind y su plugin PostCSS ^4, TypeScript ^5. El lockfile
+fija las dependencias instaladas; la auditoria de produccion tras la actualizacion
+reporto cero vulnerabilidades conocidas. Repite `npm audit --omit=dev` despues
+de futuras actualizaciones.
 
 ## Funcionalidades
 
@@ -117,6 +120,22 @@ salarial y habilidades.
 Muestra errores por campo, enfoca el primer error al enviar y restablece los
 datos tras una confirmacion local. Los botones permiten abrir y cerrar los
 detalles y el formulario sin navegar a otra pagina.
+
+#### Carga diferida del formulario
+
+El formulario largo de postulacion (`src/components/vacancy-application-form.tsx`)
+se importa con `next/dynamic` desde `src/components/lazy-vacancy-application-form.tsx`
+y solo se monta al abrir el popover `#apply-modal`. Asi, quien solo consulta las
+vacantes no descarga ni evalua el modulo de validacion/interaccion del formulario.
+Al abrirlo se anuncia un estado de carga accesible mientras se obtiene el chunk.
+La contrapartida es una posible espera breve en la primera apertura. Esta es una
+division de codigo, no una cache de datos; no requiere TTL ni afecta la frescura.
+
+La decision es cualitativa: no se guardaron mediciones comparables de tamano de
+chunks o red antes/despues. Para medirla, usa un build de produccion y la pestana
+Network con cache fria; el chunk debe solicitarse al abrir el popover, no al
+visitar `/vacantes`. El informe transversal esta en
+[`../../CACHING_REPORT.md`](../../CACHING_REPORT.md).
 
 ### Presentacion y accesibilidad
 
